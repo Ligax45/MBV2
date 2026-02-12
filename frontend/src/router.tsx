@@ -1,7 +1,7 @@
 import { createRouter } from '@tanstack/react-router';
 import { Route as rootRoute } from './routes/__root';
 import { Route as indexRoute } from './routes/index';
-import { Route as bibliothequeRoute } from './routes/bibliotheque';
+import { Route as bibliothequeRoute } from './routes/library';
 
 const routeTree = rootRoute.addChildren([indexRoute, bibliothequeRoute]);
 
