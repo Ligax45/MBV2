@@ -116,14 +116,17 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    border-color: var(--border);
+    outline-color: color-mix(in srgb, var(--ring) 50%, transparent);
   }
+
   body {
-    @apply bg-background text-foreground;
+    background-color: var(--background);
+    color: var(--foreground);
   }
+
   #root {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 2rem;
+    width: 100%;
+    min-height: 100vh;
   }
 }
