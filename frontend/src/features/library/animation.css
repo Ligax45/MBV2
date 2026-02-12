@@ -1,0 +1,28 @@
+@keyframes heart-press {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(0.75);
+  }
+  70% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes particle-burst {
+  0% {
+    transform: translate(-50%, -50%) translate(0, 0);
+    opacity: 1;
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) translate(var(--out-x), var(--out-y));
+    opacity: 0;
+  }
+}

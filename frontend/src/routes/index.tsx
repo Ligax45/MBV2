@@ -5,10 +5,10 @@ import { Route as rootRoute } from './__root';
 export const Route = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
-  component: AccueilPage,
+  component: HomePage,
 });
 
-function AccueilPage(): ReactElement {
+function HomePage(): ReactElement {
   return (
     <div>
       <h1 className="text-2xl font-semibold">Accueil</h1>
