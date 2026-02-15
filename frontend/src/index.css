@@ -120,13 +120,16 @@
     outline-color: color-mix(in srgb, var(--ring) 50%, transparent);
   }
 
+  html,
   body {
+    height: 100%;
+    overflow: hidden;
     background-color: var(--background);
     color: var(--foreground);
   }
 
   #root {
     width: 100%;
-    min-height: 100vh;
+    height: 100%;
   }
 }
