@@ -5,13 +5,7 @@ import { bouchonRecipes } from '@/features/library/bouchonLibrary';
 import { RecipeCard } from '@/features/library/RecipeCard';
 import { RecipeSearchBar, useRecipeSearch } from '@/features/library/RecipeSearchBar';
 
-export const Route = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/bibliotheque',
-  component: LibraryPage,
-});
-
-function LibraryPage(): ReactElement {
+const LibraryPage = (): ReactElement => {
   const { query, setQuery, filteredRecipes } = useRecipeSearch(bouchonRecipes);
 
   return (
@@ -24,4 +18,10 @@ function LibraryPage(): ReactElement {
       </div>
     </div>
   );
-}
+};
+
+export const Route = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/bibliotheque',
+  component: LibraryPage,
+});

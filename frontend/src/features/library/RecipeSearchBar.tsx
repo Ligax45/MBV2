@@ -4,14 +4,13 @@ import { Input } from '@/components/ui/input';
 import type { Recipe } from './bouchonLibrary';
 
 /** Normalise une chaîne pour la recherche : minuscules + sans accents */
-function normalizeForSearch(str: string): string {
-  return str
+const normalizeForSearch = (str: string): string =>
+  str
     .toLowerCase()
     .normalize('NFD')
     .replaceAll(/[\u0300-\u036f]/g, '');
-}
 
-export function useRecipeSearch(recipes: Recipe[]) {
+export const useRecipeSearch = (recipes: Recipe[]) => {
   const [query, setQuery] = useState('');
 
   const filteredRecipes = useMemo(() => {
@@ -21,7 +20,7 @@ export function useRecipeSearch(recipes: Recipe[]) {
   }, [recipes, query]);
 
   return { query, setQuery, filteredRecipes };
-}
+};
 
 type RecipeSearchBarProps = {
   value: string;
@@ -29,13 +28,12 @@ type RecipeSearchBarProps = {
   placeholder?: string;
 };
 
-export function RecipeSearchBar({
+export const RecipeSearchBar = ({
   value,
   onChange,
   placeholder = 'Rechercher une recette par titre…',
-}: Readonly<RecipeSearchBarProps>) {
-  return (
-    <div className="relative max-w-md">
+}: Readonly<RecipeSearchBarProps>) => (
+  <div className="relative max-w-md">
       <Search
         className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
         aria-hidden
@@ -59,6 +57,5 @@ export function RecipeSearchBar({
           <X className="size-4" />
         </button>
       )}
-    </div>
-  );
-}
+  </div>
+);

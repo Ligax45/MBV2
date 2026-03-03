@@ -8,9 +8,8 @@ type RecipeTypeFieldProps = {
   className?: string;
 };
 
-export function RecipeTypeField({ value, onChange, className }: Readonly<RecipeTypeFieldProps>) {
-  return (
-    <div className={cn('space-y-2', className)}>
+export const RecipeTypeField = ({ value, onChange, className }: Readonly<RecipeTypeFieldProps>) => (
+  <div className={cn('space-y-2', className)}>
       <label htmlFor="recipe-type" className="text-sm font-medium">
         Type de recette
       </label>
@@ -27,6 +26,5 @@ export function RecipeTypeField({ value, onChange, className }: Readonly<RecipeT
           </option>
         ))}
       </select>
-    </div>
-  );
-}
+  </div>
+);

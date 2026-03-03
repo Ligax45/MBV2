@@ -21,36 +21,35 @@ const difficultyStyles: Record<Recipe['difficulty'], { label: string; className:
   },
 };
 
-function formatDate(isoDate: string): string {
-  return new Date(isoDate).toLocaleDateString('fr-FR', {
+const formatDate = (isoDate: string): string =>
+  new Date(isoDate).toLocaleDateString('fr-FR', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
   });
-}
 
-function formatPreparationTime(minutes: number): string {
+const formatPreparationTime = (minutes: number): string => {
   if (minutes < 60) return `${minutes} min`;
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
   return m > 0 ? `${h} h ${m} min` : `${h} h`;
-}
+};
 
 type RecipeCardProps = {
   recipe: Recipe;
   className?: string;
 };
 
-export function RecipeCard({ recipe, className }: Readonly<RecipeCardProps>) {
+export const RecipeCard = ({ recipe, className }: Readonly<RecipeCardProps>) => {
   const [isLiked, setIsLiked] = useState(false);
   const { burstKey, isPressing, triggerLikeAnimation } = useLikeAnimation();
   const difficulty = difficultyStyles[recipe.difficulty];
 
-  function handleLikeClick() {
+  const handleLikeClick = () => {
     const newLiked = !isLiked;
     setIsLiked(newLiked);
     if (newLiked) triggerLikeAnimation();
-  }
+  };
 
   return (
     <Card
@@ -102,4 +101,4 @@ export function RecipeCard({ recipe, className }: Readonly<RecipeCardProps>) {
       <CardFooter className="px-5 pb-4 pt-2 text-sm text-muted-foreground">Par {recipe.creatorName}</CardFooter>
     </Card>
   );
-}
+};

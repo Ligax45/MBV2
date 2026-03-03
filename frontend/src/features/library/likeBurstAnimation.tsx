@@ -19,7 +19,7 @@ const RAY_POINTS = RAY_ANGLES.flatMap((angle, rayIndex) =>
 
 const HEART_PRESS_DURATION = 400;
 
-export function useLikeAnimation() {
+export const useLikeAnimation = () => {
   const [burstKey, setBurstKey] = useState(0);
   const [isPressing, setIsPressing] = useState(false);
 
@@ -30,13 +30,13 @@ export function useLikeAnimation() {
   }, []);
 
   return { burstKey, isPressing, triggerLikeAnimation };
-}
+};
 
 type LikeBurstEffectProps = {
   burstKey: number;
 };
 
-export function LikeBurstEffect({ burstKey }: Readonly<LikeBurstEffectProps>) {
+export const LikeBurstEffect = ({ burstKey }: Readonly<LikeBurstEffectProps>) => {
   if (burstKey === 0) return null;
 
   return (
@@ -70,4 +70,4 @@ export function LikeBurstEffect({ burstKey }: Readonly<LikeBurstEffectProps>) {
       })}
     </div>
   );
-}
+};
