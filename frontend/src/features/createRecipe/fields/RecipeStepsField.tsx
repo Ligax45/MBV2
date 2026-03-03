@@ -9,24 +9,23 @@ type RecipeStepsFieldProps = {
   className?: string;
 };
 
-function generateId() {
-  return crypto.randomUUID?.() ?? `step-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-}
+const generateId = () =>
+  crypto.randomUUID?.() ?? `step-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
-export function RecipeStepsField({ steps, onChange, className }: Readonly<RecipeStepsFieldProps>) {
-  function addStep() {
+export const RecipeStepsField = ({ steps, onChange, className }: Readonly<RecipeStepsFieldProps>) => {
+  const addStep = () => {
     const newOrder = steps.length > 0 ? Math.max(...steps.map((s) => s.order)) + 1 : 1;
     onChange([...steps, { id: generateId(), content: '', order: newOrder }]);
-  }
+  };
 
-  function removeStep(id: string) {
+  const removeStep = (id: string) => {
     const remaining = steps.filter((s) => s.id !== id);
     onChange(remaining.map((s, i) => ({ ...s, order: i + 1 })));
-  }
+  };
 
-  function updateStep(id: string, content: string) {
+  const updateStep = (id: string, content: string) => {
     onChange(steps.map((s) => (s.id === id ? { ...s, content } : s)));
-  }
+  };
 
   return (
     <fieldset className={cn('space-y-2', className)}>
@@ -63,4 +62,4 @@ export function RecipeStepsField({ steps, onChange, className }: Readonly<Recipe
       </Button>
     </fieldset>
   );
-}
+};

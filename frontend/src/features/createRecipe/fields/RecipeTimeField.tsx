@@ -9,10 +9,10 @@ type RecipeTimeFieldProps = {
   className?: string;
 };
 
-export function RecipeTimeField({ value, onChange, className }: Readonly<RecipeTimeFieldProps>) {
-  function updateField(field: keyof RecipeTime, minutes: number) {
+export const RecipeTimeField = ({ value, onChange, className }: Readonly<RecipeTimeFieldProps>) => {
+  const updateField = (field: keyof RecipeTime, minutes: number) => {
     onChange({ ...value, [field]: Math.max(0, minutes) });
-  }
+  };
 
   return (
     <div className={cn('space-y-2', className)}>
@@ -63,4 +63,4 @@ export function RecipeTimeField({ value, onChange, className }: Readonly<RecipeT
       </div>
     </div>
   );
-}
+};

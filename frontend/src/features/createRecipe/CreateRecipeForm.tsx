@@ -36,23 +36,23 @@ const initialFormData: CreateRecipeFormData = {
   steps: [],
 };
 
-export function CreateRecipeForm() {
+export const CreateRecipeForm = () => {
   const [formData, setFormData] = useState<CreateRecipeFormData>(initialFormData);
   const [titleError, setTitleError] = useState<string | null>(null);
 
-  function updateField<K extends keyof CreateRecipeFormData>(
+  const updateField = <K extends keyof CreateRecipeFormData>(
     field: K,
     value: CreateRecipeFormData[K],
-  ) {
+  ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (field === 'title') setTitleError(null);
-  }
+  };
 
-  function handlePhotoChange(file: File | null, preview: string | null) {
+  const handlePhotoChange = (file: File | null, preview: string | null) => {
     setFormData((prev) => ({ ...prev, photo: file, photoPreview: preview }));
-  }
+  };
 
-  function handleSubmit(e: React.FormEvent) {
+  const handleSubmit = (e: { preventDefault(): void }) => {
     e.preventDefault();
     const title = formData.title.trim();
     if (!title) {
@@ -61,7 +61,7 @@ export function CreateRecipeForm() {
     }
     // TODO: soumission vers l'API
     console.log('Form submitted:', formData);
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -83,7 +83,10 @@ export function CreateRecipeForm() {
             onPhotoChange={handlePhotoChange}
           />
           <div className="grid gap-6 sm:grid-cols-2">
-            <RecipeServingsField value={formData.servings} />
+            <RecipeServingsField
+              value={formData.servings}
+              onChange={(v) => updateField('servings', v)}
+            />
             <RecipeTypeField
               value={formData.recipeType}
               onChange={(v) => updateField('recipeType', v)}
@@ -150,4 +153,4 @@ export function CreateRecipeForm() {
       </div>
     </form>
   );
-}
+};

@@ -8,9 +8,8 @@ type RecipeTitleFieldProps = {
   className?: string;
 };
 
-export function RecipeTitleField({ value, onChange, error, className }: Readonly<RecipeTitleFieldProps>) {
-  return (
-    <div className={cn('space-y-2', className)}>
+export const RecipeTitleField = ({ value, onChange, error, className }: Readonly<RecipeTitleFieldProps>) => (
+  <div className={cn('space-y-2', className)}>
       <label htmlFor="recipe-title" className="text-sm font-medium">
         Titre
       </label>
@@ -24,6 +23,5 @@ export function RecipeTitleField({ value, onChange, error, className }: Readonly
         aria-invalid={!!error}
       />
       {error && <p className="text-sm text-destructive">{error}</p>}
-    </div>
-  );
-}
+  </div>
+);

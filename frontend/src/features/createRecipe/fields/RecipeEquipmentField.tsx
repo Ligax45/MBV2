@@ -8,14 +8,14 @@ type RecipeEquipmentFieldProps = {
   className?: string;
 };
 
-export function RecipeEquipmentField({ value, onChange, className }: Readonly<RecipeEquipmentFieldProps>) {
-  function toggleEquipment(id: EquipmentId) {
+export const RecipeEquipmentField = ({ value, onChange, className }: Readonly<RecipeEquipmentFieldProps>) => {
+  const toggleEquipment = (id: EquipmentId) => {
     if (value.includes(id)) {
       onChange(value.filter((e) => e !== id));
     } else {
       onChange([...value, id]);
     }
-  }
+  };
 
   return (
     <fieldset className={cn('space-y-2', className)}>
@@ -43,4 +43,4 @@ export function RecipeEquipmentField({ value, onChange, className }: Readonly<Re
       </div>
     </fieldset>
   );
-}
+};

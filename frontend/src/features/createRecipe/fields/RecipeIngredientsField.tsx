@@ -12,22 +12,21 @@ type RecipeIngredientsFieldProps = {
 
 const defaultUnits = ['g', 'kg', 'cl', 'L', 'ml', 'pièce(s)', 'c. à soupe', 'c. à café', 'pincée(s)', ''] as const;
 
-function generateId() {
-  return crypto.randomUUID?.() ?? `ing-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-}
+const generateId = () =>
+  crypto.randomUUID?.() ?? `ing-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
-export function RecipeIngredientsField({ ingredients, onChange, className }: Readonly<RecipeIngredientsFieldProps>) {
-  function addIngredient() {
+export const RecipeIngredientsField = ({ ingredients, onChange, className }: Readonly<RecipeIngredientsFieldProps>) => {
+  const addIngredient = () => {
     onChange([...ingredients, { id: generateId(), quantity: '', unit: '', name: '' }]);
-  }
+  };
 
-  function removeIngredient(id: string) {
+  const removeIngredient = (id: string) => {
     onChange(ingredients.filter((i) => i.id !== id));
-  }
+  };
 
-  function updateIngredient(id: string, field: keyof RecipeIngredient, value: string) {
+  const updateIngredient = (id: string, field: keyof RecipeIngredient, value: string) => {
     onChange(ingredients.map((i) => (i.id === id ? { ...i, [field]: value } : i)));
-  }
+  };
 
   return (
     <fieldset className={cn('space-y-2', className)}>
@@ -80,4 +79,4 @@ export function RecipeIngredientsField({ ingredients, onChange, className }: Rea
       </Button>
     </fieldset>
   );
-}
+};

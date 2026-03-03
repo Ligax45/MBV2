@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/shared/components/ui/button';
 import { useTheme } from '@/contexts/ThemeContext';
 
-export function Topbar() {
+export const Topbar = () => {
   const { theme, toggleTheme } = useTheme();
 
   return (
@@ -47,4 +47,4 @@ export function Topbar() {
       </div>
     </header>
   );
-}
+};
