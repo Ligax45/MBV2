@@ -1,19 +1,15 @@
 import { useState } from 'react';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/shared/components/ui/button';
 import type { CreateRecipeFormData } from './types';
 import {
   RecipeTitleField,
+  RecipeDescriptionField,
   RecipePhotoField,
   RecipeServingsField,
   RecipeTypeField,
+  RecipeDifficultyField,
   RecipeEquipmentField,
   RecipeTimeField,
   RecipeIngredientsField,
@@ -22,10 +18,12 @@ import {
 
 const initialFormData: CreateRecipeFormData = {
   title: '',
+  description: '',
   photo: null,
   photoPreview: null,
   servings: 2,
   recipeType: '',
+  difficulty: '',
   equipment: [],
   time: {
     preparationMinutes: 0,
@@ -40,10 +38,7 @@ export const CreateRecipeForm = () => {
   const [formData, setFormData] = useState<CreateRecipeFormData>(initialFormData);
   const [titleError, setTitleError] = useState<string | null>(null);
 
-  const updateField = <K extends keyof CreateRecipeFormData>(
-    field: K,
-    value: CreateRecipeFormData[K],
-  ) => {
+  const updateField = <K extends keyof CreateRecipeFormData>(field: K, value: CreateRecipeFormData[K]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (field === 'title') setTitleError(null);
   };
@@ -68,9 +63,7 @@ export const CreateRecipeForm = () => {
       <Card>
         <CardHeader>
           <CardTitle>Informations générales</CardTitle>
-          <CardDescription>
-            Titre, photo et type de votre recette
-          </CardDescription>
+          <CardDescription>Titre, description, photo, type et difficulté de votre recette</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-6">
           <RecipeTitleField
@@ -78,19 +71,12 @@ export const CreateRecipeForm = () => {
             onChange={(v) => updateField('title', v)}
             error={titleError ?? undefined}
           />
-          <RecipePhotoField
-            photoPreview={formData.photoPreview}
-            onPhotoChange={handlePhotoChange}
-          />
-          <div className="grid gap-6 sm:grid-cols-2">
-            <RecipeServingsField
-              value={formData.servings}
-              onChange={(v) => updateField('servings', v)}
-            />
-            <RecipeTypeField
-              value={formData.recipeType}
-              onChange={(v) => updateField('recipeType', v)}
-            />
+          <RecipeDescriptionField value={formData.description} onChange={(v) => updateField('description', v)} />
+          <RecipePhotoField photoPreview={formData.photoPreview} onPhotoChange={handlePhotoChange} />
+          <div className="grid gap-6 sm:grid-cols-3">
+            <RecipeServingsField value={formData.servings} onChange={(v) => updateField('servings', v)} />
+            <RecipeTypeField value={formData.recipeType} onChange={(v) => updateField('recipeType', v)} />
+            <RecipeDifficultyField value={formData.difficulty} onChange={(v) => updateField('difficulty', v)} />
           </div>
         </CardContent>
       </Card>
@@ -98,50 +84,36 @@ export const CreateRecipeForm = () => {
       <Card>
         <CardHeader>
           <CardTitle>Équipement et temps</CardTitle>
-          <CardDescription>
-            Outils nécessaires et durée de préparation
-          </CardDescription>
+          <CardDescription>Outils nécessaires et durée de préparation</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-6">
-          <RecipeEquipmentField
-            value={formData.equipment}
-            onChange={(v) => updateField('equipment', v)}
-          />
+          <RecipeEquipmentField value={formData.equipment} onChange={(v) => updateField('equipment', v)} />
           <Separator />
-          <RecipeTimeField
-            value={formData.time}
-            onChange={(v) => updateField('time', v)}
-          />
+          <RecipeTimeField value={formData.time} onChange={(v) => updateField('time', v)} />
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Ingrédients</CardTitle>
-          <CardDescription>
-            Liste des ingrédients avec quantités et unités
-          </CardDescription>
+          <CardTitle>
+            Ingrédients <span className="font-normal text-muted-foreground">({formData.ingredients.length})</span>
+          </CardTitle>
+          <CardDescription>Liste des ingrédients avec quantités et unités</CardDescription>
         </CardHeader>
         <CardContent>
-          <RecipeIngredientsField
-            ingredients={formData.ingredients}
-            onChange={(v) => updateField('ingredients', v)}
-          />
+          <RecipeIngredientsField ingredients={formData.ingredients} onChange={(v) => updateField('ingredients', v)} />
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Étapes de réalisation</CardTitle>
-          <CardDescription>
-            Décrivez les étapes dans l'ordre
-          </CardDescription>
+          <CardTitle>
+            Étapes de réalisation <span className="font-normal text-muted-foreground">({formData.steps.length})</span>
+          </CardTitle>
+          <CardDescription>Décrivez les étapes dans l'ordre</CardDescription>
         </CardHeader>
         <CardContent>
-          <RecipeStepsField
-            steps={formData.steps}
-            onChange={(v) => updateField('steps', v)}
-          />
+          <RecipeStepsField steps={formData.steps} onChange={(v) => updateField('steps', v)} />
         </CardContent>
       </Card>
 
