@@ -38,13 +38,22 @@ export const RecipePhotoField = ({ photoPreview, onPhotoChange, className }: Rea
       </label>
       <div className="flex justify-center">
         {photoPreview ? (
-          <div className="relative aspect-video w-full max-w-xs overflow-hidden rounded-lg border-2 border-dashed border-muted-foreground/25 bg-muted/50">
+          <div className="group relative aspect-video w-full max-w-xs overflow-hidden rounded-lg border-2 border-dashed border-muted-foreground/25 bg-muted/50">
             <img src={photoPreview} alt="Aperçu" className="h-full w-full object-cover" />
             <Button
               type="button"
               variant="secondary"
               size="icon"
-              className="absolute right-2 top-2 size-9 rounded-full shadow-md"
+              className="
+                absolute top-2 right-2
+                size-9 rounded-full
+                bg-white text-foreground
+                shadow-sm
+                opacity-0 transition-opacity
+                group-hover:opacity-100
+                focus:opacity-100
+                hover:bg-destructive hover:text-destructive-foreground
+              "
               onClick={handleRemove}
               aria-label="Supprimer la photo"
             >

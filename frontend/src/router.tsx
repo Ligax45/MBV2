@@ -3,8 +3,14 @@ import { Route as rootRoute } from './routes/__root';
 import { Route as indexRoute } from './routes/index';
 import { Route as bibliothequeRoute } from './routes/library';
 import { Route as createRecipeRoute } from './routes/createRecipe';
+import { Route as recipeDetailsRoute } from './routes/recipeDetails';
 
-const routeTree = rootRoute.addChildren([indexRoute, bibliothequeRoute, createRecipeRoute]);
+const routeTree = rootRoute.addChildren([
+  indexRoute,
+  bibliothequeRoute,
+  createRecipeRoute,
+  recipeDetailsRoute,
+]);
 
 export const router = createRouter({
   routeTree,

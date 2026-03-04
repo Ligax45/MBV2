@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from '@tanstack/react-router';
 import { Card, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
 import { Heart, Timer } from 'lucide-react';
@@ -45,13 +46,16 @@ export const RecipeCard = ({ recipe, className }: Readonly<RecipeCardProps>) => 
   const { burstKey, isPressing, triggerLikeAnimation } = useLikeAnimation();
   const difficulty = difficultyStyles[recipe.difficulty];
 
-  const handleLikeClick = () => {
+  const handleLikeClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     const newLiked = !isLiked;
     setIsLiked(newLiked);
     if (newLiked) triggerLikeAnimation();
   };
 
   return (
+    <Link to="/recette/$recipeId" params={{ recipeId: recipe.id }} className="block cursor-pointer">
     <Card
       className={cn(
         'flex w-80 max-w-full shrink-0 flex-col gap-2 overflow-hidden p-0 transition-shadow hover:shadow-md',
@@ -69,7 +73,7 @@ export const RecipeCard = ({ recipe, className }: Readonly<RecipeCardProps>) => 
             size="icon"
             className="relative z-10 size-9 rounded-full bg-white/30 shadow-sm backdrop-blur-sm hover:bg-white/50 dark:bg-black/30 dark:hover:bg-black/50"
             aria-label={isLiked ? 'Retirer des favoris' : 'Ajouter aux favoris'}
-            onClick={handleLikeClick}
+            onClick={(e) => handleLikeClick(e)}
           >
             <span
               className={cn('inline-flex origin-center', isPressing && 'animate-[heart-press_0.4s_ease-out_forwards]')}
@@ -100,5 +104,6 @@ export const RecipeCard = ({ recipe, className }: Readonly<RecipeCardProps>) => 
       </CardHeader>
       <CardFooter className="px-5 pb-4 pt-2 text-sm text-muted-foreground">Par {recipe.creatorName}</CardFooter>
     </Card>
+    </Link>
   );
 };

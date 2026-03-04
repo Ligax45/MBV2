@@ -1,7 +1,9 @@
 export { RecipeTitleField } from './RecipeTitleField';
+export { RecipeDescriptionField } from './RecipeDescriptionField';
 export { RecipePhotoField } from './RecipePhotoField';
 export { RecipeServingsField } from './RecipeServingsField';
 export { RecipeTypeField } from './RecipeTypeField';
+export { RecipeDifficultyField } from './RecipeDifficultyField';
 export { RecipeEquipmentField } from './RecipeEquipmentField';
 export { RecipeTimeField } from './RecipeTimeField';
 export { RecipeIngredientsField } from './RecipeIngredientsField';
