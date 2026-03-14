@@ -11,7 +11,7 @@ const LibraryPage = (): ReactElement => {
   return (
     <div className="mx-auto max-w-[1400px] px-4">
       <RecipeSearchBar value={query} onChange={setQuery} />
-      <div className="mt-6 flex flex-wrap justify-start gap-6">
+      <div className="mt-6 flex flex-wrap justify-center gap-6">
         {filteredRecipes.map((recipe) => (
           <RecipeCard key={recipe.id} recipe={recipe} />
         ))}

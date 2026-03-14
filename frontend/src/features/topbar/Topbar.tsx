@@ -1,14 +1,30 @@
-import { Moon, Settings, Sun } from 'lucide-react';
+import { Menu, Moon, Settings, Sun } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/shared/components/ui/button';
 import { useTheme } from '@/contexts/ThemeContext';
 
-export const Topbar = () => {
+type TopbarProps = {
+  onMobileMenuToggle?: () => void;
+};
+
+export const Topbar = ({ onMobileMenuToggle }: TopbarProps) => {
   const { theme, toggleTheme } = useTheme();
 
   return (
     <header className="flex h-12 shrink-0 items-center border-b border-border">
-      <div className="flex min-w-52 w-52 max-w-52 shrink-0 items-center border-r border-border px-2">
+      <div className="flex shrink-0 items-center gap-2 border-r border-border px-2 md:min-w-52 md:w-52">
+        {onMobileMenuToggle && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+            aria-label="Ouvrir le menu"
+            onClick={onMobileMenuToggle}
+          >
+            <Menu className="size-5" />
+          </Button>
+        )}
         <span className="font-semibold text-foreground">MiamBook</span>
       </div>
       <div className="flex flex-1 items-center justify-end gap-2 px-2">

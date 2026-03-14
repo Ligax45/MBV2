@@ -1,7 +1,9 @@
 import type { ReactElement } from 'react';
-import { createRoute } from '@tanstack/react-router';
+import { createRoute, Link } from '@tanstack/react-router';
+import { ArrowLeft } from 'lucide-react';
 import { Route as rootRoute } from './__root';
 import { RecipeDetailsView, bouchonRecipeDetailsTarteAuxPommes } from '@/features/recipeDetails';
+import { Button } from '@/shared/components/ui/button';
 import type { RecipeDetails } from '@/features/recipeDetails';
 import { bouchonRecipes } from '@/features/library/bouchonLibrary';
 
@@ -47,6 +49,12 @@ function RecipeDetailsPage(): ReactElement {
   if (!recipe) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-12 text-center">
+        <Button variant="ghost" className="mb-6 gap-2" asChild>
+          <Link to="/bibliotheque">
+            <ArrowLeft className="size-4" />
+            Retour à la bibliothèque
+          </Link>
+        </Button>
         <h2 className="text-xl font-semibold text-muted-foreground">
           Recette introuvable
         </h2>
@@ -58,7 +66,13 @@ function RecipeDetailsPage(): ReactElement {
   }
 
   return (
-    <div className="px-4 py-8">
+    <div>
+      <Button variant="ghost" className="-ml-2 mb-4 gap-2" asChild>
+        <Link to="/bibliotheque">
+          <ArrowLeft className="size-4" />
+          Retour à la bibliothèque
+        </Link>
+      </Button>
       <RecipeDetailsView recipe={recipe} />
     </div>
   );
