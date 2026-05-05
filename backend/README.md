@@ -1,98 +1,124 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# MBV2 — Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API REST **NestJS**, organisée **par modules métier**, avec persistance **PostgreSQL** via **MikroORM**. Ce dépôt hébergera plusieurs domaines fonctionnels au fil du temps ; chaque brique importante vit sous `src/modules/<nom-du-module>/`.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Architecture
 
-## Description
+- **`src/core/`** — transversal au projet (ex. configuration base de données).
+- **`src/migrations/`** — évolutions du schéma PostgreSQL versionnées.
+- **`src/modules/*/`** — un dossier **par capacité métier** (Nest `Module`, contrôleurs, logique métier).
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Pour les modules riches, une **structure en couches** est encouragée : `domain/` → `application/` (use cases) → `infrastructure/` (ORM, implémentations) → `presentation/` (controllers). Le premier module suivant ce modèle est **Recipe** ; les prochains peuvent réutiliser le même schéma ou s’adapter au besoin.
 
-## Project setup
+## Prérequis
 
-```bash
-$ npm install
+- **Node.js** (LTS recommandé, ex. 20+)
+- **PostgreSQL** accessible localement ou à distance
+- Un fichier **`.env`** à la racine du dossier `backend/` (voir ci-dessous)
+
+## Variables d’environnement
+
+Crée un fichier `backend/.env` (il est ignoré par Git). Exemple :
+
+```env
+PORT=3333
+
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=user_name
+DB_PASSWORD=ton_mot_de_passe
+DB_NAME=nom__bdd
 ```
 
-## Compile and run the project
+Tu peux aussi utiliser **`MIKRO_ORM_PASSWORD`** à la place de `DB_PASSWORD` si besoin — la config fusionne les variables MikroORM au démarrage.
+
+> Les commandes de migration utilisent la même connexion que l’application.
+
+## Installation
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+cd backend
+npm install
 ```
 
-## Run tests
+## Migrations
+
+Applique le schéma (tables, colonnes, etc.) :
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm run migration:up
 ```
 
-## Deployment
+Autres commandes utiles :
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+| Commande | Rôle |
+|----------|------|
+| `npm run migration:list` | liste des migrations |
+| `npm run migration:pending` | migrations non appliquées |
+| `npm run migration:check` | vérifie si le schéma est à jour |
+| `npm run migration:create` | génère une migration à partir des différences |
+| `npm run migration:create:blank` | migration vide à remplir à la main |
+| `npm run migration:down` | annule la dernière migration |
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Configuration : `src/core/database/mikro-orm.config.ts`. Fichiers de migration TypeScript : `src/migrations/`.
+
+## Lancer l’API
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+# développement (rechargement à chaud)
+npm run start:dev
+
+# production (build puis node)
+npm run build
+npm run start:prod
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Par défaut : **`PORT`** depuis l’environnement, sinon **3333**.
 
-## Resources
+### Points de contrôle globaux
 
-Check out a few resources that may come in handy when working with NestJS:
+- `GET /` — entrée racine de l’API
+- `GET /health` — statut `{ "status": "ok" }`
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### Routes métier (au fil des modules)
 
-## Support
+Chaque module peut exposer son préfixe HTTP via ses controllers Nest. À ce jour :
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+| Module | Préfixe | Exemples |
+|--------|---------|----------|
+| **Recipe** | `/recipes` | `GET /recipes`, `GET /recipes/:id`, `POST /recipes` |
 
-## Stay in touch
+Les futurs modules ajouteront leurs propres préfixes (ex. `/users`, `/ingredients`) en les important dans `AppModule` comme les modules existants.
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Structure du projet (aperçu)
 
-## License
+```
+src/
+  core/
+    database/          # MikroORM (connexion, entités par glob)
+  migrations/          # Migrations PostgreSQL
+  modules/
+    recipe/            # Premier module métier (pattern en couches)
+      domain/
+      application/
+      infrastructure/
+      presentation/
+    # ... autres modules à l’avenir
+  app.module.ts        # Compose MikroORM + les modules métier
+  main.ts
+```
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+## Qualité & tests
+
+```bash
+npm run lint
+npm run format
+npm run test
+npm run test:e2e
+npm run test:cov
+```
+
+## Références
+
+- [NestJS](https://docs.nestjs.com/)
+- [MikroORM](https://mikro-orm.io/) — [NestJS integration](https://mikro-orm.io/docs/usage-with-nestjs)
