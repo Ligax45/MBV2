@@ -13,6 +13,13 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "migration:create": "cross-env MIKRO_ORM_ALLOW_GLOBAL_CLI=1 mikro-orm migration:create --config ./src/core/database/mikro-orm.config.ts",
+    "migration:create:blank": "cross-env MIKRO_ORM_ALLOW_GLOBAL_CLI=1 mikro-orm migration:create --blank --config ./src/core/database/mikro-orm.config.ts",
+    "migration:up": "cross-env MIKRO_ORM_ALLOW_GLOBAL_CLI=1 mikro-orm migration:up --config ./src/core/database/mikro-orm.config.ts",
+    "migration:down": "cross-env MIKRO_ORM_ALLOW_GLOBAL_CLI=1 mikro-orm migration:down --config ./src/core/database/mikro-orm.config.ts",
+    "migration:list": "cross-env MIKRO_ORM_ALLOW_GLOBAL_CLI=1 mikro-orm migration:list --config ./src/core/database/mikro-orm.config.ts",
+    "migration:pending": "cross-env MIKRO_ORM_ALLOW_GLOBAL_CLI=1 mikro-orm migration:pending --config ./src/core/database/mikro-orm.config.ts",
+    "migration:check": "cross-env MIKRO_ORM_ALLOW_GLOBAL_CLI=1 mikro-orm migration:check --config ./src/core/database/mikro-orm.config.ts",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
@@ -20,15 +27,24 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@mikro-orm/core": "^7.0.14",
+    "@mikro-orm/migrations": "7.0.14",
+    "@mikro-orm/mysql": "^7.0.14",
+    "@mikro-orm/nestjs": "^7.0.1",
+    "@mikro-orm/postgresql": "^7.0.14",
     "@nestjs/common": "^11.0.1",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
+    "dotenv": "^17.4.2",
+    "mysql2": "^3.22.3",
+    "pg": "^8.20.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.18.0",
+    "@mikro-orm/cli": "7.0.14",
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.1",
@@ -36,6 +52,7 @@
     "@types/jest": "^30.0.0",
     "@types/node": "^22.10.7",
     "@types/supertest": "^6.0.2",
+    "cross-env": "^10.1.0",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",
@@ -48,8 +65,16 @@
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.20.0"
+  },
+  "mikro-orm": {
+    "configPaths": [
+      "./src/core/database/mikro-orm.config.ts"
+    ],
+    "preferTs": true,
+    "tsConfigPath": "./tsconfig.json"
   },
   "jest": {
     "moduleFileExtensions": [
