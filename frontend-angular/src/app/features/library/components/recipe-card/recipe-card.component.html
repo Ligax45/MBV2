@@ -1,0 +1,49 @@
+<a class="recipe-card__link" [routerLink]="['/recette', recipe().id]">
+  <p-card styleClass="recipe-card">
+    <ng-template #header>
+      <div class="recipe-card__media">
+        <img
+          class="recipe-card__image"
+          [src]="recipe().imageUrl"
+          [alt]="recipe().title"
+        />
+        <p-button
+          type="button"
+          [icon]="isLiked() ? 'pi pi-heart-fill' : 'pi pi-heart'"
+          [rounded]="true"
+          severity="secondary"
+          styleClass="recipe-card__like"
+          [attr.aria-label]="
+            isLiked() ? 'Retirer des favoris' : 'Ajouter aux favoris'
+          "
+          (onClick)="toggleLike($event)"
+        />
+      </div>
+    </ng-template>
+
+    <h3 class="recipe-card__title">{{ recipe().title }}</h3>
+    <p class="recipe-card__description">{{ recipe().description }}</p>
+
+    <div class="recipe-card__meta">
+      <span class="recipe-card__time">
+        <i class="pi pi-clock" aria-hidden="true"></i>
+        {{ formatTime(recipe().totalTimeMinutes) }}
+      </span>
+      <p-tag
+        [value]="difficultyLabel(recipe().difficulty)"
+        [severity]="difficultySeverity(recipe().difficulty)"
+      />
+    </div>
+
+    <p class="recipe-card__date">
+      Publié le
+      <time [attr.datetime]="recipe().createdAt">{{
+        formatDate(recipe().createdAt)
+      }}</time>
+    </p>
+
+    <ng-template #footer>
+      <span class="recipe-card__author">Par {{ recipe().creatorName }}</span>
+    </ng-template>
+  </p-card>
+</a>

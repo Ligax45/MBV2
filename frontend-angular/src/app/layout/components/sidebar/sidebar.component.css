@@ -1,0 +1,16 @@
+.sidebar {
+  display: none;
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  max-width: var(--sidebar-width);
+  flex-shrink: 0;
+  flex-direction: column;
+  border-right: 1px solid var(--border);
+  padding: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .sidebar {
+    display: flex;
+  }
+}

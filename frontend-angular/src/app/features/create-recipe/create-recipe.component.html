@@ -1,0 +1,356 @@
+<p-toast />
+
+<div class="create-recipe-page">
+  <h1 class="create-recipe-page__title">{{ pageTitle() }}</h1>
+
+  @if (pageBusy()) {
+    <div class="create-recipe-page__loading" role="status">
+      <p-progressSpinner ariaLabel="Chargement du formulaire" />
+    </div>
+  }
+
+  <form
+    class="create-recipe-form"
+    [class.create-recipe-form--hidden]="pageBusy()"
+    (submit)="onSubmit($event)"
+  >
+    <!-- Informations générales -->
+    <p-card>
+      <ng-template #title>Informations générales</ng-template>
+      <ng-template #subtitle>
+        Titre, description, photo, type et difficulté de votre recette
+      </ng-template>
+
+      <div class="create-recipe-form__section">
+        <div class="field">
+          <label for="recipe-title" class="field__label">Titre</label>
+          <input
+            pInputText
+            id="recipe-title"
+            class="field__control w-full"
+            type="text"
+            placeholder="Ex : Tarte aux pommes"
+            [ngModel]="form().title"
+            (ngModelChange)="updateTitle($event)"
+            [ngModelOptions]="{ standalone: true }"
+            [class.ng-invalid]="titleError()"
+            aria-describedby="recipe-title-error"
+          />
+          @if (titleError()) {
+            <small id="recipe-title-error" class="field__error">{{
+              titleError()
+            }}</small>
+          }
+        </div>
+
+        <div class="field">
+          <label for="recipe-description" class="field__label">Description</label>
+          <textarea
+            pTextarea
+            id="recipe-description"
+            class="field__control w-full"
+            rows="4"
+            placeholder="Décrivez brièvement votre recette..."
+            [ngModel]="form().description"
+            (ngModelChange)="updateDescription($event)"
+            [ngModelOptions]="{ standalone: true }"
+          ></textarea>
+        </div>
+
+        <div class="field">
+          <span class="field__label">Photo</span>
+          <div class="photo-field">
+            @if (form().photoPreview) {
+              <div class="photo-field__preview">
+                <img
+                  [src]="form().photoPreview"
+                  alt="Aperçu de la recette"
+                  class="photo-field__image"
+                />
+                <p-button
+                  type="button"
+                  icon="pi pi-trash"
+                  severity="danger"
+                  [rounded]="true"
+                  styleClass="photo-field__remove"
+                  ariaLabel="Supprimer la photo"
+                  (onClick)="clearPhoto()"
+                />
+              </div>
+            } @else {
+              <label class="photo-field__upload">
+                <input
+                  type="file"
+                  accept="image/*"
+                  class="photo-field__input"
+                  (change)="onPhotoSelected($event)"
+                />
+                <i class="pi pi-camera photo-field__icon" aria-hidden="true"></i>
+                <span>Cliquez pour ajouter une photo</span>
+              </label>
+            }
+          </div>
+        </div>
+
+        <div class="create-recipe-form__row">
+          <div class="field">
+            <label for="servings" class="field__label">Nombre de personnes</label>
+            <div class="servings-field">
+              <i class="pi pi-users" aria-hidden="true"></i>
+              <p-inputnumber
+                inputId="servings"
+                [ngModel]="form().servings"
+                (ngModelChange)="updateServings($event)"
+                [ngModelOptions]="{ standalone: true }"
+                [min]="1"
+                [max]="999"
+                [showButtons]="false"
+                inputStyleClass="servings-field__input"
+              />
+              <span class="servings-field__suffix">personnes</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="recipe-type" class="field__label">Type de recette</label>
+            <p-select
+              inputId="recipe-type"
+              [options]="recipeTypeOptions()"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Sélectionnez un type"
+              [loading]="typesLoading()"
+              [disabled]="typesLoading()"
+              [ngModel]="form().recipeType || null"
+              (ngModelChange)="updateRecipeType($event)"
+              [ngModelOptions]="{ standalone: true }"
+              styleClass="w-full"
+            />
+          </div>
+
+          <div class="field">
+            <label for="recipe-difficulty" class="field__label">Difficulté</label>
+            <p-select
+              inputId="recipe-difficulty"
+              [options]="difficultyOptions"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Sélectionnez une difficulté"
+              [ngModel]="form().difficulty || null"
+              (ngModelChange)="updateDifficulty($event)"
+              [ngModelOptions]="{ standalone: true }"
+              styleClass="w-full"
+            />
+          </div>
+        </div>
+      </div>
+    </p-card>
+
+    <!-- Équipement et temps -->
+    <p-card>
+      <ng-template #title>Équipement et temps</ng-template>
+      <ng-template #subtitle>
+        Outils nécessaires et durée de préparation
+      </ng-template>
+
+      <div class="create-recipe-form__section">
+        <fieldset class="equipment-field">
+          <legend class="field__label">Équipement</legend>
+          <div class="equipment-field__chips">
+            @for (equip of equipmentOptions; track equip.id) {
+              <button
+                type="button"
+                class="equipment-chip"
+                [class.equipment-chip--selected]="isEquipmentSelected(equip.id)"
+                (click)="toggleEquipment(equip.id)"
+              >
+                {{ equip.label }}
+              </button>
+            }
+          </div>
+        </fieldset>
+
+        <p-divider />
+
+        <div class="field">
+          <span class="field__label field__label--icon">
+            <i class="pi pi-clock" aria-hidden="true"></i>
+            Temps de réalisation
+          </span>
+          <div class="create-recipe-form__row create-recipe-form__row--time">
+            <div class="field field--compact">
+              <label for="time-prep" class="field__hint">Préparation (min)</label>
+              <p-inputnumber
+                inputId="time-prep"
+                [ngModel]="form().time.preparationMinutes"
+                (ngModelChange)="updateTime('preparationMinutes', $event)"
+                [ngModelOptions]="{ standalone: true }"
+                [min]="0"
+                placeholder="0"
+                styleClass="w-full"
+              />
+            </div>
+            <div class="field field--compact">
+              <label for="time-cook" class="field__hint">Cuisson (min)</label>
+              <p-inputnumber
+                inputId="time-cook"
+                [ngModel]="form().time.cookingMinutes"
+                (ngModelChange)="updateTime('cookingMinutes', $event)"
+                [ngModelOptions]="{ standalone: true }"
+                [min]="0"
+                placeholder="0"
+                styleClass="w-full"
+              />
+            </div>
+            <div class="field field--compact">
+              <label for="time-rest" class="field__hint">Repos (min)</label>
+              <p-inputnumber
+                inputId="time-rest"
+                [ngModel]="form().time.restMinutes"
+                (ngModelChange)="updateTime('restMinutes', $event)"
+                [ngModelOptions]="{ standalone: true }"
+                [min]="0"
+                placeholder="0"
+                styleClass="w-full"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </p-card>
+
+    <!-- Ingrédients -->
+    <p-card>
+      <ng-template #title>
+        Ingrédients
+        <span class="create-recipe-form__count">({{ form().ingredients.length }})</span>
+      </ng-template>
+      <ng-template #subtitle>
+        Liste des ingrédients avec quantités et unités
+      </ng-template>
+
+      <div class="create-recipe-form__section">
+        <ul class="dynamic-list">
+          @for (ing of form().ingredients; track ing.id; let i = $index) {
+            <li class="dynamic-list__item dynamic-list__item--ingredient">
+              <span class="dynamic-list__index">{{ i + 1 }}.</span>
+              <input
+                pInputText
+                class="dynamic-list__qty"
+                placeholder="Quantité"
+                [ngModel]="ing.quantity"
+                (ngModelChange)="updateIngredient(ing.id, 'quantity', $event)"
+                [ngModelOptions]="{ standalone: true }"
+                [attr.aria-label]="'Quantité ingrédient ' + (i + 1)"
+              />
+              <p-select
+                [options]="ingredientUnitSelectOptions"
+                optionLabel="label"
+                optionValue="value"
+                [ngModel]="ing.unit"
+                (ngModelChange)="updateIngredient(ing.id, 'unit', $event)"
+                [ngModelOptions]="{ standalone: true }"
+                styleClass="dynamic-list__unit"
+                [attr.aria-label]="'Unité ingrédient ' + (i + 1)"
+              />
+              <input
+                pInputText
+                class="dynamic-list__name"
+                placeholder="Nom de l'ingrédient"
+                [ngModel]="ing.name"
+                (ngModelChange)="updateIngredient(ing.id, 'name', $event)"
+                [ngModelOptions]="{ standalone: true }"
+                [attr.aria-label]="'Nom ingrédient ' + (i + 1)"
+              />
+              <p-button
+                type="button"
+                icon="pi pi-trash"
+                severity="danger"
+                [text]="true"
+                [rounded]="true"
+                [attr.aria-label]="'Supprimer ingrédient ' + (i + 1)"
+                (onClick)="removeIngredient(ing.id)"
+              />
+            </li>
+          }
+        </ul>
+        <p-button
+          type="button"
+          label="Ajouter un ingrédient"
+          icon="pi pi-plus"
+          [outlined]="true"
+          size="small"
+          (onClick)="addIngredient()"
+        />
+      </div>
+    </p-card>
+
+    <!-- Étapes -->
+    <p-card>
+      <ng-template #title>
+        Étapes de réalisation
+        <span class="create-recipe-form__count">({{ form().steps.length }})</span>
+      </ng-template>
+      <ng-template #subtitle>Décrivez les étapes dans l'ordre</ng-template>
+
+      <div class="create-recipe-form__section">
+        <ol class="dynamic-list dynamic-list--steps">
+          @for (step of form().steps; track step.id; let i = $index) {
+            <li class="dynamic-list__item dynamic-list__item--step">
+              <span class="dynamic-list__step-badge">{{ i + 1 }}</span>
+              <textarea
+                pTextarea
+                class="dynamic-list__step-content"
+                [placeholder]="'Étape ' + (i + 1) + '...'"
+                rows="3"
+                [ngModel]="step.content"
+                (ngModelChange)="updateStep(step.id, $event)"
+                [ngModelOptions]="{ standalone: true }"
+                [attr.aria-label]="'Étape ' + (i + 1)"
+              ></textarea>
+              <p-button
+                type="button"
+                icon="pi pi-trash"
+                severity="danger"
+                [text]="true"
+                [rounded]="true"
+                [attr.aria-label]="'Supprimer étape ' + (i + 1)"
+                (onClick)="removeStep(step.id)"
+              />
+            </li>
+          }
+        </ol>
+        <p-button
+          type="button"
+          label="Ajouter une étape"
+          icon="pi pi-plus"
+          [outlined]="true"
+          size="small"
+          (onClick)="addStep()"
+        />
+      </div>
+    </p-card>
+
+    @if (formError()) {
+      <p class="create-recipe-form__error" role="alert">{{ formError() }}</p>
+    }
+
+    <div class="create-recipe-form__actions">
+      <p-button
+        type="button"
+        label="Annuler"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="submitting()"
+        (onClick)="onCancel()"
+      />
+      <p-button
+        type="submit"
+        [label]="submitLabel()"
+        icon="pi pi-check"
+        [loading]="submitting()"
+        [disabled]="submitting() || pageBusy()"
+      />
+    </div>
+  </form>
+</div>

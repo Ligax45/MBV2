@@ -1,96 +1,106 @@
 # MiamBookV2
 
-MiamBookV2 est une **bibliothèque de recettes de cuisine** moderne, qui permet aux utilisateurs de créer, organiser et suivre leurs propres recettes. Chaque recette peut contenir **des ingrédients détaillés** et des **étapes de préparation personnalisées**.
+MiamBookV2 est une **bibliothèque de recettes de cuisine** moderne : créer, organiser et suivre ses recettes, avec **ingrédients détaillés** et **étapes de préparation**.
 
 ---
 
-## 🏗️ Stack technique
+## Stack technique
 
-- **Frontend** : React + TypeScript + Vite + shadcn (UI moderne et composants réutilisables)
-- **Backend** : NestJS (API RESTful pour gérer les recettes, ingrédients et étapes)
-- **Gestion des dépendances** : npm
-- **Architecture** : Front et Back séparés, mono-repo
+| Couche | Technologies |
+|--------|----------------|
+| **Frontend** | Angular 21, TypeScript, PrimeNG, PrimeIcons |
+| **Backend** | NestJS, API REST |
+| **Base de données** | PostgreSQL sur Supabase (MikroORM) |
+| **Gestion des paquets** | npm |
+| **Architecture** | Mono-repo — frontend et backend séparés |
 
 ---
 
-## 📁 Structure du projet
+## Structure du projet
 
+```
 MiamBookV2/
-├── frontend/ ← Application React
-│ ├── package.json
-│ ├── tsconfig.json
-│ ├── vite.config.ts
-│ ├── src/
-│ └── node_modules/
-├── backend/ ← API NestJS
-│ ├── package.json
-│ ├── tsconfig.json
-│ ├── src/
-│ └── node_modules/
-├── .gitignore
+├── frontend-angular/     # Application Angular (UI)
+├── backend/              # API NestJS + migrations PostgreSQL
+├── LICENSE
 └── README.md
-
----
-
-## ⚡ Fonctionnalités
-
-- Créer, modifier et supprimer des recettes
-- Ajouter des ingrédients avec quantité et unité
-- Définir des étapes de préparation pour chaque recette
-- Interface réactive et moderne avec **shadcn UI**
-- API backend sécurisée et évolutive avec **NestJS**
-
-## 🧰 Technologies utilisées
-
-- **React** pour l’interface utilisateur
-- **TypeScript** pour un code typé et sécurisé
-- **shadcn UI** pour des composants modernes
-- **Vite** pour un dev server rapide et une compilation optimisée
-- **NestJS** pour l’API backend modulaire et testable
-
----
-
-## 📈 Roadmap
-
-- Authentification des utilisateurs
-- Gestion des catégories de recettes
-- Possibilité d’exporter des recettes en PDF
-- Fonctionnalité de partage et commentaires
-
----
-
-## 🚀 Installation & lancement
-
-### Prérequis
-
-- Node.js >= 22.x
-- npm >= 9.x
-
----
-
-### Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
 ```
 
-Le front sera disponible sur : http://localhost:5173
+Documentation détaillée :
 
-### Backend
+- [Frontend Angular](frontend-angular/README.md)
+- [Backend NestJS](backend/README.md)
+
+---
+
+## Fonctionnalités
+
+- Créer, consulter et gérer des recettes
+- Ingrédients avec quantité et unité
+- Étapes de préparation par recette
+- Bibliothèque avec recherche
+- Détail recette (ingrédients, étapes, équipement)
+- Thème clair / sombre
+- API modulaire et évolutive (NestJS)
+
+---
+
+## Prérequis
+
+- **Node.js** 20+ (LTS recommandé)
+- **npm** 9+
+- Compte **Supabase** (PostgreSQL managé) pour le backend
+
+---
+
+## Installation et lancement
+
+### 1. Base de données et API
 
 ```bash
 cd backend
 npm install
+```
+
+Copier `backend/.env.example` vers `backend/.env`, renseigner la connexion **Supabase** (voir [backend/README.md](backend/README.md)), puis appliquer les migrations :
+
+```bash
+npm run migration:up
 npm run start:dev
 ```
 
-L’API sera disponible sur : http://localhost:3000
+API : [http://localhost:3333](http://localhost:3333)  
+Santé : `GET /health` — Recettes : `GET /recipes`, `GET /recipes/:id`, `POST /recipes`
+
+### 2. Frontend Angular
+
+```bash
+cd frontend-angular
+npm install
+npm start
+```
+
+Application : [http://localhost:4200](http://localhost:4200)
+
+En développement, le proxy Angular redirige `/api` vers le backend (`proxy.conf.json` → port **3333**).
+
+### Frontend et API
+
+Le frontend appelle l’API via le proxy (`/api` → port 3333).  
+Pour repasser en mode démo hors-ligne : `useMockData: true` dans `frontend-angular/src/environments/environment.development.ts` (fichiers `core/data/bouchon-*.ts` conservés).
 
 ---
 
-## 📄 Licence
+## Roadmap
 
-Ce projet est distribué sous la licence **MIT**. Voir le fichier [LICENSE](LICENSE) pour plus de détails.  
+- Authentification utilisateurs
+- Catégories de recettes
+- Export PDF
+- Partage et commentaires
+
+---
+
+## Licence
+
+Projet sous licence **MIT**. Voir [LICENSE](LICENSE).  
 © 2025 Clement Farina

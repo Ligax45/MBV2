@@ -1,0 +1,16 @@
+/**
+ * Ajustements PrimeNG pour rester cohérent avec les tokens MiamBook.
+ * Le mode clair/sombre est piloté par html.light / html.dark (ThemeService).
+ */
+
+html.light .p-card,
+html.light .p-card .p-card-body,
+html.light .p-card .p-card-footer {
+  color: var(--p-text-color);
+}
+
+html.light .p-inputtext {
+  background: var(--p-form-field-background);
+  color: var(--p-form-field-color);
+  border-color: var(--p-form-field-border-color);
+}

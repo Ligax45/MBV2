@@ -1,0 +1,30 @@
+@if (open()) {
+  <button
+    type="button"
+    class="mobile-menu__overlay"
+    aria-label="Fermer le menu"
+    (click)="onClose()"
+  ></button>
+
+  <aside
+    class="mobile-menu__drawer"
+    aria-modal="true"
+    aria-label="Menu de navigation"
+  >
+    <div class="mobile-menu__header">
+      <span class="mobile-menu__title">MiamBook</span>
+      <button
+        type="button"
+        class="btn btn-ghost btn-icon"
+        aria-label="Fermer le menu"
+        (click)="onClose()"
+      >
+        <i class="pi pi-times" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <div class="mobile-menu__nav">
+      <app-nav-list (linkNavigate)="onClose()" />
+    </div>
+  </aside>
+}

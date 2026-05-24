@@ -1,0 +1,24 @@
+<p-iconfield class="recipe-search">
+  <p-inputicon styleClass="pi pi-search" />
+  <input
+    pInputText
+    type="search"
+    class="recipe-search__input"
+    [ngModel]="value()"
+    (ngModelChange)="onInput($event)"
+    [placeholder]="placeholder()"
+    aria-label="Rechercher une recette par titre"
+  />
+  @if (value().length > 0) {
+    <p-button
+      type="button"
+      icon="pi pi-times"
+      [rounded]="true"
+      [text]="true"
+      severity="secondary"
+      class="recipe-search__clear"
+      ariaLabel="Effacer la recherche"
+      (onClick)="clear()"
+    />
+  }
+</p-iconfield>
