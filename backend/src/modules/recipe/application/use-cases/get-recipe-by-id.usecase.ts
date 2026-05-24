@@ -18,8 +18,7 @@ export class GetRecipeByIdUseCase {
 
   async execute(id: string) {
     const trimmed = id?.trim() ?? '';
-    if (!trimmed)
-      throw new BadRequestException('id is required');
+    if (!trimmed) throw new BadRequestException('id is required');
     if (!PG_UUID_RE.test(trimmed))
       throw new BadRequestException('id doit être un UUID valide');
 

@@ -1,0 +1,14 @@
+<nav class="nav-list" aria-label="Navigation principale">
+  @for (link of navLinks; track link.path) {
+    <a
+      class="btn btn-ghost btn-nav"
+      [routerLink]="link.path"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: link.path === '/' }"
+      (click)="onLinkClick()"
+    >
+      <i [class]="link.icon" aria-hidden="true"></i>
+      {{ link.label }}
+    </a>
+  }
+</nav>

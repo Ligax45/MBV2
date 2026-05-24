@@ -1,0 +1,16 @@
+.recipe-search {
+  display: block;
+  width: 100%;
+  max-width: 28rem;
+}
+
+.recipe-search__input {
+  width: 100%;
+}
+
+.recipe-search__clear {
+  position: absolute;
+  right: 0.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+}

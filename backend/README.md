@@ -1,38 +1,59 @@
 # MBV2 — Backend
 
-API REST **NestJS**, organisée **par modules métier**, avec persistance **PostgreSQL** via **MikroORM**. Ce dépôt hébergera plusieurs domaines fonctionnels au fil du temps ; chaque brique importante vit sous `src/modules/<nom-du-module>/`.
+API REST **NestJS**, organisée **par modules métier**, avec persistance **PostgreSQL** hébergée sur **Supabase**, via **MikroORM**.
 
 ## Architecture
 
 - **`src/core/`** — transversal au projet (ex. configuration base de données).
-- **`src/migrations/`** — évolutions du schéma PostgreSQL versionnées.
+- **`src/migrations/`** — évolutions du schéma PostgreSQL versionnées (MikroORM).
 - **`src/modules/*/`** — un dossier **par capacité métier** (Nest `Module`, contrôleurs, logique métier).
 
-Pour les modules riches, une **structure en couches** est encouragée : `domain/` → `application/` (use cases) → `infrastructure/` (ORM, implémentations) → `presentation/` (controllers). Le premier module suivant ce modèle est **Recipe** ; les prochains peuvent réutiliser le même schéma ou s’adapter au besoin.
+Pour les modules riches, une **structure en couches** est encouragée : `domain/` → `application/` (use cases) → `infrastructure/` (ORM, implémentations) → `presentation/` (controllers). Le premier module suivant ce modèle est **Recipe**.
 
 ## Prérequis
 
-- **Node.js** (LTS recommandé, ex. 20+)
-- **PostgreSQL** accessible localement ou à distance
-- Un fichier **`.env`** à la racine du dossier `backend/` (voir ci-dessous)
+- **Node.js** 20+
+- Projet **Supabase** (PostgreSQL managé)
+- Fichier **`backend/.env`** (non versionné)
 
-## Variables d’environnement
+## Variables d'environnement (Supabase)
 
-Crée un fichier `backend/.env` (il est ignoré par Git). Exemple :
+1. Copier l'exemple :
 
-```env
-PORT=3333
-
-DB_HOST=localhost
-DB_PORT=5432
-DB_USER=user_name
-DB_PASSWORD=ton_mot_de_passe
-DB_NAME=nom__bdd
+```bash
+cd backend
+cp .env.example .env
 ```
 
-Tu peux aussi utiliser **`MIKRO_ORM_PASSWORD`** à la place de `DB_PASSWORD` si besoin — la config fusionne les variables MikroORM au démarrage.
+2. Dans [Supabase](https://supabase.com/dashboard) → ton projet → **Project Settings** → **Database** :
+   - récupérer le **Database password** (ou le réinitialiser) ;
+   - copier la **Connection string** (URI) ou les champs Host / Port / Database.
 
-> Les commandes de migration utilisent la même connexion que l’application.
+3. Renseigner **une** des deux options dans `.env` :
+
+| Méthode | Variables |
+|---------|-----------|
+| **URI (recommandé)** | `DATABASE_URL=postgresql://...` |
+| **Détail** | `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME=postgres`, `DB_SSL=true` |
+
+Hôte direct Supabase (exemple) : `db.cjndkdrjrjtitbkiszwo.supabase.co` — port **5432**, base **`postgres`**.
+
+> Le SSL est activé automatiquement pour les hôtes `*.supabase.co` ou si `DB_SSL=true`. Obligatoire pour une connexion distante.
+
+Les migrations (`npm run migration:up`) utilisent la même configuration que l'API.
+
+### Supabase Storage (images recettes)
+
+Bucket par défaut : **`recipe-images`**. Variables dans `.env` :
+
+```env
+SUPABASE_URL=https://cjndkdrjrjtitbkiszwo.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=...   # Project Settings → API → service_role (secret)
+SUPABASE_STORAGE_BUCKET=recipe-images
+```
+
+Upload : `POST /recipes/:id/image` (multipart, champ `file`, max 5 Mo).  
+Fichier stocké sous `recipes/{recipeId}/cover.{ext}` ; `image_url` mis à jour en base.
 
 ## Installation
 
@@ -41,15 +62,68 @@ cd backend
 npm install
 ```
 
-## Migrations
+## Première fois : créer les tables sur Supabase
 
-Applique le schéma (tables, colonnes, etc.) :
+Supabase affiche **0 table** tant que tu n’as pas appliqué les migrations **MikroORM** du backend (pas `supabase db push`).
+
+### Étape 1 — Mot de passe et `.env`
+
+1. [Dashboard Supabase](https://supabase.com/dashboard) → ton projet → **Project Settings** → **Database**.
+2. Section **Database password** : note le mot de passe ou clique **Reset database password**.
+3. Section **Connection string** → onglet **URI** → copie la chaîne (mode **Session** ou **Direct**).
+4. Dans `backend/` :
+
+```bash
+copy .env.example .env
+```
+
+5. Ouvre `backend/.env` et renseigne **`DB_PASSWORD`** (mot de passe de la base Supabase, sans le mettre dans l’URI) :
+
+```env
+DB_PASSWORD=ton_mot_de_passe_supabase
+```
+
+> `.env` est dans `.gitignore` : ne jamais le committer. Si un outil (SonarLint) signale un secret dans `.env`, c’est attendu tant que le fichier est ouvert — ou exclu via `.vscode/settings.json`.
+
+> Tant que `.env` contient `DB_HOST=localhost`, les migrations partent sur ta machine locale, **pas** sur Supabase.
+
+### Étape 2 — Lancer la migration
+
+```bash
+cd backend
+npm install
+npm run migration:up
+```
+
+Si tout va bien, tu vois les migrations appliquées sans erreur.
+
+### Étape 3 — Vérifier dans Supabase
+
+**Table Editor** : tu dois voir notamment `recipes`, `recipe_types`, `users`, `equipment`, `recipe_ingredients`, `recipe_steps`, `recipe_equipment`, et la table de suivi `mikro_orm_migrations`.
+
+### Étape 4 — Démarrer l’API
+
+```bash
+npm run start:dev
+```
+
+Test : [http://localhost:3333/health](http://localhost:3333/health) puis [http://localhost:3333/recipes](http://localhost:3333/recipes).
+
+### En cas d’erreur fréquente
+
+| Message | Cause probable |
+|---------|----------------|
+| `password authentication failed` | Mauvais mot de passe dans `.env` |
+| `ECONNREFUSED` / timeout | `.env` encore en `localhost` ou pare-feu |
+| `SSL required` | Ajoute `DB_SSL=true` ou utilise l’URI Supabase avec SSL |
+
+## Migrations (évolutions suivantes)
 
 ```bash
 npm run migration:up
 ```
 
-Autres commandes utiles :
+Autres commandes :
 
 | Commande | Rôle |
 |----------|------|
@@ -60,51 +134,39 @@ Autres commandes utiles :
 | `npm run migration:create:blank` | migration vide à remplir à la main |
 | `npm run migration:down` | annule la dernière migration |
 
-Configuration : `src/core/database/mikro-orm.config.ts`. Fichiers de migration TypeScript : `src/migrations/`.
+Configuration : `src/core/database/mikro-orm.config.ts`. Fichiers : `src/migrations/`.
 
-## Lancer l’API
+> Les migrations du dossier racine `supabase/migrations/` (CLI Supabase) ne remplacent pas MikroORM pour ce backend.
+
+## Lancer l'API
 
 ```bash
-# développement (rechargement à chaud)
 npm run start:dev
-
-# production (build puis node)
-npm run build
-npm run start:prod
 ```
 
-Par défaut : **`PORT`** depuis l’environnement, sinon **3333**.
+Par défaut : port **3333** (`PORT` dans `.env`).
 
-### Points de contrôle globaux
+### Points de contrôle
 
-- `GET /` — entrée racine de l’API
-- `GET /health` — statut `{ "status": "ok" }`
+- `GET /` — entrée racine
+- `GET /health` — `{ "status": "ok" }`
 
-### Routes métier (au fil des modules)
-
-Chaque module peut exposer son préfixe HTTP via ses controllers Nest. À ce jour :
+### Routes métier
 
 | Module | Préfixe | Exemples |
 |--------|---------|----------|
-| **Recipe** | `/recipes` | `GET /recipes`, `GET /recipes/:id`, `POST /recipes` |
+| **Recipe** | `/recipes` | `GET /recipes`, `GET /recipes/:id`, `POST /recipes`, `PATCH /recipes/:id`, `POST /recipes/:id/image` |
 
-Les futurs modules ajouteront leurs propres préfixes (ex. `/users`, `/ingredients`) en les important dans `AppModule` comme les modules existants.
-
-## Structure du projet (aperçu)
+## Structure (aperçu)
 
 ```
 src/
   core/
-    database/          # MikroORM (connexion, entités par glob)
-  migrations/          # Migrations PostgreSQL
+    database/          # MikroORM + résolution Supabase / SSL
+  migrations/
   modules/
-    recipe/            # Premier module métier (pattern en couches)
-      domain/
-      application/
-      infrastructure/
-      presentation/
-    # ... autres modules à l’avenir
-  app.module.ts        # Compose MikroORM + les modules métier
+    recipe/
+  app.module.ts
   main.ts
 ```
 
@@ -115,10 +177,10 @@ npm run lint
 npm run format
 npm run test
 npm run test:e2e
-npm run test:cov
 ```
 
 ## Références
 
 - [NestJS](https://docs.nestjs.com/)
-- [MikroORM](https://mikro-orm.io/) — [NestJS integration](https://mikro-orm.io/docs/usage-with-nestjs)
+- [MikroORM](https://mikro-orm.io/)
+- [Supabase — Connect to your database](https://supabase.com/docs/guides/database/connecting-to-postgres)

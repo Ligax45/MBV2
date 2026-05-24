@@ -1,7 +1,3 @@
-/* eslint-disable
-  @typescript-eslint/no-unsafe-assignment,
-  @typescript-eslint/no-unsafe-member-access
-*/
 import type { EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { Injectable } from '@nestjs/common';
@@ -73,7 +69,10 @@ export class MikroOrmRecipeRepository implements RecipeRepository {
     entity.imageUrl = params.imageUrl ?? null;
     entity.difficulty = params.difficulty;
     entity.servings = params.servings;
-    entity.recipeType = em.getReference(RecipeTypeOrmEntity, params.recipeTypeId);
+    entity.recipeType = em.getReference(
+      RecipeTypeOrmEntity,
+      params.recipeTypeId,
+    );
     entity.authorUserId = params.authorUserId ?? null;
     entity.prepMinutes = params.prepMinutes ?? 0;
     entity.cookMinutes = params.cookMinutes ?? 0;
@@ -82,6 +81,72 @@ export class MikroOrmRecipeRepository implements RecipeRepository {
     em.persist(entity);
     await em.flush();
     await em.populate(entity, ['recipeType']);
+
+    return new Recipe(
+      entity.id,
+      entity.title,
+      entity.description,
+      entity.difficulty,
+      entity.servings,
+      { id: entity.recipeType.id, label: entity.recipeType.label },
+      entity.imageUrl ?? null,
+      entity.authorUserId ?? null,
+      entity.prepMinutes,
+      entity.cookMinutes,
+      entity.restMinutes,
+      entity.createdAt,
+      entity.updatedAt,
+    );
+  }
+
+  async update(id: string, params: CreateRecipeParams): Promise<Recipe | null> {
+    const entity = await this.repo.findOne({ id }, { populate: ['recipeType'] });
+    if (!entity) return null;
+
+    const em = this.repo.getEntityManager();
+    entity.title = params.title;
+    entity.description = params.description;
+    if (params.imageUrl !== undefined) {
+      entity.imageUrl = params.imageUrl ?? null;
+    }
+    entity.difficulty = params.difficulty;
+    entity.servings = params.servings;
+    entity.recipeType = em.getReference(
+      RecipeTypeOrmEntity,
+      params.recipeTypeId,
+    );
+    entity.authorUserId = params.authorUserId ?? null;
+    entity.prepMinutes = params.prepMinutes ?? 0;
+    entity.cookMinutes = params.cookMinutes ?? 0;
+    entity.restMinutes = params.restMinutes ?? 0;
+
+    await em.flush();
+    await em.populate(entity, ['recipeType']);
+
+    return new Recipe(
+      entity.id,
+      entity.title,
+      entity.description,
+      entity.difficulty,
+      entity.servings,
+      { id: entity.recipeType.id, label: entity.recipeType.label },
+      entity.imageUrl ?? null,
+      entity.authorUserId ?? null,
+      entity.prepMinutes,
+      entity.cookMinutes,
+      entity.restMinutes,
+      entity.createdAt,
+      entity.updatedAt,
+    );
+  }
+
+  async updateImageUrl(id: string, imageUrl: string): Promise<Recipe | null> {
+    const entity = await this.repo.findOne({ id }, { populate: ['recipeType'] });
+    if (!entity) return null;
+
+    entity.imageUrl = imageUrl;
+    await this.repo.getEntityManager().flush();
+    await this.repo.getEntityManager().populate(entity, ['recipeType']);
 
     return new Recipe(
       entity.id,

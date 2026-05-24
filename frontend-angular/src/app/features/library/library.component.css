@@ -1,0 +1,24 @@
+.library-page {
+  margin: 0 auto;
+  max-width: 87.5rem;
+}
+
+.library-page__state {
+  display: flex;
+  justify-content: center;
+  padding: 3rem 0;
+}
+
+:host ::ng-deep .library-page__message {
+  display: block;
+  margin-top: 1.5rem;
+  width: 100%;
+}
+
+.library-page__grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}

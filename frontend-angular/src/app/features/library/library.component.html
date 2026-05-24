@@ -1,0 +1,26 @@
+<div class="library-page">
+  <app-recipe-search-bar
+    [value]="searchQuery()"
+    (valueChange)="onSearchChange($event)"
+  />
+
+  @if (loading()) {
+    <div class="library-page__state" role="status">
+      <p-progressSpinner ariaLabel="Chargement des recettes" />
+    </div>
+  } @else if (error()) {
+    <p-message severity="error" [text]="error()!" styleClass="library-page__message" />
+  } @else if (filteredRecipes().length === 0) {
+    <p-message
+      severity="info"
+      text="Aucune recette ne correspond à votre recherche."
+      styleClass="library-page__message"
+    />
+  } @else {
+    <div class="library-page__grid">
+      @for (recipe of filteredRecipes(); track recipe.id) {
+        <app-recipe-card [recipe]="recipe" />
+      }
+    </div>
+  }
+</div>

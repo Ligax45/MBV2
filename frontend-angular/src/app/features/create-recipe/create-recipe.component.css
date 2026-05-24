@@ -1,0 +1,310 @@
+.create-recipe-page__loading {
+  display: flex;
+  justify-content: center;
+  padding: 3rem 0;
+}
+
+.create-recipe-form--hidden {
+  visibility: hidden;
+  position: absolute;
+  pointer-events: none;
+  height: 0;
+  overflow: hidden;
+}
+
+.create-recipe-page {
+  margin: 0 auto;
+  max-width: 48rem;
+  padding-bottom: 2rem;
+}
+
+.create-recipe-page__title {
+  margin: 0 0 1.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.create-recipe-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.create-recipe-form__section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.create-recipe-form__row {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr;
+}
+
+.create-recipe-form__row--time {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .create-recipe-form__row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .create-recipe-form__row--time {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.create-recipe-form__count {
+  font-weight: 400;
+  color: var(--muted-foreground);
+}
+
+.create-recipe-form__error {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  color: var(--p-red-700, #b91c1c);
+  background: var(--p-red-50, #fef2f2);
+  font-size: 0.875rem;
+}
+
+.create-recipe-form__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.field--compact {
+  gap: 0.375rem;
+}
+
+.field__label {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.field__label--icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.field__hint {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+.field__error {
+  color: var(--p-red-500, #ef4444);
+  font-size: 0.875rem;
+}
+
+.w-full {
+  width: 100%;
+}
+
+/* Photo */
+.photo-field {
+  display: flex;
+  justify-content: center;
+}
+
+.photo-field__upload {
+  display: flex;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  max-width: 20rem;
+  cursor: pointer;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--muted) 50%, transparent);
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.photo-field__upload:hover {
+  border-color: var(--muted-foreground);
+  background: var(--muted);
+}
+
+.photo-field__input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.photo-field__icon {
+  font-size: 2.5rem;
+}
+
+.photo-field__preview {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  max-width: 20rem;
+  overflow: hidden;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--muted) 50%, transparent);
+}
+
+.photo-field__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+:host ::ng-deep .photo-field__remove {
+  position: absolute !important;
+  top: 0.5rem;
+  right: 0.5rem;
+}
+
+/* Portions */
+.servings-field {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--muted) 30%, transparent);
+}
+
+.servings-field__suffix {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+  white-space: nowrap;
+}
+
+:host ::ng-deep .servings-field__input {
+  width: 3rem !important;
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* Équipement */
+.equipment-field {
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.equipment-field__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.equipment-chip {
+  cursor: pointer;
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  background: color-mix(in srgb, var(--muted) 50%, transparent);
+  color: var(--foreground);
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.equipment-chip:hover {
+  background: var(--muted);
+}
+
+.equipment-chip--selected {
+  border-color: var(--foreground);
+  background: var(--foreground);
+  color: var(--background);
+}
+
+/* Listes dynamiques */
+.dynamic-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.dynamic-list--steps {
+  list-style: none;
+}
+
+.dynamic-list__item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--muted) 30%, transparent);
+}
+
+.dynamic-list__item--step {
+  align-items: flex-start;
+}
+
+.dynamic-list__index {
+  width: 1.5rem;
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted-foreground);
+}
+
+.dynamic-list__qty {
+  width: 5rem;
+  flex-shrink: 0;
+}
+
+:host ::ng-deep .dynamic-list__unit {
+  width: 7rem;
+  flex-shrink: 0;
+}
+
+.dynamic-list__name {
+  flex: 1;
+  min-width: 8rem;
+}
+
+.dynamic-list__step-badge {
+  display: flex;
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: var(--foreground);
+  color: var(--background);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.dynamic-list__step-content {
+  flex: 1;
+  min-width: 0;
+}

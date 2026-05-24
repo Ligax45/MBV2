@@ -1,0 +1,14 @@
+<div class="app-shell">
+  <app-topbar (mobileMenuToggle)="toggleMobileMenu()" />
+  <app-mobile-menu
+    [open]="mobileMenuOpen()"
+    (closed)="closeMobileMenu()"
+  />
+
+  <div class="app-body">
+    <app-sidebar />
+    <main class="app-main">
+      <router-outlet />
+    </main>
+  </div>
+</div>

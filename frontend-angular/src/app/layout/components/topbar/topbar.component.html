@@ -1,0 +1,49 @@
+<header class="topbar">
+  <div class="topbar__brand">
+    <button
+      type="button"
+      class="btn btn-ghost btn-icon topbar__menu-btn"
+      aria-label="Ouvrir le menu"
+      (click)="mobileMenuToggle.emit()"
+    >
+      <i class="pi pi-bars" aria-hidden="true"></i>
+    </button>
+    <span class="topbar__title">MiamBook</span>
+  </div>
+
+  <div class="topbar__actions">
+    <button
+      type="button"
+      class="btn btn-ghost btn-icon"
+      [attr.aria-label]="theme() === 'light' ? 'Mode sombre' : 'Mode clair'"
+      [attr.title]="
+        theme() === 'light' ? 'Passer en mode sombre' : 'Passer en mode clair'
+      "
+      (click)="onToggleTheme()"
+    >
+      @if (theme() === 'light') {
+        <i class="pi pi-moon" aria-hidden="true"></i>
+      } @else {
+        <i class="pi pi-sun" aria-hidden="true"></i>
+      }
+    </button>
+
+    <button
+      type="button"
+      class="btn btn-ghost btn-icon"
+      aria-label="Réglages"
+      title="Réglages"
+    >
+      <i class="pi pi-cog" aria-hidden="true"></i>
+    </button>
+
+    <div class="avatar" aria-label="Avatar utilisateur">
+      <img
+        src="https://avatar.vercel.sh/miambook"
+        alt="Avatar utilisateur"
+        (error)="onAvatarError($event)"
+      />
+      <span class="avatar-fallback" hidden>MB</span>
+    </div>
+  </div>
+</header>
