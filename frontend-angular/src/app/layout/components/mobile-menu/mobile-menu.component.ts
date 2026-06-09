@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+﻿import { Component, input, output } from '@angular/core';
 
 import { NavListComponent } from '@layout/components/nav-list/nav-list.component';
 
@@ -6,7 +6,7 @@ import { NavListComponent } from '@layout/components/nav-list/nav-list.component
   selector: 'app-mobile-menu',
   imports: [NavListComponent],
   templateUrl: './mobile-menu.component.html',
-  styleUrl: './mobile-menu.component.css',
+  styleUrl: './mobile-menu.component.scss',
 })
 export class MobileMenuComponent {
   readonly open = input(false);

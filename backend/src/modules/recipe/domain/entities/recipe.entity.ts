@@ -1,5 +1,21 @@
 export type RecipeTypeSummary = { id: string; label: string };
 
+export type EquipmentSummary = { id: string; label: string };
+
+export type RecipeIngredientSummary = {
+  id: string;
+  position: number;
+  quantity: string;
+  unit: string;
+  name: string;
+};
+
+export type RecipeStepSummary = {
+  id: string;
+  order: number;
+  content: string;
+};
+
 export class Recipe {
   constructor(
     public readonly id: string,
@@ -15,5 +31,8 @@ export class Recipe {
     public readonly restMinutes: number,
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
+    public readonly ingredients: RecipeIngredientSummary[] = [],
+    public readonly steps: RecipeStepSummary[] = [],
+    public readonly equipment: EquipmentSummary[] = [],
   ) {}
 }

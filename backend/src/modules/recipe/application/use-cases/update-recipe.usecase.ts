@@ -4,6 +4,7 @@ import {
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
+import { toRecipeResponse } from '../recipe-response.util';
 import {
   RECIPE_REPOSITORY,
   type CreateRecipeParams,
@@ -21,6 +22,27 @@ function assertUuid(field: string, value: string): void {
   }
 }
 
+function validateRecipeInput(input: CreateRecipeParams): void {
+  if (!input.title?.trim())
+    throw new BadRequestException('title is required');
+  if (!input.description?.trim())
+    throw new BadRequestException('description is required');
+  if (!input.recipeTypeId?.trim())
+    throw new BadRequestException('recipeTypeId is required');
+  assertUuid('recipeTypeId', input.recipeTypeId);
+  if (input.authorUserId != null && String(input.authorUserId).trim() !== '')
+    assertUuid('authorUserId', String(input.authorUserId));
+
+  if (!['facile', 'moyen', 'difficile'].includes(input.difficulty))
+    throw new BadRequestException('difficulty is invalid');
+  if (typeof input.servings !== 'number' || input.servings < 0)
+    throw new BadRequestException('servings is invalid');
+
+  for (const equipmentId of input.equipmentIds ?? []) {
+    assertUuid('equipmentIds', equipmentId);
+  }
+}
+
 @Injectable()
 export class UpdateRecipeUseCase {
   constructor(
@@ -31,39 +53,11 @@ export class UpdateRecipeUseCase {
     const trimmed = id?.trim() ?? '';
     if (!trimmed) throw new BadRequestException('id is required');
     assertUuid('id', trimmed);
-
-    if (!input.title?.trim())
-      throw new BadRequestException('title is required');
-    if (!input.description?.trim())
-      throw new BadRequestException('description is required');
-    if (!input.recipeTypeId?.trim())
-      throw new BadRequestException('recipeTypeId is required');
-    assertUuid('recipeTypeId', input.recipeTypeId);
-    if (input.authorUserId != null && String(input.authorUserId).trim() !== '')
-      assertUuid('authorUserId', String(input.authorUserId));
-
-    if (!['facile', 'moyen', 'difficile'].includes(input.difficulty))
-      throw new BadRequestException('difficulty is invalid');
-    if (typeof input.servings !== 'number' || input.servings < 0)
-      throw new BadRequestException('servings is invalid');
+    validateRecipeInput(input);
 
     const recipe = await this.recipeRepo.update(trimmed, input);
     if (!recipe) throw new NotFoundException('Recette introuvable');
 
-    return {
-      id: recipe.id,
-      title: recipe.title,
-      description: recipe.description,
-      imageUrl: recipe.imageUrl,
-      difficulty: recipe.difficulty,
-      servings: recipe.servings,
-      recipeType: recipe.recipeType,
-      authorUserId: recipe.authorUserId,
-      prepMinutes: recipe.prepMinutes,
-      cookMinutes: recipe.cookMinutes,
-      restMinutes: recipe.restMinutes,
-      createdAt: recipe.createdAt.toISOString(),
-      updatedAt: recipe.updatedAt.toISOString(),
-    };
+    return toRecipeResponse(recipe);
   }
 }

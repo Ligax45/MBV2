@@ -11,6 +11,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateRecipeUseCase } from '../application/use-cases/create-recipe.usecase';
 import { GetRecipeByIdUseCase } from '../application/use-cases/get-recipe-by-id.usecase';
+import { GetEquipmentUseCase } from '../application/use-cases/get-equipment.usecase';
 import { GetRecipeTypesUseCase } from '../application/use-cases/get-recipe-types.usecase';
 import { GetRecipesUseCase } from '../application/use-cases/get-recipes.usecase';
 import { UpdateRecipeUseCase } from '../application/use-cases/update-recipe.usecase';
@@ -24,6 +25,7 @@ export class RecipeController {
     private readonly getRecipes: GetRecipesUseCase,
     private readonly getRecipeById: GetRecipeByIdUseCase,
     private readonly getRecipeTypes: GetRecipeTypesUseCase,
+    private readonly getEquipment: GetEquipmentUseCase,
     private readonly createRecipe: CreateRecipeUseCase,
     private readonly updateRecipe: UpdateRecipeUseCase,
     private readonly uploadRecipeImage: UploadRecipeImageUseCase,
@@ -37,6 +39,11 @@ export class RecipeController {
   @Get('types')
   async listTypes() {
     return this.getRecipeTypes.execute();
+  }
+
+  @Get('equipment')
+  async listEquipment() {
+    return this.getEquipment.execute();
   }
 
   @Get(':id')

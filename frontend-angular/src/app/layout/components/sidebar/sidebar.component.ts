@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+﻿import { Component } from '@angular/core';
 
 import { NavListComponent } from '@layout/components/nav-list/nav-list.component';
 
@@ -6,6 +6,6 @@ import { NavListComponent } from '@layout/components/nav-list/nav-list.component
   selector: 'app-sidebar',
   imports: [NavListComponent],
   templateUrl: './sidebar.component.html',
-  styleUrl: './sidebar.component.css',
+  styleUrl: './sidebar.component.scss',
 })
 export class SidebarComponent {}

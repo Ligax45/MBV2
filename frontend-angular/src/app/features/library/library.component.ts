@@ -1,10 +1,11 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+﻿import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { Message } from 'primeng/message';
 import { ProgressSpinner } from 'primeng/progressspinner';
 
 import type { RecipeListItem } from '@core/models/recipe-list-item.model';
 import { RecipeDataService } from '@core/services/recipe-data.service';
 import { filterRecipesByTitle } from '@core/utils/recipe-search.util';
+import { AlertService } from '@shared/services/alert.service';
 
 import { RecipeCardComponent } from './components/recipe-card/recipe-card.component';
 import { RecipeSearchBarComponent } from './components/recipe-search-bar/recipe-search-bar.component';
@@ -18,14 +19,15 @@ import { RecipeSearchBarComponent } from './components/recipe-search-bar/recipe-
     Message,
   ],
   templateUrl: './library.component.html',
-  styleUrl: './library.component.css',
+  styleUrl: './library.component.scss',
 })
 export class LibraryComponent implements OnInit {
   private readonly recipeData = inject(RecipeDataService);
+  private readonly alertService = inject(AlertService);
 
   protected readonly recipes = signal<RecipeListItem[]>([]);
   protected readonly loading = signal(true);
-  protected readonly error = signal<string | null>(null);
+  protected readonly loadFailed = signal(false);
   protected readonly searchQuery = signal('');
 
   protected readonly filteredRecipes = computed(() =>
@@ -42,7 +44,7 @@ export class LibraryComponent implements OnInit {
 
   private loadRecipes(): void {
     this.loading.set(true);
-    this.error.set(null);
+    this.loadFailed.set(false);
 
     this.recipeData.getRecipes().subscribe({
       next: (data) => {
@@ -50,10 +52,11 @@ export class LibraryComponent implements OnInit {
         this.loading.set(false);
       },
       error: () => {
-        this.error.set(
+        this.loadFailed.set(true);
+        this.loading.set(false);
+        this.alertService.error(
           'Impossible de charger les recettes. Vérifiez que le backend tourne (port 3333).',
         );
-        this.loading.set(false);
       },
     });
   }

@@ -1,11 +1,11 @@
-import { Component, inject, output } from '@angular/core';
+﻿import { Component, inject, output } from '@angular/core';
 
 import { ThemeService } from '@core/services/theme.service';
 
 @Component({
   selector: 'app-topbar',
   templateUrl: './topbar.component.html',
-  styleUrl: './topbar.component.css',
+  styleUrl: './topbar.component.scss',
 })
 export class TopbarComponent {
   private readonly themeService = inject(ThemeService);

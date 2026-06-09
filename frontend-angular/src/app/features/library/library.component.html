@@ -8,8 +8,10 @@
     <div class="library-page__state" role="status">
       <p-progressSpinner ariaLabel="Chargement des recettes" />
     </div>
-  } @else if (error()) {
-    <p-message severity="error" [text]="error()!" styleClass="library-page__message" />
+  } @else if (loadFailed()) {
+    <div class="library-page__state" role="status">
+      <p class="library-page__empty">Les recettes n'ont pas pu être chargées.</p>
+    </div>
   } @else if (filteredRecipes().length === 0) {
     <p-message
       severity="info"

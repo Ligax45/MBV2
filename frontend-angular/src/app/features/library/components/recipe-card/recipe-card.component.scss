@@ -1,19 +1,40 @@
 .recipe-card__link {
+  position: relative;
+  z-index: 0;
   display: block;
   width: 20rem;
   max-width: 100%;
   color: inherit;
   text-decoration: none;
+  transition: z-index 0s;
+
+  &:hover,
+  &:focus-visible {
+    z-index: 1;
+    transition-delay: 0s;
+  }
 }
 
 :host ::ng-deep .recipe-card {
   overflow: hidden;
-  transition: box-shadow 0.2s ease;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
-.recipe-card__link:hover :host ::ng-deep .recipe-card,
-.recipe-card__link:focus-visible :host ::ng-deep .recipe-card {
-  box-shadow: 0 4px 16px rgb(0 0 0 / 12%);
+.recipe-card__link:hover ::ng-deep .recipe-card,
+.recipe-card__link:focus-visible ::ng-deep .recipe-card {
+  transform: translateY(-6px);
+  box-shadow:
+    0 12px 28px rgb(0 0 0 / 12%),
+    0 4px 10px rgb(0 0 0 / 8%);
+}
+
+:host-context(.dark) .recipe-card__link:hover ::ng-deep .recipe-card,
+:host-context(.dark) .recipe-card__link:focus-visible ::ng-deep .recipe-card {
+  box-shadow:
+    0 12px 28px rgb(0 0 0 / 35%),
+    0 4px 10px rgb(0 0 0 / 20%);
 }
 
 .recipe-card__media {
@@ -27,6 +48,12 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.35s ease;
+}
+
+.recipe-card__link:hover .recipe-card__image,
+.recipe-card__link:focus-visible .recipe-card__image {
+  transform: scale(1.05);
 }
 
 :host ::ng-deep .recipe-card__like {

@@ -8,5 +8,4 @@ export const INGREDIENT_UNITS: readonly string[] = [
   'c. à soupe',
   'c. à café',
   'pincée(s)',
-  '',
 ] as const;

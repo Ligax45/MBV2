@@ -1,0 +1,31 @@
+<div class="alert-container" aria-live="polite" aria-relevant="additions">
+  @for (alert of alerts(); track alert.id) {
+    <div
+      class="alert"
+      [class]="'alert--' + alert.severity"
+      role="alert"
+    >
+      <i
+        class="alert__icon pi"
+        [class]="iconFor(alert.severity)"
+        aria-hidden="true"
+      ></i>
+
+      <div class="alert__content">
+        @if (alert.title) {
+          <p class="alert__title">{{ alert.title }}</p>
+        }
+        <p class="alert__message">{{ alert.message }}</p>
+      </div>
+
+      <button
+        type="button"
+        class="alert__close"
+        aria-label="Fermer"
+        (click)="dismiss(alert.id)"
+      >
+        <i class="pi pi-times" aria-hidden="true"></i>
+      </button>
+    </div>
+  }
+</div>

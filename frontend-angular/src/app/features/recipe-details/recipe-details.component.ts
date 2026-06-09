@@ -1,9 +1,8 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+﻿import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Button } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { Divider } from 'primeng/divider';
-import { Message } from 'primeng/message';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { Tag } from 'primeng/tag';
 
@@ -16,6 +15,7 @@ import {
   getDifficultyLabel,
   getDifficultySeverity,
 } from '@core/utils/recipe-format.util';
+import { AlertService } from '@shared/services/alert.service';
 
 @Component({
   selector: 'app-recipe-details',
@@ -24,27 +24,27 @@ import {
     Button,
     Card,
     Divider,
-    Message,
     ProgressSpinner,
     Tag,
   ],
   templateUrl: './recipe-details.component.html',
-  styleUrl: './recipe-details.component.css',
+  styleUrl: './recipe-details.component.scss',
 })
 export class RecipeDetailsComponent implements OnInit {
   private readonly recipeData = inject(RecipeDataService);
   private readonly route = inject(ActivatedRoute);
+  private readonly alertService = inject(AlertService);
 
   protected readonly recipe = signal<RecipeDetail | null>(null);
   protected readonly loading = signal(true);
-  protected readonly notFound = signal(false);
-  protected readonly error = signal<string | null>(null);
+  protected readonly pageFailed = signal(false);
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('recipeId');
     if (!id) {
-      this.notFound.set(true);
+      this.pageFailed.set(true);
       this.loading.set(false);
+      this.alertService.warning('Recette introuvable.');
       return;
     }
     this.loadRecipe(id);
@@ -78,8 +78,7 @@ export class RecipeDetailsComponent implements OnInit {
 
   private loadRecipe(id: string): void {
     this.loading.set(true);
-    this.error.set(null);
-    this.notFound.set(false);
+    this.pageFailed.set(false);
 
     this.recipeData.getRecipeById(id).subscribe({
       next: (data) => {
@@ -87,12 +86,15 @@ export class RecipeDetailsComponent implements OnInit {
         this.loading.set(false);
       },
       error: (err: unknown) => {
-        if (err instanceof Error && err.message === 'NOT_FOUND') {
-          this.notFound.set(true);
-        } else {
-          this.error.set('Impossible de charger la recette. Vérifiez que le backend tourne.');
-        }
+        this.pageFailed.set(true);
         this.loading.set(false);
+        if (err instanceof Error && err.message === 'NOT_FOUND') {
+          this.alertService.warning('Recette introuvable.');
+        } else {
+          this.alertService.error(
+            'Impossible de charger la recette. Vérifiez que le backend tourne.',
+          );
+        }
       },
     });
   }

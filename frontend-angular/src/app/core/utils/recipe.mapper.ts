@@ -3,6 +3,7 @@ import {
   UNKNOWN_AUTHOR_LABEL,
 } from '@core/constants/recipe.constants';
 import type { RecipeDetail } from '@core/models/recipe-detail.model';
+import type { RecipeDetailApiResponse } from '@core/models/recipe-api.model';
 import type { RecipeApiResponse } from '@core/models/recipe-api.model';
 import type { RecipeListItem } from '@core/models/recipe-list-item.model';
 
@@ -13,8 +14,19 @@ function resolveCreatorName(authorUserId: string | null): string {
   return `Utilisateur ${authorUserId.slice(0, 8)}`;
 }
 
-function resolveImageUrl(imageUrl: string | null): string {
-  return imageUrl?.trim() ? imageUrl : RECIPE_PLACEHOLDER_IMAGE;
+export function resolveRecipeImageUrl(
+  imageUrl: string | null | undefined,
+  cacheKey?: string,
+): string {
+  const trimmed = imageUrl?.trim();
+  if (!trimmed) {
+    return RECIPE_PLACEHOLDER_IMAGE;
+  }
+  if (!cacheKey || trimmed.includes('placehold.co')) {
+    return trimmed;
+  }
+  const separator = trimmed.includes('?') ? '&' : '?';
+  return `${trimmed}${separator}v=${encodeURIComponent(cacheKey)}`;
 }
 
 export function mapRecipeToListItem(api: RecipeApiResponse): RecipeListItem {
@@ -22,7 +34,7 @@ export function mapRecipeToListItem(api: RecipeApiResponse): RecipeListItem {
     id: api.id,
     title: api.title,
     description: api.description,
-    imageUrl: resolveImageUrl(api.imageUrl),
+    imageUrl: resolveRecipeImageUrl(api.imageUrl, api.updatedAt),
     totalTimeMinutes: api.prepMinutes + api.cookMinutes + api.restMinutes,
     createdAt: api.createdAt,
     difficulty: api.difficulty,
@@ -30,12 +42,12 @@ export function mapRecipeToListItem(api: RecipeApiResponse): RecipeListItem {
   };
 }
 
-export function mapRecipeToDetail(api: RecipeApiResponse): RecipeDetail {
+export function mapRecipeToDetail(api: RecipeDetailApiResponse): RecipeDetail {
   return {
     id: api.id,
     title: api.title,
     description: api.description,
-    imageUrl: resolveImageUrl(api.imageUrl),
+    imageUrl: resolveRecipeImageUrl(api.imageUrl, api.updatedAt),
     createdAt: api.createdAt,
     difficulty: api.difficulty,
     creatorName: resolveCreatorName(api.authorUserId),
@@ -44,8 +56,17 @@ export function mapRecipeToDetail(api: RecipeApiResponse): RecipeDetail {
     prepMinutes: api.prepMinutes,
     cookMinutes: api.cookMinutes,
     restMinutes: api.restMinutes,
-    equipmentLabels: [],
-    ingredients: [],
-    steps: [],
+    equipmentLabels: api.equipment.map((item) => item.label),
+    ingredients: api.ingredients.map((item) => ({
+      id: item.id,
+      quantity: item.quantity,
+      unit: item.unit,
+      name: item.name,
+    })),
+    steps: api.steps.map((item) => ({
+      id: item.id,
+      order: item.order,
+      content: item.content,
+    })),
   };
 }

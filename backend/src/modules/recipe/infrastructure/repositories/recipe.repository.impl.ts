@@ -6,7 +6,11 @@ import type {
   CreateRecipeParams,
   RecipeRepository,
 } from '../../domain/repositories/recipe.repository';
+import { EquipmentOrmEntity } from '../mikroorm/equipment.orm-entity';
+import { RecipeEquipmentOrmEntity } from '../mikroorm/recipe-equipment.orm-entity';
+import { RecipeIngredientOrmEntity } from '../mikroorm/recipe-ingredient.orm-entity';
 import { RecipeOrmEntity } from '../mikroorm/recipe.orm-entity';
+import { RecipeStepOrmEntity } from '../mikroorm/recipe-step.orm-entity';
 import { RecipeTypeOrmEntity } from '../mikroorm/recipe-type.orm-entity';
 
 @Injectable()
@@ -14,26 +18,19 @@ export class MikroOrmRecipeRepository implements RecipeRepository {
   constructor(
     @InjectRepository(RecipeOrmEntity)
     private readonly repo: EntityRepository<RecipeOrmEntity>,
+    @InjectRepository(RecipeIngredientOrmEntity)
+    private readonly ingredientRepo: EntityRepository<RecipeIngredientOrmEntity>,
+    @InjectRepository(RecipeStepOrmEntity)
+    private readonly stepRepo: EntityRepository<RecipeStepOrmEntity>,
+    @InjectRepository(RecipeEquipmentOrmEntity)
+    private readonly recipeEquipmentRepo: EntityRepository<RecipeEquipmentOrmEntity>,
   ) {}
 
   async findById(id: string): Promise<Recipe | null> {
     const r = await this.repo.findOne({ id }, { populate: ['recipeType'] });
     if (!r) return null;
-    return new Recipe(
-      r.id,
-      r.title,
-      r.description,
-      r.difficulty,
-      r.servings,
-      { id: r.recipeType.id, label: r.recipeType.label },
-      r.imageUrl ?? null,
-      r.authorUserId ?? null,
-      r.prepMinutes,
-      r.cookMinutes,
-      r.restMinutes,
-      r.createdAt,
-      r.updatedAt,
-    );
+    const details = await this.loadDetails(id);
+    return this.toDomain(r, details);
   }
 
   async findAll(): Promise<Recipe[]> {
@@ -41,24 +38,7 @@ export class MikroOrmRecipeRepository implements RecipeRepository {
       populate: ['recipeType'],
       orderBy: { createdAt: 'desc' },
     });
-    return rows.map(
-      (r) =>
-        new Recipe(
-          r.id,
-          r.title,
-          r.description,
-          r.difficulty,
-          r.servings,
-          { id: r.recipeType.id, label: r.recipeType.label },
-          r.imageUrl ?? null,
-          r.authorUserId ?? null,
-          r.prepMinutes,
-          r.cookMinutes,
-          r.restMinutes,
-          r.createdAt,
-          r.updatedAt,
-        ),
-    );
+    return rows.map((r) => this.toDomain(r));
   }
 
   async create(params: CreateRecipeParams): Promise<Recipe> {
@@ -80,23 +60,11 @@ export class MikroOrmRecipeRepository implements RecipeRepository {
 
     em.persist(entity);
     await em.flush();
+    await this.replaceDetails(entity.id, params);
     await em.populate(entity, ['recipeType']);
 
-    return new Recipe(
-      entity.id,
-      entity.title,
-      entity.description,
-      entity.difficulty,
-      entity.servings,
-      { id: entity.recipeType.id, label: entity.recipeType.label },
-      entity.imageUrl ?? null,
-      entity.authorUserId ?? null,
-      entity.prepMinutes,
-      entity.cookMinutes,
-      entity.restMinutes,
-      entity.createdAt,
-      entity.updatedAt,
-    );
+    const details = await this.loadDetails(entity.id);
+    return this.toDomain(entity, details);
   }
 
   async update(id: string, params: CreateRecipeParams): Promise<Recipe | null> {
@@ -121,23 +89,11 @@ export class MikroOrmRecipeRepository implements RecipeRepository {
     entity.restMinutes = params.restMinutes ?? 0;
 
     await em.flush();
+    await this.replaceDetails(id, params);
     await em.populate(entity, ['recipeType']);
 
-    return new Recipe(
-      entity.id,
-      entity.title,
-      entity.description,
-      entity.difficulty,
-      entity.servings,
-      { id: entity.recipeType.id, label: entity.recipeType.label },
-      entity.imageUrl ?? null,
-      entity.authorUserId ?? null,
-      entity.prepMinutes,
-      entity.cookMinutes,
-      entity.restMinutes,
-      entity.createdAt,
-      entity.updatedAt,
-    );
+    const details = await this.loadDetails(id);
+    return this.toDomain(entity, details);
   }
 
   async updateImageUrl(id: string, imageUrl: string): Promise<Recipe | null> {
@@ -148,20 +104,116 @@ export class MikroOrmRecipeRepository implements RecipeRepository {
     await this.repo.getEntityManager().flush();
     await this.repo.getEntityManager().populate(entity, ['recipeType']);
 
+    const details = await this.loadDetails(id);
+    return this.toDomain(entity, details);
+  }
+
+  private async loadDetails(recipeId: string) {
+    const [ingredients, steps, recipeEquipment] = await Promise.all([
+      this.ingredientRepo.find(
+        { recipe: recipeId },
+        { orderBy: { position: 'asc' } },
+      ),
+      this.stepRepo.find(
+        { recipe: recipeId },
+        { orderBy: { stepOrder: 'asc' } },
+      ),
+      this.recipeEquipmentRepo.find(
+        { recipe: recipeId },
+        { populate: ['equipment'], orderBy: { equipment: { label: 'asc' } } },
+      ),
+    ]);
+
+    return {
+      ingredients: ingredients.map((ingredient) => ({
+        id: ingredient.id,
+        position: ingredient.position,
+        quantity: ingredient.quantity,
+        unit: ingredient.unit,
+        name: ingredient.name,
+      })),
+      steps: steps.map((step) => ({
+        id: step.id,
+        order: step.stepOrder,
+        content: step.content,
+      })),
+      equipment: recipeEquipment.map((link) => ({
+        id: link.equipment.id,
+        label: link.equipment.label,
+      })),
+    };
+  }
+
+  private async replaceDetails(
+    recipeId: string,
+    params: CreateRecipeParams,
+  ): Promise<void> {
+    const em = this.repo.getEntityManager();
+
+    await em.nativeDelete(RecipeIngredientOrmEntity, { recipe: recipeId });
+    await em.nativeDelete(RecipeStepOrmEntity, { recipe: recipeId });
+    await em.nativeDelete(RecipeEquipmentOrmEntity, { recipe: recipeId });
+
+    const recipeRef = em.getReference(RecipeOrmEntity, recipeId);
+
+    const ingredients = (params.ingredients ?? []).filter((item) =>
+      item.name.trim(),
+    );
+    ingredients.forEach((item, index) => {
+      const ingredient = new RecipeIngredientOrmEntity();
+      ingredient.recipe = recipeRef;
+      ingredient.position = index;
+      ingredient.quantity = item.quantity.trim() || '0';
+      ingredient.unit = item.unit.trim();
+      ingredient.name = item.name.trim();
+      em.persist(ingredient);
+    });
+
+    const steps = (params.steps ?? []).filter((item) => item.content.trim());
+    steps.forEach((item, index) => {
+      const step = new RecipeStepOrmEntity();
+      step.recipe = recipeRef;
+      step.stepOrder = item.order > 0 ? item.order : index + 1;
+      step.content = item.content.trim();
+      em.persist(step);
+    });
+
+    const equipmentIds = [...new Set(params.equipmentIds ?? [])];
+    equipmentIds.forEach((equipmentId) => {
+      const link = new RecipeEquipmentOrmEntity();
+      link.recipe = recipeRef;
+      link.equipment = em.getReference(EquipmentOrmEntity, equipmentId);
+      em.persist(link);
+    });
+
+    await em.flush();
+  }
+
+  private toDomain(
+    r: RecipeOrmEntity,
+    details?: {
+      ingredients: Recipe['ingredients'];
+      steps: Recipe['steps'];
+      equipment: Recipe['equipment'];
+    },
+  ): Recipe {
     return new Recipe(
-      entity.id,
-      entity.title,
-      entity.description,
-      entity.difficulty,
-      entity.servings,
-      { id: entity.recipeType.id, label: entity.recipeType.label },
-      entity.imageUrl ?? null,
-      entity.authorUserId ?? null,
-      entity.prepMinutes,
-      entity.cookMinutes,
-      entity.restMinutes,
-      entity.createdAt,
-      entity.updatedAt,
+      r.id,
+      r.title,
+      r.description,
+      r.difficulty,
+      r.servings,
+      { id: r.recipeType.id, label: r.recipeType.label },
+      r.imageUrl ?? null,
+      r.authorUserId ?? null,
+      r.prepMinutes,
+      r.cookMinutes,
+      r.restMinutes,
+      r.createdAt,
+      r.updatedAt,
+      details?.ingredients ?? [],
+      details?.steps ?? [],
+      details?.equipment ?? [],
     );
   }
 }
