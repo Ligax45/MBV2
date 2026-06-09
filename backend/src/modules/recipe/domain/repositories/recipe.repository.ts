@@ -2,6 +2,17 @@ import type { Recipe } from '../entities/recipe.entity';
 
 export const RECIPE_REPOSITORY = Symbol('RECIPE_REPOSITORY');
 
+export interface CreateRecipeIngredientParams {
+  quantity: string;
+  unit: string;
+  name: string;
+}
+
+export interface CreateRecipeStepParams {
+  order: number;
+  content: string;
+}
+
 export interface CreateRecipeParams {
   title: string;
   description: string;
@@ -13,6 +24,9 @@ export interface CreateRecipeParams {
   prepMinutes?: number;
   cookMinutes?: number;
   restMinutes?: number;
+  ingredients?: CreateRecipeIngredientParams[];
+  steps?: CreateRecipeStepParams[];
+  equipmentIds?: string[];
 }
 
 export interface RecipeRepository {

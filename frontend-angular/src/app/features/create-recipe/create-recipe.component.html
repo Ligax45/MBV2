@@ -1,12 +1,10 @@
-<p-toast />
-
 <div class="create-recipe-page">
   <h1 class="create-recipe-page__title">{{ pageTitle() }}</h1>
 
   @if (pageBusy()) {
-    <div class="create-recipe-page__loading" role="status">
+    <output class="create-recipe-page__loading">
       <p-progressSpinner ariaLabel="Chargement du formulaire" />
-    </div>
+    </output>
   }
 
   <form
@@ -67,15 +65,27 @@
                   alt="Aperçu de la recette"
                   class="photo-field__image"
                 />
-                <p-button
-                  type="button"
-                  icon="pi pi-trash"
-                  severity="danger"
-                  [rounded]="true"
-                  styleClass="photo-field__remove"
-                  ariaLabel="Supprimer la photo"
-                  (onClick)="clearPhoto()"
-                />
+                <div class="photo-field__actions">
+                  <label class="photo-field__change">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      class="photo-field__input"
+                      (change)="onPhotoSelected($event)"
+                    />
+                    <i class="pi pi-camera" aria-hidden="true"></i>
+                    <span>Changer</span>
+                  </label>
+                  <p-button
+                    type="button"
+                    icon="pi pi-trash"
+                    severity="danger"
+                    [rounded]="true"
+                    styleClass="photo-field__remove-inline"
+                    ariaLabel="Supprimer la photo"
+                    (onClick)="clearPhoto()"
+                  />
+                </div>
               </div>
             } @else {
               <label class="photo-field__upload">
@@ -157,7 +167,7 @@
         <fieldset class="equipment-field">
           <legend class="field__label">Équipement</legend>
           <div class="equipment-field__chips">
-            @for (equip of equipmentOptions; track equip.id) {
+            @for (equip of equipmentOptions(); track equip.id) {
               <button
                 type="button"
                 class="equipment-chip"
@@ -247,10 +257,14 @@
                 [options]="ingredientUnitSelectOptions"
                 optionLabel="label"
                 optionValue="value"
-                [ngModel]="ing.unit"
-                (ngModelChange)="updateIngredient(ing.id, 'unit', $event)"
+                placeholder="Unité"
+                [autoOptionFocus]="false"
+                [focusOnHover]="false"
+                [ngModel]="ing.unit || null"
+                (ngModelChange)="updateIngredient(ing.id, 'unit', $event ?? '')"
                 [ngModelOptions]="{ standalone: true }"
                 styleClass="dynamic-list__unit"
+                panelStyleClass="ingredient-unit-panel"
                 [attr.aria-label]="'Unité ingrédient ' + (i + 1)"
               />
               <input

@@ -9,6 +9,12 @@
   padding: 3rem 0;
 }
 
+.recipe-details-page__empty {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+}
+
 :host ::ng-deep .recipe-details-page__message,
 :host ::ng-deep .recipe-details__info {
   display: block;

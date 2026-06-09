@@ -1,4 +1,4 @@
-import { Component, output } from '@angular/core';
+﻿import { Component, output } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
 import { NAV_LINKS } from '@layout/constants/nav-links.constant';
@@ -7,7 +7,7 @@ import { NAV_LINKS } from '@layout/constants/nav-links.constant';
   selector: 'app-nav-list',
   imports: [RouterLink, RouterLinkActive],
   templateUrl: './nav-list.component.html',
-  styleUrl: './nav-list.component.css',
+  styleUrl: './nav-list.component.scss',
 })
 export class NavListComponent {
   readonly linkNavigate = output<void>();

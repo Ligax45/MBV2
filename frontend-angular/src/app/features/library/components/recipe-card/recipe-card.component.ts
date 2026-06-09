@@ -1,4 +1,4 @@
-import { Component, input, signal } from '@angular/core';
+﻿import { Component, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Button } from 'primeng/button';
 import { Card } from 'primeng/card';
@@ -16,7 +16,7 @@ import {
   selector: 'app-recipe-card',
   imports: [RouterLink, Card, Button, Tag],
   templateUrl: './recipe-card.component.html',
-  styleUrl: './recipe-card.component.css',
+  styleUrl: './recipe-card.component.scss',
 })
 export class RecipeCardComponent {
   readonly recipe = input.required<RecipeListItem>();

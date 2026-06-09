@@ -1,0 +1,63 @@
+---
+description: Generate a copy-pasteable English git commit message when the user writes "prepare commit"
+alwaysApply: true
+---
+
+# Prepare Commit
+
+When the user writes **"prepare commit"** (case-insensitive), generate a git commit message in **English** based on all current changes. Do **not** run `git commit` unless explicitly asked.
+
+## Workflow
+
+1. Run in parallel:
+   - `git status`
+   - `git diff` (staged + unstaged)
+   - `git diff --cached` (if any staged files)
+   - `git log -5 --oneline` (match existing commit style)
+2. Analyze **all** modifications: new files, edits, deletions, refactors, fixes, migrations.
+3. Ignore build artifacts (`dist/`, `.angular/cache/`, `node_modules/`, `*.tsbuildinfo`).
+4. Output a ready-to-copy commit message — nothing else unless the user asks.
+
+## Output format
+
+Use a single fenced code block the user can copy directly:
+
+```
+<type>: <short summary in imperative mood, max 72 chars>
+
+<body — 1-3 sentences explaining WHY, not just what>
+- <bullet point for each logical change group>
+- <another group if needed>
+```
+
+### Types
+
+- `feat` — new feature
+- `fix` — bug fix
+- `refactor` — code change without behavior change
+- `style` — UI/CSS only
+- `chore` — tooling, deps, config, migrations
+- `docs` — documentation only
+
+### Rules
+
+- Write entirely in **English**
+- Use imperative mood ("Add", "Fix", "Remove", not "Added" or "Adds")
+- Focus on **why** in the body, not a file list
+- Group related changes into one bullet, not one bullet per file
+- If multiple unrelated areas changed, suggest splitting into separate commits
+- If no changes exist, say so briefly
+
+## Example
+
+User: prepare commit
+
+```
+feat: persist recipe ingredients, steps and equipment
+
+Complete the recipe form save flow by wiring frontend payload to new
+backend endpoints and database relations.
+- Add ORM entities and repository logic for ingredients, steps, equipment
+- Extend create/update API to accept and return nested recipe data
+- Update Angular form payload, mappers and equipment API integration
+```

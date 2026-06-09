@@ -10,18 +10,10 @@
     <div class="recipe-details-page__state" role="status">
       <p-progressSpinner ariaLabel="Chargement de la recette" />
     </div>
-  } @else if (notFound()) {
-    <p-message
-      severity="warn"
-      text="Recette introuvable."
-      styleClass="recipe-details-page__message"
-    />
-  } @else if (error()) {
-    <p-message
-      severity="error"
-      [text]="error()!"
-      styleClass="recipe-details-page__message"
-    />
+  } @else if (pageFailed()) {
+    <div class="recipe-details-page__state" role="status">
+      <p class="recipe-details-page__empty">Cette recette n'est pas disponible.</p>
+    </div>
   } @else if (recipe(); as detail) {
     <article class="recipe-details">
       <p-card styleClass="recipe-details__hero">

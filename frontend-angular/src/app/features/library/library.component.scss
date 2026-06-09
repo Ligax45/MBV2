@@ -9,6 +9,12 @@
   padding: 3rem 0;
 }
 
+.library-page__empty {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+}
+
 :host ::ng-deep .library-page__message {
   display: block;
   margin-top: 1.5rem;

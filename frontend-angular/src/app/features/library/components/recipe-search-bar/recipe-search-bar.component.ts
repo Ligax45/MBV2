@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+﻿import { Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Button } from 'primeng/button';
 import { IconField } from 'primeng/iconfield';
@@ -9,7 +9,7 @@ import { InputText } from 'primeng/inputtext';
   selector: 'app-recipe-search-bar',
   imports: [FormsModule, IconField, InputIcon, InputText, Button],
   templateUrl: './recipe-search-bar.component.html',
-  styleUrl: './recipe-search-bar.component.css',
+  styleUrl: './recipe-search-bar.component.scss',
 })
 export class RecipeSearchBarComponent {
   readonly value = input('');

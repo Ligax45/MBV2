@@ -14,3 +14,8 @@ html.light .p-inputtext {
   color: var(--p-form-field-color);
   border-color: var(--p-form-field-border-color);
 }
+
+.ingredient-unit-panel .p-select-option {
+  min-height: 2.25rem;
+  padding-block: 0.5rem;
+}

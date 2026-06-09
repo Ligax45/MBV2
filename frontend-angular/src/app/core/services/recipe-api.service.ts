@@ -4,7 +4,9 @@ import { Observable } from 'rxjs';
 
 import type {
   CreateRecipePayload,
+  EquipmentSummary,
   RecipeApiResponse,
+  RecipeDetailApiResponse,
   RecipeTypeSummary,
 } from '@core/models/recipe-api.model';
 import { environment } from '../../../environments/environment';
@@ -18,23 +20,27 @@ export class RecipeApiService {
     return this.http.get<RecipeApiResponse[]>(`${this.baseUrl}/recipes`);
   }
 
-  getRecipeById(id: string): Observable<RecipeApiResponse> {
-    return this.http.get<RecipeApiResponse>(`${this.baseUrl}/recipes/${id}`);
+  getRecipeById(id: string): Observable<RecipeDetailApiResponse> {
+    return this.http.get<RecipeDetailApiResponse>(`${this.baseUrl}/recipes/${id}`);
   }
 
   getRecipeTypes(): Observable<RecipeTypeSummary[]> {
     return this.http.get<RecipeTypeSummary[]>(`${this.baseUrl}/recipes/types`);
   }
 
-  createRecipe(payload: CreateRecipePayload): Observable<RecipeApiResponse> {
-    return this.http.post<RecipeApiResponse>(`${this.baseUrl}/recipes`, payload);
+  getEquipment(): Observable<EquipmentSummary[]> {
+    return this.http.get<EquipmentSummary[]>(`${this.baseUrl}/recipes/equipment`);
+  }
+
+  createRecipe(payload: CreateRecipePayload): Observable<RecipeDetailApiResponse> {
+    return this.http.post<RecipeDetailApiResponse>(`${this.baseUrl}/recipes`, payload);
   }
 
   updateRecipe(
     id: string,
     payload: CreateRecipePayload,
-  ): Observable<RecipeApiResponse> {
-    return this.http.patch<RecipeApiResponse>(
+  ): Observable<RecipeDetailApiResponse> {
+    return this.http.patch<RecipeDetailApiResponse>(
       `${this.baseUrl}/recipes/${id}`,
       payload,
     );
