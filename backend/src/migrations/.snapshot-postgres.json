@@ -3092,6 +3092,16 @@
         },
         {
           "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "keyName": "refresh_tokens_pkey",
+          "primary": true,
+          "unique": true
+        },
+        {
+          "columnNames": [
             "session_id",
             "revoked"
           ],
@@ -5508,6 +5518,121 @@
       "comment": null
     },
     {
+      "name": "recipe_favorites",
+      "schema": "public",
+      "columns": {
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": "now()",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "recipe_id": {
+          "name": "recipe_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        }
+      },
+      "indexes": [
+        {
+          "columnNames": [
+            "recipe_id"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "idx_recipe_favorites_recipe",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "user_id"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "idx_recipe_favorites_user",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "user_id",
+            "recipe_id"
+          ],
+          "composite": true,
+          "constraint": true,
+          "keyName": "recipe_favorites_pkey",
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "fk_fav_recipe": {
+          "columnNames": [
+            "recipe_id"
+          ],
+          "constraintName": "fk_fav_recipe",
+          "localTableName": "public.recipe_favorites",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.recipes",
+          "deleteRule": "cascade"
+        },
+        "fk_fav_user": {
+          "columnNames": [
+            "user_id"
+          ],
+          "constraintName": "fk_fav_user",
+          "localTableName": "public.recipe_favorites",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.users",
+          "deleteRule": "cascade"
+        }
+      },
+      "comment": null
+    },
+    {
       "name": "recipe_ingredients",
       "schema": "public",
       "columns": {
@@ -6143,6 +6268,167 @@
       "comment": null
     },
     {
+      "name": "refresh_tokens",
+      "schema": "public",
+      "columns": {
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": "now()",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "gen_random_uuid()",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "revoked_at": {
+          "name": "revoked_at",
+          "type": "timestamp(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "token_hash": {
+          "name": "token_hash",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "text"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        }
+      },
+      "indexes": [
+        {
+          "columnNames": [
+            "expires_at"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "idx_refresh_tokens_expires_at",
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE INDEX idx_refresh_tokens_expires_at ON public.refresh_tokens USING btree (expires_at) WHERE (revoked_at IS NULL)"
+        },
+        {
+          "columnNames": [
+            "user_id"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "idx_refresh_tokens_user_id",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "keyName": "refresh_tokens_pkey",
+          "primary": true,
+          "unique": true
+        },
+        {
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "keyName": "refresh_tokens_pkey",
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "refresh_tokens_user_id_fkey": {
+          "columnNames": [
+            "user_id"
+          ],
+          "constraintName": "refresh_tokens_user_id_fkey",
+          "localTableName": "public.refresh_tokens",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.users",
+          "deleteRule": "cascade"
+        }
+      },
+      "comment": null
+    },
+    {
       "name": "users",
       "schema": "public",
       "columns": {
@@ -6194,6 +6480,38 @@
           "enumItems": [],
           "mappedType": "string"
         },
+        "mfa_enabled": {
+          "name": "mfa_enabled",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "false",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "boolean"
+        },
+        "mfa_secret": {
+          "name": "mfa_secret",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "text"
+        },
         "password_hash": {
           "name": "password_hash",
           "type": "text",
@@ -6225,6 +6543,42 @@
           "comment": null,
           "enumItems": [],
           "mappedType": "string"
+        },
+        "requires_mfa": {
+          "name": "requires_mfa",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "false",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "boolean"
+        },
+        "role": {
+          "name": "role",
+          "type": "varchar(20)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 20,
+          "precision": null,
+          "scale": null,
+          "default": "'user'",
+          "comment": null,
+          "enumItems": [
+            "user",
+            "moderator",
+            "admin"
+          ],
+          "mappedType": "enum"
         },
         "updated_at": {
           "name": "updated_at",
@@ -6275,7 +6629,14 @@
           "unique": true
         }
       ],
-      "checks": [],
+      "checks": [
+        {
+          "name": "users_role_check",
+          "expression": "\"role\" in ('user', 'moderator', 'admin')",
+          "definition": "check (\"role\" in ('user', 'moderator', 'admin'))",
+          "columnName": "role"
+        }
+      ],
       "foreignKeys": {},
       "comment": null
     },
@@ -6283,6 +6644,22 @@
       "name": "messages",
       "schema": "realtime",
       "columns": {
+        "binary_payload": {
+          "name": "binary_payload",
+          "type": "bytea",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "blob"
+        },
         "event": {
           "name": "event",
           "type": "text",
@@ -6446,7 +6823,13 @@
           "unique": true
         }
       ],
-      "checks": [],
+      "checks": [
+        {
+          "name": "messages_payload_exclusive",
+          "definition": "CHECK (((payload IS NULL) OR (binary_payload IS NULL))) NOT VALID",
+          "columnName": "binary_payload"
+        }
+      ],
       "foreignKeys": {},
       "comment": null
     },
@@ -6631,6 +7014,22 @@
           "mappedType": "bigint",
           "generated": "identity"
         },
+        "selected_columns": {
+          "name": "selected_columns",
+          "type": "text[]",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "array"
+        },
         "subscription_id": {
           "name": "subscription_id",
           "type": "uuid",
@@ -6674,13 +7073,15 @@
             "subscription_id",
             "entity",
             "filters",
-            "action_filter"
+            "action_filter",
+            "COALESCE(selected_columns, {}::text[])"
           ],
           "composite": true,
           "constraint": false,
-          "keyName": "subscription_subscription_id_entity_filters_action_filter_key",
+          "keyName": "subscription_subscription_id_entity_filters_action_filter_selec",
           "primary": false,
-          "unique": true
+          "unique": true,
+          "expression": "CREATE UNIQUE INDEX subscription_subscription_id_entity_filters_action_filter_selec ON realtime.subscription USING btree (subscription_id, entity, filters, action_filter, COALESCE(selected_columns, '{}'::text[]))"
         }
       ],
       "checks": [],

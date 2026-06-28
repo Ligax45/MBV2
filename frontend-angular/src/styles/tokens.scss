@@ -1,17 +1,52 @@
 :root {
-  --radius: 0.625rem;
-  --radius-md: calc(var(--radius) - 2px);
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --border: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --sidebar-width: 13rem;
-  --topbar-height: 3rem;
+  --radius: 1rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1.5rem;
+  --radius-xl: 2rem;
+  --radius-pill: 9999px;
+
+  /* Palette MiamBook */
+  --background: #fff9f5;
+  --foreground: #2d1b13;
+  --secondary: #7a5c46;
+  --accent: #fef3e2;
+  --accent-foreground: #2d1b13;
+  --muted: #f3e8d9;
+  --muted-foreground: #9a7b6a;
+  --border: #f3e8d9;
+  --ring: #f59e0b;
+  --card: #ffffff;
+
+  --primary: #ff9800;
+  --primary-foreground: #ffffff;
+
+  --sidebar-bg: #fff8f0;
+  --sidebar-text: #8d6e63;
+  --sidebar-text-active: #bf360c;
+  --sidebar-active-bg: #ffffff;
+  --sidebar-hover-bg: rgb(255 255 255 / 55%);
+  --sidebar-divider: #d9cec2;
+  --sidebar-border: #d9cec2;
+  --sidebar-shadow: 0 2px 8px rgb(45 27 19 / 7%);
+  --sidebar-width: 15rem;
+  --topbar-height: 3.5rem;
   --breakpoint-md: 768px;
+
+  /* Badges difficulté */
+  --badge-easy-bg: #dcfce7;
+  --badge-easy-text: #166534;
+  --badge-medium-bg: #ffedd5;
+  --badge-medium-text: #c2410c;
+  --badge-hard-bg: #fee2e2;
+  --badge-hard-text: #b91c1c;
+
+  /* Favoris */
+  --favorite-bg: #fff1f2;
+  --favorite-text: #e11d48;
+  --favorite-border: #fecdd3;
+  --favorite-inactive-bg: #fff5ed;
+  --favorite-inactive-text: #c2410c;
+  --favorite-inactive-border: #f0d4b8;
 }
 
 html.light {
@@ -23,12 +58,21 @@ html.dark {
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --border: oklch(1 0 0 / 10%);
-  --ring: oklch(0.556 0 0);
+  --background: #1a100a;
+  --foreground: #faf5f0;
+  --secondary: #c4b5a5;
+  --accent: #2d1b13;
+  --accent-foreground: #faf5f0;
+  --muted: #2d1b13;
+  --muted-foreground: #9a7b6a;
+  --border: rgb(255 255 255 / 10%);
+  --ring: #f59e0b;
+  --card: #231810;
+  --sidebar-bg: #1a100a;
+  --sidebar-text: #9a7b6a;
+  --sidebar-text-active: #ff9800;
+  --sidebar-active-bg: #2d1b13;
+  --sidebar-hover-bg: rgb(255 255 255 / 5%);
+  --sidebar-divider: rgb(255 255 255 / 14%);
+  --sidebar-border: rgb(255 255 255 / 14%);
 }

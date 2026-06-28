@@ -1,7 +1,9 @@
-﻿import { Component, output } from '@angular/core';
+﻿import { Component, computed, inject, output } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
+import { CurrentUserService } from '@core/services/current-user.service';
 import { NAV_LINKS } from '@layout/constants/nav-links.constant';
+import type { NavLink } from '@layout/models/nav-link.model';
 
 @Component({
   selector: 'app-nav-list',
@@ -10,9 +12,21 @@ import { NAV_LINKS } from '@layout/constants/nav-links.constant';
   styleUrl: './nav-list.component.scss',
 })
 export class NavListComponent {
+  private readonly currentUser = inject(CurrentUserService);
+
   readonly linkNavigate = output<void>();
 
-  protected readonly navLinks = NAV_LINKS;
+  protected readonly navLinks = computed(() => {
+    const links: NavLink[] = [...NAV_LINKS];
+    if (this.currentUser.isAdmin()) {
+      links.push({
+        path: '/admin/utilisateurs',
+        label: 'Administration',
+        icon: 'pi pi-shield',
+      });
+    }
+    return links;
+  });
 
   onLinkClick(): void {
     this.linkNavigate.emit();

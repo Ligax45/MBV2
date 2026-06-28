@@ -1,0 +1,62 @@
+<div class="admin-users-page">
+  <h1 class="admin-users-page__title">Gestion des utilisateurs</h1>
+  <p class="admin-users-page__subtitle">
+    Attribuez les rôles User, Moderator ou Admin. L’utilisateur devra se reconnecter pour que son nouveau rôle soit actif.
+  </p>
+
+  @if (loading()) {
+    <div class="admin-users-page__state" role="status">
+      <p-progressSpinner ariaLabel="Chargement des utilisateurs" />
+    </div>
+  } @else if (users().length === 0) {
+    <p class="admin-users-page__empty">Aucun utilisateur trouvé.</p>
+  } @else {
+    <p-card styleClass="admin-users-card">
+      <div class="admin-users-table">
+        <div class="admin-users-table__head">
+          <span class="admin-users-table__col admin-users-table__col--pseudo">Pseudo</span>
+          <span class="admin-users-table__col admin-users-table__col--role">Rôle actuel</span>
+          <span class="admin-users-table__col admin-users-table__col--date">Inscription</span>
+          <span class="admin-users-table__col admin-users-table__col--edit">Nouveau rôle</span>
+        </div>
+
+        @for (user of users(); track user.id) {
+          <div class="admin-users-table__row">
+            <span class="admin-users-table__col admin-users-table__col--pseudo admin-users-table__pseudo">
+              {{ user.pseudo }}
+              @if (isCurrentUser(user)) {
+                <p-tag value="Vous" severity="secondary" />
+              }
+            </span>
+            <span class="admin-users-table__col admin-users-table__col--role">
+              <p-tag
+                [value]="roleLabel(user.role)"
+                [severity]="roleSeverity(user.role)"
+              />
+            </span>
+            <span class="admin-users-table__col admin-users-table__col--date">
+              {{ formatDate(user.createdAt) }}
+            </span>
+            <span class="admin-users-table__col admin-users-table__col--edit admin-users-table__role-edit">
+              <p-select
+                [options]="roleOptions"
+                optionLabel="label"
+                optionValue="value"
+                [(ngModel)]="user.pendingRole"
+                [disabled]="user.saving"
+                styleClass="admin-users-table__select"
+              />
+              <p-button
+                label="Enregistrer"
+                size="small"
+                [disabled]="!hasRoleChange(user)"
+                [loading]="user.saving"
+                (onClick)="onSaveRole(user)"
+              />
+            </span>
+          </div>
+        }
+      </div>
+    </p-card>
+  }
+</div>

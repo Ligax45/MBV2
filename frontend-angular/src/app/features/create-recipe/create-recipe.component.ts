@@ -14,6 +14,8 @@ import type { EquipmentSummary, RecipeDifficulty, RecipeDetailApiResponse } from
 import type { RecipeIngredient } from '@core/models/recipe-ingredient.model';
 import type { RecipeStep } from '@core/models/recipe-step.model';
 import { RecipeApiService } from '@core/services/recipe-api.service';
+import { CurrentUserService } from '@core/services/current-user.service';
+import { AlertService } from '@shared/services/alert.service';
 import { switchMap, of } from 'rxjs';
 
 import { DIFFICULTY_OPTIONS } from './constants/difficulty-options.constant';
@@ -25,8 +27,6 @@ import {
 } from './models/create-recipe-form.model';
 import { buildCreateRecipePayload } from './utils/create-recipe-payload.util';
 import { createRecipeFieldId } from './utils/create-recipe-id.util';
-import { AlertService } from '@shared/services/alert.service';
-
 import { mapApiToRecipeForm } from './utils/recipe-form.mapper';
 
 @Component({
@@ -40,6 +40,7 @@ export class CreateRecipeComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly recipeApi = inject(RecipeApiService);
+  private readonly currentUser = inject(CurrentUserService);
 
   protected readonly editRecipeId = signal<string | null>(null);
   protected readonly isEditMode = computed(() => this.editRecipeId() !== null);
@@ -303,6 +304,18 @@ export class CreateRecipeComponent implements OnInit {
     this.recipeLoading.set(true);
     this.recipeApi.getRecipeById(id).subscribe({
       next: (api) => {
+        const userId = this.currentUser.userId();
+        const canEdit =
+          !!userId &&
+          (api.authorUserId === userId || this.currentUser.canModerateRecipes());
+
+        if (!canEdit) {
+          this.recipeLoading.set(false);
+          this.alertService.warning('Seul l’auteur peut modifier cette recette.');
+          void this.router.navigate(['/recette', id]);
+          return;
+        }
+
         this.imageCleared.set(false);
         this.form.set(mapApiToRecipeForm(api));
         this.recipeLoading.set(false);
@@ -332,6 +345,12 @@ export class CreateRecipeComponent implements OnInit {
       }
       if (err.status === 404 && isEdit) {
         return 'Recette introuvable.';
+      }
+      if (err.status === 401) {
+        return 'Connectez-vous pour créer ou modifier une recette.';
+      }
+      if (err.status === 403 && isEdit) {
+        return 'Seul l’auteur peut modifier cette recette.';
       }
     }
     return isEdit ? 'Une erreur est survenue lors de la modification.' : 'Une erreur est survenue lors de la création.';

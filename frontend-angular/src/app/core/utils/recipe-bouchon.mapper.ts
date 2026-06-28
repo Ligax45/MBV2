@@ -15,6 +15,7 @@ export function mapBouchonToListItem(recipe: BouchonRecipe): RecipeListItem {
     createdAt: recipe.createdAt,
     difficulty: recipe.difficulty,
     creatorName: recipe.creatorName,
+    recipeTypeLabel: getRecipeTypeLabel('autres'),
   };
 }
 
@@ -27,6 +28,7 @@ export function mapBouchonDetailToView(detail: BouchonRecipeDetail): RecipeDetai
     createdAt: detail.createdAt,
     difficulty: detail.difficulty,
     creatorName: detail.creatorName,
+    authorUserId: null,
     servings: detail.servings,
     recipeTypeLabel: getRecipeTypeLabel(detail.recipeType),
     prepMinutes: detail.prepMinutes,
@@ -49,6 +51,7 @@ export function mapBouchonListItemToMinimalDetail(
     createdAt: recipe.createdAt,
     difficulty: recipe.difficulty,
     creatorName: recipe.creatorName,
+    authorUserId: null,
     servings: 2,
     recipeTypeLabel: getRecipeTypeLabel('autres'),
     prepMinutes: recipe.preparationTimeMinutes,

@@ -1,18 +1,40 @@
 /**
  * Ajustements PrimeNG pour rester cohérent avec les tokens MiamBook.
- * Le mode clair/sombre est piloté par html.light / html.dark (ThemeService).
  */
 
-html.light .p-card,
+html.light .p-card {
+  background: var(--card);
+  border: none;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 2px 12px rgb(45 27 19 / 6%);
+  color: var(--foreground);
+}
+
 html.light .p-card .p-card-body,
 html.light .p-card .p-card-footer {
-  color: var(--p-text-color);
+  color: var(--foreground);
+}
+
+html.light .p-card .p-card-body {
+  padding: 1rem 1.25rem;
+}
+
+html.light .p-card .p-card-footer {
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid var(--border);
 }
 
 html.light .p-inputtext {
-  background: var(--p-form-field-background);
-  color: var(--p-form-field-color);
-  border-color: var(--p-form-field-border-color);
+  background: var(--card);
+  color: var(--foreground);
+  border-color: var(--border);
+  border-radius: var(--radius-pill);
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+}
+
+html.light .p-inputtext:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgb(245 158 11 / 15%);
 }
 
 .ingredient-unit-panel .p-select-option {

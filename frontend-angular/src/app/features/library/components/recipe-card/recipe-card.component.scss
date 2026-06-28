@@ -2,8 +2,7 @@
   position: relative;
   z-index: 0;
   display: block;
-  width: 20rem;
-  max-width: 100%;
+  width: 100%;
   color: inherit;
   text-decoration: none;
   transition: z-index 0s;
@@ -11,7 +10,6 @@
   &:hover,
   &:focus-visible {
     z-index: 1;
-    transition-delay: 0s;
   }
 }
 
@@ -22,24 +20,21 @@
     box-shadow 0.25s ease;
 }
 
-.recipe-card__link:hover ::ng-deep .recipe-card,
-.recipe-card__link:focus-visible ::ng-deep .recipe-card {
-  transform: translateY(-6px);
-  box-shadow:
-    0 12px 28px rgb(0 0 0 / 12%),
-    0 4px 10px rgb(0 0 0 / 8%);
+:host ::ng-deep .recipe-card .p-card-footer {
+  padding-top: 0.75rem;
+  margin-top: 0.75rem;
+  border-top: 1px solid var(--border);
 }
 
-:host-context(.dark) .recipe-card__link:hover ::ng-deep .recipe-card,
-:host-context(.dark) .recipe-card__link:focus-visible ::ng-deep .recipe-card {
-  box-shadow:
-    0 12px 28px rgb(0 0 0 / 35%),
-    0 4px 10px rgb(0 0 0 / 20%);
+.recipe-card__link:hover ::ng-deep .recipe-card,
+.recipe-card__link:focus-visible ::ng-deep .recipe-card {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgb(45 27 19 / 10%);
 }
 
 .recipe-card__media {
   position: relative;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 16 / 10;
   overflow: hidden;
   background: var(--muted);
 }
@@ -53,35 +48,91 @@
 
 .recipe-card__link:hover .recipe-card__image,
 .recipe-card__link:focus-visible .recipe-card__image {
-  transform: scale(1.05);
+  transform: scale(1.04);
 }
 
-:host ::ng-deep .recipe-card__like {
-  position: absolute !important;
-  top: 0.5rem;
-  right: 0.5rem;
+.recipe-card__like {
+  position: absolute;
+  top: 0.625rem;
+  right: 0.625rem;
   z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: 50%;
+  background-color: rgb(255 255 255 / 90%);
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.15s ease;
+  backdrop-filter: blur(4px);
+}
+
+.recipe-card__like:hover {
+  transform: scale(1.08);
+}
+
+.recipe-card__like--active {
+  color: var(--favorite-text);
+}
+
+.recipe-card__like--active .pi-heart-fill {
+  color: var(--favorite-text);
+}
+
+.recipe-card__category {
+  position: absolute;
+  bottom: 0.625rem;
+  left: 0.625rem;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--radius-pill);
+  background-color: rgb(255 255 255 / 92%);
+  color: var(--primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 2px 6px rgb(45 27 19 / 8%);
 }
 
 .recipe-card__title {
   margin: 0;
-  font-size: 1.125rem;
+  font-size: 1.0625rem;
   font-weight: 600;
-  line-height: 1.3;
+  line-height: 1.35;
+  color: var(--foreground);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-.recipe-card__description {
-  margin: 0.5rem 0 0;
-  font-size: 0.875rem;
-  color: var(--muted-foreground);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+.recipe-card__rating {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-top: 0.375rem;
+}
+
+.recipe-card__stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.125rem;
+  color: #f59e0b;
+  font-size: 0.8125rem;
+}
+
+.recipe-card__rating-value {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--secondary);
 }
 
 .recipe-card__meta {
@@ -89,9 +140,9 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  margin-top: 0.75rem;
-  font-size: 0.875rem;
-  color: var(--muted-foreground);
+  margin-top: 0.625rem;
+  font-size: 0.8125rem;
+  color: var(--secondary);
 }
 
 .recipe-card__time {
@@ -100,13 +151,29 @@
   gap: 0.375rem;
 }
 
-.recipe-card__date {
-  margin: 0.5rem 0 0;
-  font-size: 0.875rem;
+.recipe-card__time .pi {
+  font-size: 0.8125rem;
   color: var(--muted-foreground);
 }
 
+.recipe-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+}
+
 .recipe-card__author {
-  font-size: 0.875rem;
+  overflow: hidden;
+  font-size: 0.8125rem;
+  color: var(--secondary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recipe-card__date {
+  flex-shrink: 0;
+  font-size: 0.8125rem;
   color: var(--muted-foreground);
 }

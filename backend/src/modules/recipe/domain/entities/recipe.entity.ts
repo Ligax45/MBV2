@@ -26,6 +26,7 @@ export class Recipe {
     public readonly recipeType: RecipeTypeSummary,
     public readonly imageUrl: string | null,
     public readonly authorUserId: string | null,
+    public readonly authorName: string | null,
     public readonly prepMinutes: number,
     public readonly cookMinutes: number,
     public readonly restMinutes: number,
