@@ -12,6 +12,7 @@ import { RecipeIngredientOrmEntity } from '../mikroorm/recipe-ingredient.orm-ent
 import { RecipeOrmEntity } from '../mikroorm/recipe.orm-entity';
 import { RecipeStepOrmEntity } from '../mikroorm/recipe-step.orm-entity';
 import { RecipeTypeOrmEntity } from '../mikroorm/recipe-type.orm-entity';
+import { UserOrmEntity } from '../mikroorm/user.orm-entity';
 
 @Injectable()
 export class MikroOrmRecipeRepository implements RecipeRepository {
@@ -27,7 +28,7 @@ export class MikroOrmRecipeRepository implements RecipeRepository {
   ) {}
 
   async findById(id: string): Promise<Recipe | null> {
-    const r = await this.repo.findOne({ id }, { populate: ['recipeType'] });
+    const r = await this.repo.findOne({ id }, { populate: ['recipeType', 'author'] });
     if (!r) return null;
     const details = await this.loadDetails(id);
     return this.toDomain(r, details);
@@ -35,7 +36,7 @@ export class MikroOrmRecipeRepository implements RecipeRepository {
 
   async findAll(): Promise<Recipe[]> {
     const rows = await this.repo.findAll({
-      populate: ['recipeType'],
+      populate: ['recipeType', 'author'],
       orderBy: { createdAt: 'desc' },
     });
     return rows.map((r) => this.toDomain(r));
@@ -53,7 +54,9 @@ export class MikroOrmRecipeRepository implements RecipeRepository {
       RecipeTypeOrmEntity,
       params.recipeTypeId,
     );
-    entity.authorUserId = params.authorUserId ?? null;
+    entity.author = params.authorUserId
+      ? em.getReference(UserOrmEntity, params.authorUserId)
+      : null;
     entity.prepMinutes = params.prepMinutes ?? 0;
     entity.cookMinutes = params.cookMinutes ?? 0;
     entity.restMinutes = params.restMinutes ?? 0;
@@ -61,14 +64,14 @@ export class MikroOrmRecipeRepository implements RecipeRepository {
     em.persist(entity);
     await em.flush();
     await this.replaceDetails(entity.id, params);
-    await em.populate(entity, ['recipeType']);
+    await em.populate(entity, ['recipeType', 'author']);
 
     const details = await this.loadDetails(entity.id);
     return this.toDomain(entity, details);
   }
 
   async update(id: string, params: CreateRecipeParams): Promise<Recipe | null> {
-    const entity = await this.repo.findOne({ id }, { populate: ['recipeType'] });
+    const entity = await this.repo.findOne({ id }, { populate: ['recipeType', 'author'] });
     if (!entity) return null;
 
     const em = this.repo.getEntityManager();
@@ -83,29 +86,41 @@ export class MikroOrmRecipeRepository implements RecipeRepository {
       RecipeTypeOrmEntity,
       params.recipeTypeId,
     );
-    entity.authorUserId = params.authorUserId ?? null;
+    entity.author = params.authorUserId
+      ? em.getReference(UserOrmEntity, params.authorUserId)
+      : null;
     entity.prepMinutes = params.prepMinutes ?? 0;
     entity.cookMinutes = params.cookMinutes ?? 0;
     entity.restMinutes = params.restMinutes ?? 0;
 
     await em.flush();
     await this.replaceDetails(id, params);
-    await em.populate(entity, ['recipeType']);
+    await em.populate(entity, ['recipeType', 'author']);
 
     const details = await this.loadDetails(id);
     return this.toDomain(entity, details);
   }
 
   async updateImageUrl(id: string, imageUrl: string): Promise<Recipe | null> {
-    const entity = await this.repo.findOne({ id }, { populate: ['recipeType'] });
+    const entity = await this.repo.findOne({ id }, { populate: ['recipeType', 'author'] });
     if (!entity) return null;
 
     entity.imageUrl = imageUrl;
     await this.repo.getEntityManager().flush();
-    await this.repo.getEntityManager().populate(entity, ['recipeType']);
+    await this.repo.getEntityManager().populate(entity, ['recipeType', 'author']);
 
     const details = await this.loadDetails(id);
     return this.toDomain(entity, details);
+  }
+
+  async delete(id: string): Promise<boolean> {
+    const entity = await this.repo.findOne({ id });
+    if (!entity) return false;
+
+    const em = this.repo.getEntityManager();
+    em.remove(entity);
+    await em.flush();
+    return true;
   }
 
   private async loadDetails(recipeId: string) {
@@ -205,7 +220,8 @@ export class MikroOrmRecipeRepository implements RecipeRepository {
       r.servings,
       { id: r.recipeType.id, label: r.recipeType.label },
       r.imageUrl ?? null,
-      r.authorUserId ?? null,
+      r.author?.id ?? null,
+      r.author?.pseudo ?? null,
       r.prepMinutes,
       r.cookMinutes,
       r.restMinutes,

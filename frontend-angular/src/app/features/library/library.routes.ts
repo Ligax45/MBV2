@@ -6,4 +6,10 @@ export const libraryRoutes: Routes = [
     loadComponent: () =>
       import('./library.component').then((m) => m.LibraryComponent),
   },
+  {
+    path: 'bibliotheque/favoris',
+    loadComponent: () =>
+      import('./library.component').then((m) => m.LibraryComponent),
+    data: { favoritesOnly: true },
+  },
 ];

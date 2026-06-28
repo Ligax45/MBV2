@@ -1,10 +1,8 @@
 <div class="recipe-details-page">
-  <p-button
-    label="Retour à la bibliothèque"
-    icon="pi pi-arrow-left"
-    [text]="true"
-    routerLink="/bibliotheque"
-  />
+  <a class="recipe-details-page__back" routerLink="/bibliotheque">
+    <i class="pi pi-arrow-left" aria-hidden="true"></i>
+    Retour à la bibliothèque
+  </a>
 
   @if (loading()) {
     <div class="recipe-details-page__state" role="status">
@@ -16,116 +14,176 @@
     </div>
   } @else if (recipe(); as detail) {
     <article class="recipe-details">
-      <p-card styleClass="recipe-details__hero">
-        <ng-template #header>
-          <div class="recipe-details__image-wrap">
-            <img
-              class="recipe-details__image"
-              [src]="detail.imageUrl"
-              [alt]="detail.title"
-            />
-          </div>
-        </ng-template>
-
-        <header class="recipe-details__header">
-          <div class="recipe-details__header-row">
-            <h1 class="recipe-details__title">{{ detail.title }}</h1>
-            <p-button
-              label="Modifier"
-              icon="pi pi-pencil"
-              severity="secondary"
-              [outlined]="true"
-              [routerLink]="['/recette', detail.id, 'modifier']"
-            />
-          </div>
-          <p class="recipe-details__description">{{ detail.description }}</p>
-
-          <div class="recipe-details__chips">
-            <span class="recipe-details__chip">
-              <i class="pi pi-clock" aria-hidden="true"></i>
-              {{ formatTime(totalTimeMinutes(detail)) }}
-            </span>
-            <p-tag
-              [value]="difficultyLabel(detail.difficulty)"
-              [severity]="difficultySeverity(detail.difficulty)"
-            />
-            <span class="recipe-details__chip">
-              <i class="pi pi-user" aria-hidden="true"></i>
-              {{ detail.creatorName }}
-            </span>
-            <time class="recipe-details__chip" [attr.datetime]="detail.createdAt">
-              Publié le {{ formatDate(detail.createdAt) }}
-            </time>
-          </div>
-        </header>
-
-        <p-divider />
-
-        <div class="recipe-details__grid">
-          <div>
-            <h3 class="recipe-details__label">Type</h3>
-            <p class="recipe-details__value">{{ detail.recipeTypeLabel }}</p>
-          </div>
-          <div>
-            <h3 class="recipe-details__label">Portions</h3>
-            <p class="recipe-details__value">{{ detail.servings }} personne(s)</p>
-          </div>
+      <div class="recipe-details__hero">
+        <div class="recipe-details__image-wrap">
+          <img
+            class="recipe-details__image"
+            [src]="detail.imageUrl"
+            [alt]="detail.title"
+          />
         </div>
 
-        <p-divider />
+        <div class="recipe-details__summary">
+          <div class="recipe-details__header-row">
+            <h1 class="recipe-details__title">{{ detail.title }}</h1>
+            <div class="recipe-details__actions">
+              @if (canModify()) {
+                <a
+                  class="recipe-details__action-btn recipe-details__action-btn--edit"
+                  [routerLink]="['/recette', detail.id, 'modifier']"
+                >
+                  <i class="pi pi-pencil" aria-hidden="true"></i>
+                  Modifier
+                </a>
+                <button
+                  type="button"
+                  class="recipe-details__action-btn recipe-details__action-btn--delete"
+                  [disabled]="deleting()"
+                  (click)="onDeleteRecipe(detail)"
+                >
+                  <i class="pi pi-trash" aria-hidden="true"></i>
+                  Supprimer
+                </button>
+              }
+            </div>
+          </div>
 
-        <section>
-          <h3 class="recipe-details__section-title">
-            <i class="pi pi-clock" aria-hidden="true"></i>
-            Temps de réalisation
-          </h3>
-          <ul class="recipe-details__time-list">
-            <li>Préparation : {{ formatTime(detail.prepMinutes) }}</li>
-            <li>Cuisson : {{ formatTime(detail.cookMinutes) }}</li>
-            <li>Repos : {{ formatTime(detail.restMinutes) }}</li>
-          </ul>
-        </section>
+          <div class="recipe-details__meta-row">
+            <span
+              class="badge-difficulty"
+              [class]="'badge-difficulty--' + detail.difficulty"
+            >
+              {{ difficultyLabel(detail.difficulty) }}
+            </span>
+            <span class="recipe-details__author-date">
+              Par {{ detail.creatorName }} &bull; {{ formatDate(detail.createdAt) }}
+            </span>
+          </div>
 
-        @if (detail.equipmentLabels.length > 0) {
-          <p-divider />
-          <section>
-            <h3 class="recipe-details__section-title">
-              <i class="pi pi-sliders-h" aria-hidden="true"></i>
-              Équipement
-            </h3>
-            <ul class="recipe-details__equipment-list">
-              @for (label of detail.equipmentLabels; track label) {
-                <li>{{ label }}</li>
+          <p class="recipe-details__description">{{ detail.description }}</p>
+
+          <div class="recipe-details__info-grid">
+            <div class="recipe-details__info-card">
+              <span class="recipe-details__info-icon recipe-details__info-icon--type">
+                <i class="pi pi-tag" aria-hidden="true"></i>
+              </span>
+              <div>
+                <span class="recipe-details__info-label">Type</span>
+                <span class="recipe-details__info-value">{{ detail.recipeTypeLabel }}</span>
+              </div>
+            </div>
+            <div class="recipe-details__info-card">
+              <span class="recipe-details__info-icon recipe-details__info-icon--servings">
+                <i class="pi pi-users" aria-hidden="true"></i>
+              </span>
+              <div>
+                <span class="recipe-details__info-label">Portions</span>
+                <span class="recipe-details__info-value">{{ detail.servings }} pers.</span>
+              </div>
+            </div>
+            <div class="recipe-details__info-card">
+              <span class="recipe-details__info-icon recipe-details__info-icon--prep">
+                <i class="pi pi-clock" aria-hidden="true"></i>
+              </span>
+              <div>
+                <span class="recipe-details__info-label">Préparation</span>
+                <span class="recipe-details__info-value">{{ formatTime(detail.prepMinutes) }}</span>
+              </div>
+            </div>
+            <div class="recipe-details__info-card">
+              <span class="recipe-details__info-icon recipe-details__info-icon--cook">
+                <i class="pi pi-stopwatch" aria-hidden="true"></i>
+              </span>
+              <div>
+                <span class="recipe-details__info-label">Cuisson</span>
+                <span class="recipe-details__info-value">{{ formatTime(detail.cookMinutes) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            class="recipe-details__favorite"
+            [class.recipe-details__favorite--active]="isLiked()"
+            [disabled]="togglingFavorite()"
+            (click)="toggleLike()"
+          >
+            <i
+              [class]="isLiked() ? 'pi pi-heart-fill' : 'pi pi-heart'"
+              aria-hidden="true"
+            ></i>
+            {{ isLiked() ? 'Recette aimée' : 'Aimer cette recette' }}
+          </button>
+        </div>
+      </div>
+
+      @if (detail.ingredients.length > 0 || detail.steps.length > 0) {
+        <div class="recipe-details__tabs-section">
+          <div class="recipe-details__tabs" role="tablist">
+            @if (detail.ingredients.length > 0) {
+              <button
+                type="button"
+                class="recipe-details__tab"
+                [class.recipe-details__tab--active]="activeTab() === 'ingredients'"
+                role="tab"
+                [attr.aria-selected]="activeTab() === 'ingredients'"
+                (click)="setActiveTab('ingredients')"
+              >
+                Ingrédients
+              </button>
+            }
+            @if (detail.steps.length > 0) {
+              <button
+                type="button"
+                class="recipe-details__tab"
+                [class.recipe-details__tab--active]="activeTab() === 'steps'"
+                role="tab"
+                [attr.aria-selected]="activeTab() === 'steps'"
+                (click)="setActiveTab('steps')"
+              >
+                Étapes
+              </button>
+            }
+          </div>
+
+          @if (activeTab() === 'ingredients' && detail.ingredients.length > 0) {
+            <ul class="recipe-details__ingredients">
+              @for (ingredient of detail.ingredients; track ingredient.id; let i = $index) {
+                <li class="recipe-details__ingredient">
+                  <span class="recipe-details__ingredient-number">{{ i + 1 }}</span>
+                  <span class="recipe-details__ingredient-text">{{
+                    formatIngredient(ingredient)
+                  }}</span>
+                </li>
               }
             </ul>
-          </section>
-        }
-      </p-card>
+          }
 
-      @if (detail.ingredients.length > 0) {
-        <p-card header="Ingrédients" styleClass="recipe-details__section-card">
-          <ul class="recipe-details__ingredients">
-            @for (ingredient of detail.ingredients; track ingredient.id) {
-              <li>{{ formatIngredient(ingredient) }}</li>
-            }
-          </ul>
-        </p-card>
+          @if (activeTab() === 'steps' && detail.steps.length > 0) {
+            <ol class="recipe-details__steps">
+              @for (step of detail.steps; track step.id) {
+                <li class="recipe-details__step">
+                  <span class="recipe-details__step-number">{{ step.order }}</span>
+                  <p class="recipe-details__step-content">{{ step.content }}</p>
+                </li>
+              }
+            </ol>
+          }
+        </div>
       }
 
-      @if (detail.steps.length > 0) {
-        <p-card
-          header="Étapes de réalisation"
-          styleClass="recipe-details__section-card"
-        >
-          <ol class="recipe-details__steps">
-            @for (step of detail.steps; track step.id) {
-              <li class="recipe-details__step">
-                <span class="recipe-details__step-number">{{ step.order }}</span>
-                <p class="recipe-details__step-content">{{ step.content }}</p>
-              </li>
+      @if (detail.equipmentLabels.length > 0) {
+        <section class="recipe-details__equipment">
+          <h3 class="recipe-details__equipment-title">
+            <i class="pi pi-sliders-h" aria-hidden="true"></i>
+            Équipement
+          </h3>
+          <ul class="recipe-details__equipment-list">
+            @for (label of detail.equipmentLabels; track label) {
+              <li>{{ label }}</li>
             }
-          </ol>
-        </p-card>
+          </ul>
+        </section>
       }
     </article>
   }

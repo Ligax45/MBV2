@@ -1,8 +1,28 @@
 <div class="library-page">
-  <app-recipe-search-bar
-    [value]="searchQuery()"
-    (valueChange)="onSearchChange($event)"
-  />
+  <header class="library-page__header">
+    <h1 class="library-page__title">{{ pageTitle() }}</h1>
+    <p class="library-page__subtitle">{{ pageSubtitle() }}</p>
+  </header>
+
+  <div class="library-page__controls">
+    <button
+      type="button"
+      class="library-page__filter"
+      [class.library-page__filter--active]="favoritesOnly()"
+      [attr.aria-pressed]="favoritesOnly()"
+      (click)="toggleFavorites()"
+    >
+      <i class="pi pi-heart" aria-hidden="true"></i>
+      Mes favoris
+    </button>
+
+    <div class="library-page__search">
+      <app-recipe-search-bar
+        [value]="searchQuery()"
+        (valueChange)="onSearchChange($event)"
+      />
+    </div>
+  </div>
 
   @if (loading()) {
     <div class="library-page__state" role="status">
@@ -15,13 +35,16 @@
   } @else if (filteredRecipes().length === 0) {
     <p-message
       severity="info"
-      text="Aucune recette ne correspond à votre recherche."
+      [text]="emptyMessage()"
       styleClass="library-page__message"
     />
   } @else {
     <div class="library-page__grid">
       @for (recipe of filteredRecipes(); track recipe.id) {
-        <app-recipe-card [recipe]="recipe" />
+        <app-recipe-card
+          [recipe]="recipe"
+          (favoriteChange)="onFavoriteChange($event)"
+        />
       }
     </div>
   }

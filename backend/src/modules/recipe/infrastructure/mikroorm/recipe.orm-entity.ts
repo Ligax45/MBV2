@@ -1,5 +1,6 @@
 import { EntitySchema, ReferenceKind } from '@mikro-orm/core';
 import { RecipeTypeOrmEntity } from './recipe-type.orm-entity';
+import { UserOrmEntity } from './user.orm-entity';
 
 export class RecipeOrmEntity {
   id!: string;
@@ -16,7 +17,7 @@ export class RecipeOrmEntity {
 
   recipeType!: RecipeTypeOrmEntity;
 
-  authorUserId?: string | null;
+  author?: UserOrmEntity | null;
 
   prepMinutes: number = 0;
 
@@ -50,7 +51,12 @@ export const RecipeOrmEntitySchema = new EntitySchema<RecipeOrmEntity>({
       fieldNames: ['recipe_type_id'],
       nullable: false,
     },
-    authorUserId: { type: 'uuid', nullable: true, fieldName: 'author_user_id' },
+    author: {
+      kind: ReferenceKind.MANY_TO_ONE,
+      entity: () => UserOrmEntity,
+      fieldNames: ['author_user_id'],
+      nullable: true,
+    },
     prepMinutes: { type: 'smallint', fieldName: 'prep_minutes', default: 0 },
     cookMinutes: { type: 'smallint', fieldName: 'cook_minutes', default: 0 },
     restMinutes: { type: 'smallint', fieldName: 'rest_minutes', default: 0 },

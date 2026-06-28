@@ -2,9 +2,12 @@ import {
   Inject,
   Injectable,
   BadRequestException,
+  ForbiddenException,
   NotFoundException,
 } from '@nestjs/common';
+import type { AuthenticatedUser } from '../../../auth/domain/auth-user.model';
 import { toRecipeResponse } from '../recipe-response.util';
+import { canModifyRecipe } from '../recipe-authorization.util';
 import {
   RECIPE_REPOSITORY,
   type CreateRecipeParams,
@@ -30,9 +33,6 @@ function validateRecipeInput(input: CreateRecipeParams): void {
   if (!input.recipeTypeId?.trim())
     throw new BadRequestException('recipeTypeId is required');
   assertUuid('recipeTypeId', input.recipeTypeId);
-  if (input.authorUserId != null && String(input.authorUserId).trim() !== '')
-    assertUuid('authorUserId', String(input.authorUserId));
-
   if (!['facile', 'moyen', 'difficile'].includes(input.difficulty))
     throw new BadRequestException('difficulty is invalid');
   if (typeof input.servings !== 'number' || input.servings < 0)
@@ -49,13 +49,24 @@ export class UpdateRecipeUseCase {
     @Inject(RECIPE_REPOSITORY) private readonly recipeRepo: RecipeRepository,
   ) {}
 
-  async execute(id: string, input: CreateRecipeParams) {
+  async execute(id: string, input: CreateRecipeParams, actor: AuthenticatedUser) {
     const trimmed = id?.trim() ?? '';
     if (!trimmed) throw new BadRequestException('id is required');
     assertUuid('id', trimmed);
     validateRecipeInput(input);
 
-    const recipe = await this.recipeRepo.update(trimmed, input);
+    const existing = await this.recipeRepo.findById(trimmed);
+    if (!existing) throw new NotFoundException('Recette introuvable');
+
+    if (!canModifyRecipe(actor, existing.authorUserId ?? null)) {
+      throw new ForbiddenException('Seul l’auteur peut modifier cette recette');
+    }
+
+    const authorUserId = existing.authorUserId ?? actor.id;
+    const recipe = await this.recipeRepo.update(trimmed, {
+      ...input,
+      authorUserId,
+    });
     if (!recipe) throw new NotFoundException('Recette introuvable');
 
     return toRecipeResponse(recipe);

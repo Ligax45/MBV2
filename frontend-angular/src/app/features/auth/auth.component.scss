@@ -1,0 +1,126 @@
+.auth-page {
+  display: flex;
+  height: 100dvh;
+  overflow: auto;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background-color: var(--background);
+}
+
+.auth-page__container {
+  width: 100%;
+  max-width: 26rem;
+}
+
+.auth-page__brand {
+  display: block;
+  margin-bottom: 1.5rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--foreground);
+  text-align: center;
+  text-decoration: none;
+}
+
+.auth-card__header {
+  margin-bottom: 1.5rem;
+}
+
+.auth-card__title {
+  margin: 0 0 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.auth-card__subtitle {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+
+  label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--foreground);
+  }
+}
+
+:host ::ng-deep .auth-input {
+  width: 100%;
+}
+
+:host ::ng-deep .auth-input--code {
+  font-family: ui-monospace, monospace;
+  font-size: 1.25rem;
+  letter-spacing: 0.25em;
+  text-align: center;
+}
+
+:host ::ng-deep .auth-password {
+  width: 100%;
+}
+
+:host ::ng-deep .auth-password .p-password-input {
+  width: 100%;
+}
+
+:host ::ng-deep .auth-submit {
+  width: 100%;
+}
+
+.auth-form__error {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #dc2626;
+}
+
+.auth-card__switch {
+  margin: 1.25rem 0 0;
+  font-size: 0.875rem;
+  text-align: center;
+  color: var(--muted-foreground);
+}
+
+.auth-link {
+  border: none;
+  padding: 0;
+  background: none;
+  color: var(--foreground);
+  font: inherit;
+  font-weight: 500;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.auth-mfa-qr {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.auth-mfa-secret {
+  margin: 0 0 1.25rem;
+  font-size: 0.8125rem;
+  text-align: center;
+  color: var(--muted-foreground);
+  word-break: break-all;
+
+  code {
+    font-family: ui-monospace, monospace;
+    font-size: 0.75rem;
+  }
+}

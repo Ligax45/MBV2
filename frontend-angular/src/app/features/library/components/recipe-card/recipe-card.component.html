@@ -7,43 +7,60 @@
           [src]="recipe().imageUrl"
           [alt]="recipe().title"
         />
-        <p-button
+        <button
           type="button"
-          [icon]="isLiked() ? 'pi pi-heart-fill' : 'pi pi-heart'"
-          [rounded]="true"
-          severity="secondary"
-          styleClass="recipe-card__like"
+          class="recipe-card__like"
+          [class.recipe-card__like--active]="isLiked()"
+          [disabled]="togglingFavorite()"
           [attr.aria-label]="
             isLiked() ? 'Retirer des favoris' : 'Ajouter aux favoris'
           "
-          (onClick)="toggleLike($event)"
-        />
+          (click)="toggleLike($event)"
+        >
+          <i
+            [class]="isLiked() ? 'pi pi-heart-fill' : 'pi pi-heart'"
+            aria-hidden="true"
+          ></i>
+        </button>
+        @if (recipe().recipeTypeLabel) {
+          <span class="recipe-card__category">
+            {{ recipe().recipeTypeLabel }}
+          </span>
+        }
       </div>
     </ng-template>
 
     <h3 class="recipe-card__title">{{ recipe().title }}</h3>
-    <p class="recipe-card__description">{{ recipe().description }}</p>
+
+    <div class="recipe-card__rating" [attr.aria-label]="'Note ' + starRating() + ' sur 5'">
+      <span class="recipe-card__stars" aria-hidden="true">
+        @for (star of starIndexes; track star) {
+          <i [class]="starIcon(star)"></i>
+        }
+      </span>
+      <span class="recipe-card__rating-value">{{ starRating() | number: '1.1-1' }}</span>
+    </div>
 
     <div class="recipe-card__meta">
       <span class="recipe-card__time">
         <i class="pi pi-clock" aria-hidden="true"></i>
         {{ formatTime(recipe().totalTimeMinutes) }}
       </span>
-      <p-tag
-        [value]="difficultyLabel(recipe().difficulty)"
-        [severity]="difficultySeverity(recipe().difficulty)"
-      />
+      <span
+        class="badge-difficulty"
+        [class]="'badge-difficulty--' + recipe().difficulty"
+      >
+        {{ difficultyLabel(recipe().difficulty) }}
+      </span>
     </div>
 
-    <p class="recipe-card__date">
-      Publié le
-      <time [attr.datetime]="recipe().createdAt">{{
-        formatDate(recipe().createdAt)
-      }}</time>
-    </p>
-
     <ng-template #footer>
-      <span class="recipe-card__author">Par {{ recipe().creatorName }}</span>
+      <div class="recipe-card__footer">
+        <span class="recipe-card__author">Par {{ recipe().creatorName }}</span>
+        <time class="recipe-card__date" [attr.datetime]="recipe().createdAt">
+          {{ formatDate(recipe().createdAt) }}
+        </time>
+      </div>
     </ng-template>
   </p-card>
 </a>

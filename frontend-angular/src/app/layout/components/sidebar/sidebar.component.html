@@ -1,3 +1,38 @@
 <aside class="sidebar">
-  <app-nav-list />
+  <div class="sidebar__logo">
+    <span class="sidebar__logo-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+        <path d="M12 3C10.5 3 9.2 3.8 8.5 5C6.5 5.2 5 6.9 5 9v1h14V9c0-2.1-1.5-3.8-3.5-4C14.8 3.8 13.5 3 12 3z"/>
+        <path d="M5 11v1c0 3.3 2.7 6 6 6s6-2.7 6-6v-1H5zm4 8h6v2H9v-2z"/>
+      </svg>
+    </span>
+    <span class="sidebar__logo-text">MiamBook</span>
+  </div>
+
+  <div class="sidebar__nav">
+    <app-nav-list />
+  </div>
+
+  <div class="sidebar__footer">
+    @if (isAuthenticated()) {
+      <div class="sidebar__user">
+        <div class="avatar avatar--sidebar">
+          <span class="avatar-fallback">{{ avatarInitials() }}</span>
+        </div>
+        <div class="sidebar__user-info">
+          <span class="sidebar__user-name">{{ pseudo() }}</span>
+          <span class="sidebar__user-role">{{ roleLabel() }}</span>
+        </div>
+      </div>
+      <button type="button" class="sidebar__logout" (click)="onLogout()">
+        <i class="pi pi-sign-out" aria-hidden="true"></i>
+        Déconnexion
+      </button>
+    } @else {
+      <a class="sidebar__login" routerLink="/connexion">
+        <i class="pi pi-sign-in" aria-hidden="true"></i>
+        Connexion
+      </a>
+    }
+  </div>
 </aside>

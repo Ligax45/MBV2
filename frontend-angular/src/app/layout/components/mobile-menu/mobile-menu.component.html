@@ -12,10 +12,18 @@
     aria-label="Menu de navigation"
   >
     <div class="mobile-menu__header">
-      <span class="mobile-menu__title">MiamBook</span>
+      <div class="mobile-menu__logo">
+        <span class="mobile-menu__logo-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+            <path d="M12 3C10.5 3 9.2 3.8 8.5 5C6.5 5.2 5 6.9 5 9v1h14V9c0-2.1-1.5-3.8-3.5-4C14.8 3.8 13.5 3 12 3z"/>
+            <path d="M5 11v1c0 3.3 2.7 6 6 6s6-2.7 6-6v-1H5zm4 8h6v2H9v-2z"/>
+          </svg>
+        </span>
+        <span class="mobile-menu__title">MiamBook</span>
+      </div>
       <button
         type="button"
-        class="btn btn-ghost btn-icon"
+        class="btn btn-ghost btn-icon mobile-menu__close"
         aria-label="Fermer le menu"
         (click)="onClose()"
       >
