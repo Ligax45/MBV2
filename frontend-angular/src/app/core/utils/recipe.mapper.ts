@@ -7,11 +7,12 @@ import type { RecipeDetailApiResponse } from '@core/models/recipe-api.model';
 import type { RecipeApiResponse } from '@core/models/recipe-api.model';
 import type { RecipeListItem } from '@core/models/recipe-list-item.model';
 
-function resolveCreatorName(authorUserId: string | null): string {
-  if (!authorUserId) {
+function resolveCreatorName(authorName: string | null | undefined): string {
+  const trimmed = authorName?.trim();
+  if (!trimmed) {
     return UNKNOWN_AUTHOR_LABEL;
   }
-  return `Utilisateur ${authorUserId.slice(0, 8)}`;
+  return trimmed;
 }
 
 export function resolveRecipeImageUrl(
@@ -38,7 +39,9 @@ export function mapRecipeToListItem(api: RecipeApiResponse): RecipeListItem {
     totalTimeMinutes: api.prepMinutes + api.cookMinutes + api.restMinutes,
     createdAt: api.createdAt,
     difficulty: api.difficulty,
-    creatorName: resolveCreatorName(api.authorUserId),
+    creatorName: resolveCreatorName(api.authorName),
+    recipeTypeLabel: api.recipeType.label,
+    isFavorited: api.isFavorite ?? false,
   };
 }
 
@@ -50,7 +53,8 @@ export function mapRecipeToDetail(api: RecipeDetailApiResponse): RecipeDetail {
     imageUrl: resolveRecipeImageUrl(api.imageUrl, api.updatedAt),
     createdAt: api.createdAt,
     difficulty: api.difficulty,
-    creatorName: resolveCreatorName(api.authorUserId),
+    creatorName: resolveCreatorName(api.authorName),
+    authorUserId: api.authorUserId,
     servings: api.servings,
     recipeTypeLabel: api.recipeType.label,
     prepMinutes: api.prepMinutes,
@@ -68,5 +72,6 @@ export function mapRecipeToDetail(api: RecipeDetailApiResponse): RecipeDetail {
       order: item.order,
       content: item.content,
     })),
+    isFavorited: api.isFavorite ?? false,
   };
 }

@@ -1,7 +1,14 @@
+:host {
+  display: block;
+  height: 100dvh;
+}
+
 .app-shell {
   display: flex;
   height: 100dvh;
+  overflow: hidden;
   flex-direction: column;
+  background-color: var(--background);
 }
 
 .app-body {
@@ -13,6 +20,19 @@
 
 .app-main {
   flex: 1;
+  min-height: 0;
   overflow: auto;
-  padding: 1rem;
+  padding: 2rem 2.5rem;
+}
+
+@media (min-width: 768px) {
+  .app-main {
+    margin-left: var(--sidebar-width);
+  }
+}
+
+@media (max-width: 767px) {
+  .app-main {
+    padding: 1.25rem 1rem;
+  }
 }

@@ -35,4 +35,5 @@ export interface RecipeRepository {
   create(params: CreateRecipeParams): Promise<Recipe>;
   update(id: string, params: CreateRecipeParams): Promise<Recipe | null>;
   updateImageUrl(id: string, imageUrl: string): Promise<Recipe | null>;
+  delete(id: string): Promise<boolean>;
 }

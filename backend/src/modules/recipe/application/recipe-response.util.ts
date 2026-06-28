@@ -1,6 +1,13 @@
 import type { Recipe } from '../domain/entities/recipe.entity';
 
-export function toRecipeResponse(recipe: Recipe) {
+interface RecipeResponseOptions {
+  isFavorite?: boolean;
+}
+
+export function toRecipeResponse(
+  recipe: Recipe,
+  options: RecipeResponseOptions = {},
+) {
   return {
     id: recipe.id,
     title: recipe.title,
@@ -10,6 +17,7 @@ export function toRecipeResponse(recipe: Recipe) {
     servings: recipe.servings,
     recipeType: recipe.recipeType,
     authorUserId: recipe.authorUserId,
+    authorName: recipe.authorName,
     prepMinutes: recipe.prepMinutes,
     cookMinutes: recipe.cookMinutes,
     restMinutes: recipe.restMinutes,
@@ -31,10 +39,14 @@ export function toRecipeResponse(recipe: Recipe) {
       id: item.id,
       label: item.label,
     })),
+    isFavorite: options.isFavorite ?? false,
   };
 }
 
-export function toRecipeListItemResponse(recipe: Recipe) {
+export function toRecipeListItemResponse(
+  recipe: Recipe,
+  options: RecipeResponseOptions = {},
+) {
   return {
     id: recipe.id,
     title: recipe.title,
@@ -44,10 +56,12 @@ export function toRecipeListItemResponse(recipe: Recipe) {
     servings: recipe.servings,
     recipeType: recipe.recipeType,
     authorUserId: recipe.authorUserId,
+    authorName: recipe.authorName,
     prepMinutes: recipe.prepMinutes,
     cookMinutes: recipe.cookMinutes,
     restMinutes: recipe.restMinutes,
     createdAt: recipe.createdAt.toISOString(),
     updatedAt: recipe.updatedAt.toISOString(),
+    isFavorite: options.isFavorite ?? false,
   };
 }

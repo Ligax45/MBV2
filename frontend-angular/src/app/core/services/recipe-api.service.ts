@@ -16,8 +16,11 @@ export class RecipeApiService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = environment.apiUrl;
 
-  getRecipes(): Observable<RecipeApiResponse[]> {
-    return this.http.get<RecipeApiResponse[]>(`${this.baseUrl}/recipes`);
+  getRecipes(favoritesOnly = false): Observable<RecipeApiResponse[]> {
+    const params = favoritesOnly ? { favorites: 'true' } : undefined;
+    return this.http.get<RecipeApiResponse[]>(`${this.baseUrl}/recipes`, {
+      params,
+    });
   }
 
   getRecipeById(id: string): Observable<RecipeDetailApiResponse> {
@@ -55,6 +58,23 @@ export class RecipeApiService {
     return this.http.post<{ imageUrl: string }>(
       `${this.baseUrl}/recipes/${recipeId}/image`,
       formData,
+    );
+  }
+
+  deleteRecipe(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/recipes/${id}`);
+  }
+
+  addRecipeFavorite(id: string): Observable<{ success: boolean; isFavorite: boolean }> {
+    return this.http.post<{ success: boolean; isFavorite: boolean }>(
+      `${this.baseUrl}/recipes/${id}/favorite`,
+      {},
+    );
+  }
+
+  removeRecipeFavorite(id: string): Observable<{ success: boolean; isFavorite: boolean }> {
+    return this.http.delete<{ success: boolean; isFavorite: boolean }>(
+      `${this.baseUrl}/recipes/${id}/favorite`,
     );
   }
 }

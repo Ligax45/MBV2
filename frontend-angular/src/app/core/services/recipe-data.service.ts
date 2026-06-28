@@ -19,12 +19,12 @@ export class RecipeDataService {
   private readonly bouchon = inject(RecipeBouchonService);
   private readonly api = inject(RecipeApiService);
 
-  getRecipes(): Observable<RecipeListItem[]> {
+  getRecipes(favoritesOnly = false): Observable<RecipeListItem[]> {
     if (environment.useMockData) {
-      return this.bouchon.getRecipes();
+      return this.bouchon.getRecipes(favoritesOnly);
     }
     return this.api
-      .getRecipes()
+      .getRecipes(favoritesOnly)
       .pipe(map((items) => items.map(mapRecipeToListItem)));
   }
 
@@ -41,5 +41,22 @@ export class RecipeDataService {
         return throwError(() => err);
       }),
     );
+  }
+
+  deleteRecipe(id: string): Observable<void> {
+    if (environment.useMockData) {
+      return throwError(() => new Error('MOCK_DELETE_UNSUPPORTED'));
+    }
+    return this.api.deleteRecipe(id);
+  }
+
+  setRecipeFavorite(id: string, favorited: boolean): Observable<void> {
+    if (environment.useMockData) {
+      return this.bouchon.setRecipeFavorite(id, favorited);
+    }
+    const request$ = favorited
+      ? this.api.addRecipeFavorite(id)
+      : this.api.removeRecipeFavorite(id);
+    return request$.pipe(map(() => undefined));
   }
 }

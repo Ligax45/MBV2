@@ -1,16 +1,22 @@
 .recipe-search {
   display: block;
   width: 100%;
-  max-width: 28rem;
+  max-width: 32rem;
 }
 
 .recipe-search__input {
   width: 100%;
+  font-size: 0.9375rem;
+}
+
+:host ::ng-deep .recipe-search .p-iconfield .p-inputicon {
+  color: var(--muted-foreground);
+  left: 1rem;
 }
 
 .recipe-search__clear {
   position: absolute;
-  right: 0.25rem;
+  right: 0.375rem;
   top: 50%;
   transform: translateY(-50%);
 }

@@ -69,9 +69,11 @@ export interface RecipeApiResponse {
   servings: number;
   recipeType: RecipeTypeSummary;
   authorUserId: string | null;
+  authorName: string | null;
   prepMinutes: number;
   cookMinutes: number;
   restMinutes: number;
   createdAt: string;
   updatedAt: string;
+  isFavorite?: boolean;
 }

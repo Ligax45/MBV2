@@ -18,17 +18,34 @@ import {
 @Injectable({ providedIn: 'root' })
 export class RecipeBouchonService {
   private readonly mockDelayMs = 200;
+  private readonly favoriteIds = new Set<string>();
 
-  getRecipes(): Observable<RecipeListItem[]> {
-    const items = BOUCHON_RECIPES.map(mapBouchonToListItem);
+  getRecipes(favoritesOnly = false): Observable<RecipeListItem[]> {
+    let items = BOUCHON_RECIPES.map(mapBouchonToListItem).map((item) => ({
+      ...item,
+      isFavorited: this.favoriteIds.has(item.id),
+    }));
+    if (favoritesOnly) {
+      items = items.filter((item) => item.isFavorited);
+    }
     return of(items).pipe(delay(this.mockDelayMs));
+  }
+
+  setRecipeFavorite(id: string, favorited: boolean): Observable<void> {
+    if (favorited) {
+      this.favoriteIds.add(id);
+    } else {
+      this.favoriteIds.delete(id);
+    }
+    return of(undefined).pipe(delay(this.mockDelayMs));
   }
 
   getRecipeById(id: string): Observable<RecipeDetail> {
     if (id === BOUCHON_RECIPE_DETAILS_TARTE_AUX_POMMES.id) {
-      return of(mapBouchonDetailToView(BOUCHON_RECIPE_DETAILS_TARTE_AUX_POMMES)).pipe(
-        delay(this.mockDelayMs),
-      );
+      return of({
+        ...mapBouchonDetailToView(BOUCHON_RECIPE_DETAILS_TARTE_AUX_POMMES),
+        isFavorited: this.favoriteIds.has(id),
+      }).pipe(delay(this.mockDelayMs));
     }
 
     const fromList = BOUCHON_RECIPES.find((r) => r.id === id);
@@ -36,8 +53,9 @@ export class RecipeBouchonService {
       return throwError(() => new Error('NOT_FOUND'));
     }
 
-    return of(mapBouchonListItemToMinimalDetail(fromList)).pipe(
-      delay(this.mockDelayMs),
-    );
+    return of({
+      ...mapBouchonListItemToMinimalDetail(fromList),
+      isFavorited: this.favoriteIds.has(id),
+    }).pipe(delay(this.mockDelayMs));
   }
 }

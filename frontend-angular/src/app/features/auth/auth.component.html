@@ -1,0 +1,234 @@
+<div class="auth-page">
+  <div class="auth-page__container">
+    <a routerLink="/" class="auth-page__brand">MiamBook</a>
+
+    <p-card class="auth-card">
+      @switch (view()) {
+        @case ('login') {
+          <div class="auth-card__header">
+            <h1 class="auth-card__title">Connexion</h1>
+            <p class="auth-card__subtitle">
+              Connectez-vous pour créer et gérer vos recettes. Seul votre pseudo sera visible publiquement.
+            </p>
+          </div>
+
+          <form class="auth-form" (ngSubmit)="onSubmitLogin()">
+            <div class="auth-field">
+              <label for="login-identifiant">Identifiant</label>
+              <input
+                pInputText
+                id="login-identifiant"
+                name="identifiant"
+                autocomplete="username"
+                [(ngModel)]="identifiant"
+                class="auth-input"
+                placeholder="votre.identifiant"
+              />
+            </div>
+
+            <div class="auth-field">
+              <label for="login-password">Mot de passe</label>
+              <p-password
+                inputId="login-password"
+                name="password"
+                [(ngModel)]="password"
+                [feedback]="false"
+                [toggleMask]="true"
+                autocomplete="current-password"
+                styleClass="auth-password"
+                inputStyleClass="auth-input"
+                placeholder="••••••••"
+              />
+            </div>
+
+            @if (formError()) {
+              <p class="auth-form__error" role="alert">{{ formError() }}</p>
+            }
+
+            <p-button
+              type="submit"
+              label="Se connecter"
+              [loading]="submitting()"
+              styleClass="auth-submit"
+            />
+          </form>
+
+          <p class="auth-card__switch">
+            Pas encore de compte ?
+            <button type="button" class="auth-link" (click)="setView('register')">
+              Créer un compte
+            </button>
+          </p>
+        }
+
+        @case ('register') {
+          <div class="auth-card__header">
+            <h1 class="auth-card__title">Créer un compte</h1>
+            <p class="auth-card__subtitle">
+              Choisissez un pseudo anonyme — c’est le seul nom affiché sur vos recettes.
+            </p>
+          </div>
+
+          <form class="auth-form" (ngSubmit)="onSubmitRegister()">
+            <div class="auth-field">
+              <label for="register-identifiant">Identifiant</label>
+              <input
+                pInputText
+                id="register-identifiant"
+                name="identifiant"
+                autocomplete="username"
+                [(ngModel)]="identifiant"
+                class="auth-input"
+                placeholder="lettres, chiffres, . _ -"
+              />
+            </div>
+
+            <div class="auth-field">
+              <label for="register-pseudo">Pseudo public</label>
+              <input
+                pInputText
+                id="register-pseudo"
+                name="pseudo"
+                autocomplete="nickname"
+                [(ngModel)]="pseudo"
+                class="auth-input"
+                placeholder="ChefAnonyme"
+              />
+            </div>
+
+            <div class="auth-field">
+              <label for="register-password">Mot de passe</label>
+              <p-password
+                inputId="register-password"
+                name="password"
+                [(ngModel)]="password"
+                [toggleMask]="true"
+                autocomplete="new-password"
+                styleClass="auth-password"
+                inputStyleClass="auth-input"
+                placeholder="8 caractères minimum"
+              />
+            </div>
+
+            <div class="auth-field">
+              <label for="register-confirm">Confirmer le mot de passe</label>
+              <p-password
+                inputId="register-confirm"
+                name="confirmPassword"
+                [(ngModel)]="confirmPassword"
+                [feedback]="false"
+                [toggleMask]="true"
+                autocomplete="new-password"
+                styleClass="auth-password"
+                inputStyleClass="auth-input"
+                placeholder="••••••••"
+              />
+            </div>
+
+            @if (formError()) {
+              <p class="auth-form__error" role="alert">{{ formError() }}</p>
+            }
+
+            <p-button
+              type="submit"
+              label="Créer mon compte"
+              [loading]="submitting()"
+              styleClass="auth-submit"
+            />
+          </form>
+
+          <p class="auth-card__switch">
+            Déjà inscrit ?
+            <button type="button" class="auth-link" (click)="setView('login')">
+              Se connecter
+            </button>
+          </p>
+        }
+
+        @case ('mfa') {
+          <div class="auth-card__header">
+            <h1 class="auth-card__title">Vérification en deux étapes</h1>
+            <p class="auth-card__subtitle">
+              Saisissez le code à 6 chiffres de votre application d’authentification.
+            </p>
+          </div>
+
+          <form class="auth-form" (ngSubmit)="onSubmitMfa()">
+            <div class="auth-field">
+              <label for="mfa-code">Code TOTP</label>
+              <input
+                pInputText
+                id="mfa-code"
+                name="totpCode"
+                inputmode="numeric"
+                autocomplete="one-time-code"
+                maxlength="6"
+                [(ngModel)]="totpCode"
+                class="auth-input auth-input--code"
+                placeholder="123456"
+              />
+            </div>
+
+            @if (formError()) {
+              <p class="auth-form__error" role="alert">{{ formError() }}</p>
+            }
+
+            <p-button
+              type="submit"
+              label="Valider"
+              [loading]="submitting()"
+              styleClass="auth-submit"
+            />
+          </form>
+        }
+
+        @case ('mfa-setup') {
+          <div class="auth-card__header">
+            <h1 class="auth-card__title">Configurer l’authentification à deux facteurs</h1>
+            <p class="auth-card__subtitle">
+              Ce compte requiert la MFA. Scannez le QR code avec Google Authenticator (ou équivalent).
+            </p>
+          </div>
+
+          @if (qrCodeUrl) {
+            <div class="auth-mfa-qr">
+              <img [src]="qrCodeUrl" alt="QR code MFA" width="200" height="200" />
+            </div>
+          }
+
+          <p class="auth-mfa-secret">
+            Clé manuelle : <code>{{ mfaSecret }}</code>
+          </p>
+
+          <form class="auth-form" (ngSubmit)="onSubmitMfaSetup()">
+            <div class="auth-field">
+              <label for="mfa-setup-code">Code de vérification</label>
+              <input
+                pInputText
+                id="mfa-setup-code"
+                name="totpCode"
+                inputmode="numeric"
+                autocomplete="one-time-code"
+                maxlength="6"
+                [(ngModel)]="totpCode"
+                class="auth-input auth-input--code"
+                placeholder="123456"
+              />
+            </div>
+
+            @if (formError()) {
+              <p class="auth-form__error" role="alert">{{ formError() }}</p>
+            }
+
+            <p-button
+              type="submit"
+              label="Activer et continuer"
+              [loading]="submitting()"
+              styleClass="auth-submit"
+            />
+          </form>
+        }
+      }
+    </p-card>
+  </div>
+</div>

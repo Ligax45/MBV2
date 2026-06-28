@@ -11,6 +11,7 @@ export interface RecipeDetail {
   createdAt: string;
   difficulty: RecipeDifficulty;
   creatorName: string;
+  authorUserId: string | null;
   servings: number;
   recipeTypeLabel: string;
   prepMinutes: number;
@@ -19,4 +20,5 @@ export interface RecipeDetail {
   equipmentLabels: string[];
   ingredients: RecipeIngredient[];
   steps: RecipeStep[];
+  isFavorited?: boolean;
 }

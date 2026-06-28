@@ -25,9 +25,6 @@ function validateRecipeInput(input: CreateRecipeParams): void {
   if (!input.recipeTypeId?.trim())
     throw new BadRequestException('recipeTypeId is required');
   assertUuid('recipeTypeId', input.recipeTypeId);
-  if (input.authorUserId != null && String(input.authorUserId).trim() !== '')
-    assertUuid('authorUserId', String(input.authorUserId));
-
   if (!['facile', 'moyen', 'difficile'].includes(input.difficulty))
     throw new BadRequestException('difficulty is invalid');
   if (typeof input.servings !== 'number' || input.servings < 0)
@@ -44,9 +41,12 @@ export class CreateRecipeUseCase {
     @Inject(RECIPE_REPOSITORY) private readonly recipeRepo: RecipeRepository,
   ) {}
 
-  async execute(input: CreateRecipeParams) {
+  async execute(input: CreateRecipeParams, authorUserId: string) {
     validateRecipeInput(input);
-    const recipe = await this.recipeRepo.create(input);
+    const recipe = await this.recipeRepo.create({
+      ...input,
+      authorUserId,
+    });
     return toRecipeResponse(recipe);
   }
 }
