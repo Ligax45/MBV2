@@ -15,6 +15,7 @@ export function mapBouchonToListItem(recipe: BouchonRecipe): RecipeListItem {
     createdAt: recipe.createdAt,
     difficulty: recipe.difficulty,
     creatorName: recipe.creatorName,
+    recipeTypeId: 'autres',
     recipeTypeLabel: getRecipeTypeLabel('autres'),
   };
 }

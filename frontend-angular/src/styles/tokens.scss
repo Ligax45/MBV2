@@ -20,14 +20,17 @@
   --primary: #ff9800;
   --primary-foreground: #ffffff;
 
-  --sidebar-bg: #fff8f0;
-  --sidebar-text: #8d6e63;
-  --sidebar-text-active: #bf360c;
-  --sidebar-active-bg: #ffffff;
-  --sidebar-hover-bg: rgb(255 255 255 / 55%);
-  --sidebar-divider: #d9cec2;
-  --sidebar-border: #d9cec2;
-  --sidebar-shadow: 0 2px 8px rgb(45 27 19 / 7%);
+  --sidebar-bg: #1e1713;
+  --sidebar-foreground: #ffffff;
+  --sidebar-text: #9b9691;
+  --sidebar-text-active: #cf895c;
+  --sidebar-active-bg: #3e271c;
+  --sidebar-hover-bg: rgb(255 255 255 / 6%);
+  --sidebar-divider: rgb(255 255 255 / 8%);
+  --sidebar-border: transparent;
+  --sidebar-logo-accent: #e85d33;
+  --sidebar-shadow: none;
+  --sidebar-nav-radius: 0.625rem;
   --sidebar-width: 15rem;
   --topbar-height: 3.5rem;
   --breakpoint-md: 768px;
@@ -68,11 +71,15 @@ html.dark {
   --border: rgb(255 255 255 / 10%);
   --ring: #f59e0b;
   --card: #231810;
-  --sidebar-bg: #1a100a;
-  --sidebar-text: #9a7b6a;
-  --sidebar-text-active: #ff9800;
-  --sidebar-active-bg: #2d1b13;
-  --sidebar-hover-bg: rgb(255 255 255 / 5%);
-  --sidebar-divider: rgb(255 255 255 / 14%);
-  --sidebar-border: rgb(255 255 255 / 14%);
+  --sidebar-bg: #1e1713;
+  --sidebar-foreground: #ffffff;
+  --sidebar-text: #9b9691;
+  --sidebar-text-active: #cf895c;
+  --sidebar-active-bg: #3e271c;
+  --sidebar-hover-bg: rgb(255 255 255 / 6%);
+  --sidebar-divider: rgb(255 255 255 / 8%);
+  --sidebar-border: transparent;
+  --sidebar-logo-accent: #e85d33;
+  --sidebar-shadow: none;
+  --sidebar-nav-radius: 0.625rem;
 }

@@ -10,6 +10,7 @@ export interface RecipeListItem {
   createdAt: string;
   difficulty: RecipeDifficulty;
   creatorName: string;
+  recipeTypeId: string;
   recipeTypeLabel: string;
   averageRating?: number | null;
   isFavorited?: boolean;

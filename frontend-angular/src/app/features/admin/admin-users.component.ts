@@ -36,9 +36,9 @@ export class AdminUsersComponent implements OnInit {
   protected readonly users = signal<UserRow[]>([]);
 
   protected readonly roleOptions: { label: string; value: UserRole }[] = [
-    { label: 'User', value: 'user' },
-    { label: 'Moderator', value: 'moderator' },
-    { label: 'Admin', value: 'admin' },
+    { label: 'Utilisateur', value: 'user' },
+    { label: 'Modérateur', value: 'moderator' },
+    { label: 'Administrateur', value: 'admin' },
   ];
 
   ngOnInit(): void {
@@ -52,11 +52,11 @@ export class AdminUsersComponent implements OnInit {
   protected roleLabel(role: UserRole): string {
     switch (role) {
       case 'admin':
-        return 'Admin';
+        return 'Administrateur';
       case 'moderator':
-        return 'Moderator';
+        return 'Modérateur';
       default:
-        return 'User';
+        return 'Utilisateur';
     }
   }
 

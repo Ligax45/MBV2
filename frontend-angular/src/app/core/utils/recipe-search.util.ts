@@ -20,3 +20,13 @@ export function filterRecipesByTitle(
     normalizeForSearch(recipe.title).includes(normalizedQuery),
   );
 }
+
+export function filterRecipesByType(
+  recipes: RecipeListItem[],
+  recipeTypeId: string | null,
+): RecipeListItem[] {
+  if (!recipeTypeId) {
+    return recipes;
+  }
+  return recipes.filter((recipe) => recipe.recipeTypeId === recipeTypeId);
+}
