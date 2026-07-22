@@ -73,11 +73,12 @@
 
 .recipe-details__title {
   margin: 0;
+  font-family: var(--font-display);
   font-size: 1.75rem;
   font-weight: 700;
   line-height: 1.2;
   color: var(--foreground);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 
 .recipe-details__actions {
@@ -140,6 +141,7 @@
 
 .recipe-details__description {
   margin: 0;
+  font-family: var(--font-sans);
   color: var(--secondary);
   line-height: 1.65;
   font-size: 0.9375rem;

@@ -40,6 +40,12 @@ export class LibraryComponent implements OnInit {
   protected readonly favoritesOnly = signal(false);
   protected readonly selectedRecipeTypeId = signal<string | null>(null);
 
+  protected readonly visibleRecipeTypes = computed(() =>
+    this.recipeTypes().filter(
+      (type) => type.id !== 'autres' && type.label.toLowerCase() !== 'autres',
+    ),
+  );
+
   protected readonly filteredRecipes = computed(() => {
     const byType = filterRecipesByType(
       this.recipes(),
@@ -163,6 +169,10 @@ export class LibraryComponent implements OnInit {
     this.selectedRecipeTypeId.update((current) =>
       current === typeId ? null : typeId,
     );
+  }
+
+  selectAllTypes(): void {
+    this.selectedRecipeTypeId.set(null);
   }
 
   clearFilters(): void {
