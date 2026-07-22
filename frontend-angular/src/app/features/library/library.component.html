@@ -8,16 +8,15 @@
     <div class="library-page__filters">
       <button
         type="button"
-        class="library-page__filter library-page__filter--favorites"
-        [class.library-page__filter--active]="favoritesOnly()"
-        [attr.aria-pressed]="favoritesOnly()"
-        (click)="toggleFavorites()"
+        class="library-page__filter library-page__filter--all"
+        [class.library-page__filter--all-active]="selectedRecipeTypeId() === null"
+        [attr.aria-pressed]="selectedRecipeTypeId() === null"
+        (click)="selectAllTypes()"
       >
-        <i class="pi pi-heart" aria-hidden="true"></i>
-        Mes favoris
+        Tous
       </button>
 
-      @for (type of recipeTypes(); track type.id) {
+      @for (type of visibleRecipeTypes(); track type.id) {
         <button
           type="button"
           class="library-page__filter library-page__filter--type"
@@ -30,11 +29,24 @@
       }
     </div>
 
-    <div class="library-page__search">
-      <app-recipe-search-bar
-        [value]="searchQuery()"
-        (valueChange)="onSearchChange($event)"
-      />
+    <div class="library-page__search-row">
+      <div class="library-page__search">
+        <app-recipe-search-bar
+          [value]="searchQuery()"
+          (valueChange)="onSearchChange($event)"
+        />
+      </div>
+
+      <button
+        type="button"
+        class="library-page__filter library-page__filter--favorites"
+        [class.library-page__filter--active]="favoritesOnly()"
+        [attr.aria-pressed]="favoritesOnly()"
+        (click)="toggleFavorites()"
+      >
+        <i class="pi pi-heart" aria-hidden="true"></i>
+        Mes favoris
+      </button>
     </div>
   </div>
 

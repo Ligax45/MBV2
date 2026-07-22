@@ -104,8 +104,9 @@
 
 .recipe-card__title {
   margin: 0;
+  font-family: var(--font-display);
   font-size: 1.0625rem;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.35;
   color: var(--foreground);
   display: -webkit-box;
