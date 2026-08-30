@@ -12,12 +12,14 @@ body {
   overflow: hidden;
   background-color: var(--background);
   color: var(--foreground);
-  font-family:
-    system-ui,
-    -apple-system,
-    'Segoe UI',
-    Roboto,
-    sans-serif;
+  font-family: var(--font-sans);
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
 }
 
 app-root {

@@ -2,6 +2,10 @@
  * Ajustements PrimeNG pour rester cohérent avec les tokens MiamBook.
  */
 
+.p-component {
+  font-family: var(--font-sans);
+}
+
 html.light .p-card {
   background: var(--card);
   border: none;
