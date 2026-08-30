@@ -38,6 +38,7 @@ export class LibraryComponent implements OnInit {
   protected readonly loadFailed = signal(false);
   protected readonly searchQuery = signal('');
   protected readonly favoritesOnly = signal(false);
+  protected readonly mineOnly = signal(false);
   protected readonly selectedRecipeTypeId = signal<string | null>(null);
 
   protected readonly visibleRecipeTypes = computed(() =>
@@ -60,17 +61,26 @@ export class LibraryComponent implements OnInit {
     return this.recipeTypes().find((type) => type.id === typeId)?.label ?? null;
   });
 
-  protected readonly pageTitle = computed(() =>
-    this.favoritesOnly() ? 'Mes recettes favorites' : 'Bibliothèque de recettes',
-  );
+  protected readonly pageTitle = computed(() => {
+    if (this.mineOnly()) return 'Mes recettes';
+    if (this.favoritesOnly()) return 'Mes recettes favorites';
+    return 'Bibliothèque de recettes';
+  });
 
-  protected readonly pageSubtitle = computed(() =>
-    this.favoritesOnly()
-      ? 'Retrouvez toutes les recettes que vous avez aimées'
-      : 'Découvrez et gérez toutes vos recettes',
-  );
+  protected readonly pageSubtitle = computed(() => {
+    if (this.mineOnly()) {
+      return 'Retrouvez vos recettes publiques, privées et en attente de validation';
+    }
+    if (this.favoritesOnly()) {
+      return 'Retrouvez toutes les recettes que vous avez aimées';
+    }
+    return 'Découvrez les recettes validées de la communauté';
+  });
 
   protected readonly emptyTitle = computed(() => {
+    if (this.mineOnly() && !this.searchQuery().trim() && !this.selectedRecipeTypeId()) {
+      return 'Vous n’avez pas encore de recette';
+    }
     if (this.favoritesOnly() && !this.searchQuery().trim() && !this.selectedRecipeTypeId()) {
       return 'Vos favoris sont vides';
     }
@@ -83,6 +93,19 @@ export class LibraryComponent implements OnInit {
   protected readonly emptyMessage = computed(() => {
     const hasSearch = this.searchQuery().trim().length > 0;
     const typeLabel = this.selectedRecipeTypeLabel();
+
+    if (this.mineOnly()) {
+      if (hasSearch && typeLabel) {
+        return `Aucune de vos recettes de type « ${typeLabel} » ne correspond à votre recherche.`;
+      }
+      if (typeLabel) {
+        return `Vous n’avez pas encore de recette de type « ${typeLabel} ».`;
+      }
+      if (hasSearch) {
+        return 'Aucune de vos recettes ne correspond à votre recherche.';
+      }
+      return 'Créez une recette pour la retrouver ici.';
+    }
 
     if (this.favoritesOnly()) {
       if (hasSearch && typeLabel) {
@@ -113,7 +136,8 @@ export class LibraryComponent implements OnInit {
     () =>
       this.searchQuery().trim().length > 0 ||
       this.selectedRecipeTypeId() !== null ||
-      this.favoritesOnly(),
+      this.favoritesOnly() ||
+      this.mineOnly(),
   );
 
   protected readonly emptyIcon = computed(() => {
@@ -134,13 +158,21 @@ export class LibraryComponent implements OnInit {
 
     this.route.data.subscribe((data) => {
       const favoritesOnly = data['favoritesOnly'] === true;
+      const mineOnly = data['mineOnly'] === true;
       if (favoritesOnly && !this.currentUser.isAuthenticated()) {
         void this.router.navigate(['/connexion'], {
           queryParams: { returnUrl: '/bibliotheque/favoris' },
         });
         return;
       }
+      if (mineOnly && !this.currentUser.isAuthenticated()) {
+        void this.router.navigate(['/connexion'], {
+          queryParams: { returnUrl: '/bibliotheque/mes-recettes' },
+        });
+        return;
+      }
       this.favoritesOnly.set(favoritesOnly);
+      this.mineOnly.set(mineOnly);
       this.loadRecipes();
     });
   }
@@ -181,6 +213,9 @@ export class LibraryComponent implements OnInit {
     if (this.favoritesOnly()) {
       void this.router.navigate(['/bibliotheque']);
     }
+    if (this.mineOnly()) {
+      void this.router.navigate(['/bibliotheque']);
+    }
   }
 
   onFavoriteChange(event: { recipeId: string; isFavorited: boolean }): void {
@@ -209,7 +244,12 @@ export class LibraryComponent implements OnInit {
     this.loading.set(true);
     this.loadFailed.set(false);
 
-    this.recipeData.getRecipes(this.favoritesOnly()).subscribe({
+    this.recipeData
+      .getRecipes({
+        favoritesOnly: this.favoritesOnly(),
+        mineOnly: this.mineOnly(),
+      })
+      .subscribe({
       next: (data) => {
         this.recipes.set(data);
         this.loading.set(false);

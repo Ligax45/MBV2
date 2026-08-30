@@ -1,3 +1,8 @@
+import type {
+  RecipeModerationStatus,
+  RecipeVisibility,
+} from '../recipe-visibility';
+
 export type RecipeTypeSummary = { id: string; label: string };
 
 export type EquipmentSummary = { id: string; label: string };
@@ -35,5 +40,10 @@ export class Recipe {
     public readonly ingredients: RecipeIngredientSummary[] = [],
     public readonly steps: RecipeStepSummary[] = [],
     public readonly equipment: EquipmentSummary[] = [],
+    public readonly visibility: RecipeVisibility = 'public',
+    public readonly moderationStatus: RecipeModerationStatus = 'approved',
+    public readonly moderationComment: string | null = null,
+    public readonly reviewedAt: Date | null = null,
+    public readonly reviewedByUserId: string | null = null,
   ) {}
 }

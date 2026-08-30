@@ -22,37 +22,46 @@
       <div class="create-recipe-form__section">
         <div class="field">
           <label for="recipe-title" class="field__label">Titre</label>
-          <input
-            pInputText
-            id="recipe-title"
-            class="field__control w-full"
-            type="text"
-            placeholder="Ex : Tarte aux pommes"
-            [ngModel]="form().title"
-            (ngModelChange)="updateTitle($event)"
-            [ngModelOptions]="{ standalone: true }"
-            [class.ng-invalid]="titleError()"
-            aria-describedby="recipe-title-error"
-          />
-          @if (titleError()) {
-            <small id="recipe-title-error" class="field__error">{{
-              titleError()
-            }}</small>
-          }
+          <div class="field__control-wrap" [class.field__control-wrap--error]="fieldError('title')">
+            <input
+              pInputText
+              id="recipe-title"
+              class="field__control w-full"
+              type="text"
+              placeholder="Ex : Tarte aux pommes"
+              [ngModel]="form().title"
+              (ngModelChange)="updateTitle($event)"
+              [ngModelOptions]="{ standalone: true }"
+              [class.ng-invalid]="fieldError('title')"
+              [attr.aria-invalid]="!!fieldError('title')"
+              [attr.aria-describedby]="fieldError('title') ? 'recipe-title-error' : null"
+            />
+            @if (fieldError('title'); as error) {
+              <span id="recipe-title-error" class="field__tooltip" role="alert">{{ error }}</span>
+            }
+          </div>
         </div>
 
         <div class="field">
           <label for="recipe-description" class="field__label">Description</label>
-          <textarea
-            pTextarea
-            id="recipe-description"
-            class="field__control w-full"
-            rows="4"
-            placeholder="Décrivez brièvement votre recette..."
-            [ngModel]="form().description"
-            (ngModelChange)="updateDescription($event)"
-            [ngModelOptions]="{ standalone: true }"
-          ></textarea>
+          <div class="field__control-wrap" [class.field__control-wrap--error]="fieldError('description')">
+            <textarea
+              pTextarea
+              id="recipe-description"
+              class="field__control w-full"
+              rows="4"
+              placeholder="Décrivez brièvement votre recette..."
+              [ngModel]="form().description"
+              (ngModelChange)="updateDescription($event)"
+              [ngModelOptions]="{ standalone: true }"
+              [class.ng-invalid]="fieldError('description')"
+              [attr.aria-invalid]="!!fieldError('description')"
+              [attr.aria-describedby]="fieldError('description') ? 'recipe-description-error' : null"
+            ></textarea>
+            @if (fieldError('description'); as error) {
+              <span id="recipe-description-error" class="field__tooltip" role="alert">{{ error }}</span>
+            }
+          </div>
         </div>
 
         <div class="field">
@@ -107,52 +116,120 @@
             <label for="servings" class="field__label">Nombre de personnes</label>
             <div class="servings-field">
               <i class="pi pi-users" aria-hidden="true"></i>
-              <p-inputnumber
-                inputId="servings"
-                [ngModel]="form().servings"
-                (ngModelChange)="updateServings($event)"
-                [ngModelOptions]="{ standalone: true }"
-                [min]="1"
-                [max]="999"
-                [showButtons]="false"
-                inputStyleClass="servings-field__input"
+              <input
+                id="servings"
+                class="servings-field__input"
+                type="text"
+                inputmode="numeric"
+                maxlength="2"
+                pattern="[0-9]*"
+                autocomplete="off"
+                [value]="servingsDraft()"
+                (input)="onServingsInput($event)"
+                (blur)="onServingsBlur()"
               />
               <span class="servings-field__suffix">personnes</span>
             </div>
           </div>
 
           <div class="field">
-            <label for="recipe-type" class="field__label">Type de recette</label>
-            <p-select
-              inputId="recipe-type"
-              [options]="recipeTypeOptions()"
-              optionLabel="label"
-              optionValue="value"
-              placeholder="Sélectionnez un type"
-              [loading]="typesLoading()"
-              [disabled]="typesLoading()"
-              [ngModel]="form().recipeType || null"
-              (ngModelChange)="updateRecipeType($event)"
-              [ngModelOptions]="{ standalone: true }"
-              styleClass="w-full"
-            />
+            <label for="recipe-type" class="field__label">
+              Type de recette
+              <span class="field__required" aria-hidden="true">*</span>
+            </label>
+            <div
+              id="recipe-type-field"
+              class="field__control-wrap"
+              [class.field__control-wrap--error]="fieldError('recipeType')"
+            >
+              <p-select
+                inputId="recipe-type"
+                [options]="recipeTypeOptions()"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Sélectionnez un type"
+                [loading]="typesLoading()"
+                [disabled]="typesLoading()"
+                [ngModel]="form().recipeType || null"
+                (ngModelChange)="updateRecipeType($event)"
+                [ngModelOptions]="{ standalone: true }"
+                styleClass="w-full"
+                [class.ng-invalid]="fieldError('recipeType')"
+                [attr.aria-invalid]="!!fieldError('recipeType')"
+                [attr.aria-describedby]="fieldError('recipeType') ? 'recipe-type-error' : null"
+              />
+              @if (fieldError('recipeType'); as error) {
+                <span id="recipe-type-error" class="field__tooltip" role="alert">{{ error }}</span>
+              }
+            </div>
           </div>
 
           <div class="field">
-            <label for="recipe-difficulty" class="field__label">Difficulté</label>
-            <p-select
-              inputId="recipe-difficulty"
-              [options]="difficultyOptions"
-              optionLabel="label"
-              optionValue="value"
-              placeholder="Sélectionnez une difficulté"
-              [ngModel]="form().difficulty || null"
-              (ngModelChange)="updateDifficulty($event)"
-              [ngModelOptions]="{ standalone: true }"
-              styleClass="w-full"
-            />
+            <label for="recipe-difficulty" class="field__label">
+              Difficulté
+              <span class="field__required" aria-hidden="true">*</span>
+            </label>
+            <div
+              id="recipe-difficulty-field"
+              class="field__control-wrap"
+              [class.field__control-wrap--error]="fieldError('difficulty')"
+            >
+              <p-select
+                inputId="recipe-difficulty"
+                [options]="difficultyOptions"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Sélectionnez une difficulté"
+                [ngModel]="form().difficulty || null"
+                (ngModelChange)="updateDifficulty($event)"
+                [ngModelOptions]="{ standalone: true }"
+                styleClass="w-full"
+                [class.ng-invalid]="fieldError('difficulty')"
+                [attr.aria-invalid]="!!fieldError('difficulty')"
+                [attr.aria-describedby]="fieldError('difficulty') ? 'recipe-difficulty-error' : null"
+              />
+              @if (fieldError('difficulty'); as error) {
+                <span id="recipe-difficulty-error" class="field__tooltip" role="alert">{{ error }}</span>
+              }
+            </div>
           </div>
         </div>
+
+        <fieldset class="visibility-field">
+          <legend class="field__label">Visibilité</legend>
+          <p class="field__hint">
+            Une recette publique sera visible dans la bibliothèque après validation par un
+            modérateur ou un administrateur. Une recette privée n’est visible que par vous.
+          </p>
+          <div class="visibility-field__options">
+            <label class="visibility-option">
+              <input
+                type="radio"
+                name="recipe-visibility"
+                value="public"
+                [checked]="form().visibility === 'public'"
+                (change)="updateVisibility('public')"
+              />
+              <span>
+                <strong>Publique</strong>
+                <span class="visibility-option__hint">Soumise à validation</span>
+              </span>
+            </label>
+            <label class="visibility-option">
+              <input
+                type="radio"
+                name="recipe-visibility"
+                value="private"
+                [checked]="form().visibility === 'private'"
+                (change)="updateVisibility('private')"
+              />
+              <span>
+                <strong>Privée</strong>
+                <span class="visibility-option__hint">Visible uniquement par vous</span>
+              </span>
+            </label>
+          </div>
+        </fieldset>
       </div>
     </p-card>
 
@@ -344,10 +421,6 @@
         />
       </div>
     </p-card>
-
-    @if (formError()) {
-      <p class="create-recipe-form__error" role="alert">{{ formError() }}</p>
-    }
 
     <div class="create-recipe-form__actions">
       <p-button

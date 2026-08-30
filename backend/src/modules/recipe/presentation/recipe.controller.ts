@@ -14,15 +14,20 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CurrentUser } from '../../auth/presentation/current-user.decorator';
 import type { AuthenticatedUser } from '../../auth/domain/auth-user.model';
+import { UserRole } from '../../auth/domain/user-role.enum';
 import { JwtAuthGuard } from '../../auth/presentation/jwt-auth.guard';
 import { OptionalJwtAuthGuard } from '../../auth/presentation/optional-jwt-auth.guard';
+import { Roles } from '../../auth/presentation/roles.decorator';
+import { RolesGuard } from '../../auth/presentation/roles.guard';
 import { AddRecipeFavoriteUseCase } from '../application/use-cases/add-recipe-favorite.usecase';
+import { ApproveRecipeUseCase } from '../application/use-cases/approve-recipe.usecase';
 import { CreateRecipeUseCase } from '../application/use-cases/create-recipe.usecase';
 import { DeleteRecipeUseCase } from '../application/use-cases/delete-recipe.usecase';
 import { GetRecipeByIdUseCase } from '../application/use-cases/get-recipe-by-id.usecase';
 import { GetEquipmentUseCase } from '../application/use-cases/get-equipment.usecase';
 import { GetRecipeTypesUseCase } from '../application/use-cases/get-recipe-types.usecase';
 import { GetRecipesUseCase } from '../application/use-cases/get-recipes.usecase';
+import { RejectRecipeUseCase } from '../application/use-cases/reject-recipe.usecase';
 import { RemoveRecipeFavoriteUseCase } from '../application/use-cases/remove-recipe-favorite.usecase';
 import { UpdateRecipeUseCase } from '../application/use-cases/update-recipe.usecase';
 import { UploadRecipeImageUseCase } from '../application/use-cases/upload-recipe-image.usecase';
@@ -42,17 +47,23 @@ export class RecipeController {
     private readonly uploadRecipeImage: UploadRecipeImageUseCase,
     private readonly addRecipeFavorite: AddRecipeFavoriteUseCase,
     private readonly removeRecipeFavorite: RemoveRecipeFavoriteUseCase,
+    private readonly approveRecipe: ApproveRecipeUseCase,
+    private readonly rejectRecipe: RejectRecipeUseCase,
   ) {}
 
   @Get()
   @UseGuards(OptionalJwtAuthGuard)
   async list(
     @Query('favorites') favorites?: string,
+    @Query('mine') mine?: string,
+    @Query('pending') pending?: string,
     @CurrentUser() user?: AuthenticatedUser,
   ) {
     return this.getRecipes.execute({
       favoritesOnly: favorites === 'true',
-      userId: user?.id,
+      mineOnly: mine === 'true',
+      pendingOnly: pending === 'true',
+      user,
     });
   }
 
@@ -72,7 +83,7 @@ export class RecipeController {
     @Param('id') id: string,
     @CurrentUser() user?: AuthenticatedUser,
   ) {
-    return this.getRecipeById.execute(id, user?.id);
+    return this.getRecipeById.execute(id, user);
   }
 
   @Post()
@@ -119,6 +130,27 @@ export class RecipeController {
     @CurrentUser() user: AuthenticatedUser,
   ) {
     return this.removeRecipeFavorite.execute(id, user);
+  }
+
+  @Post(':id/approve')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.Admin, UserRole.Moderator)
+  async approve(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.approveRecipe.execute(id, user);
+  }
+
+  @Post(':id/reject')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.Admin, UserRole.Moderator)
+  async reject(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() body: { comment?: string },
+  ) {
+    return this.rejectRecipe.execute(id, user, body?.comment);
   }
 
   @Post(':id/image')

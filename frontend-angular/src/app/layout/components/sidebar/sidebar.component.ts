@@ -34,7 +34,8 @@ export class SidebarComponent {
 
   onLogout(): void {
     this.auth.logout().subscribe({
-      complete: () => void this.router.navigate(['/connexion']),
+      next: () => void this.router.navigate(['/']),
+      error: () => void this.router.navigate(['/']),
     });
   }
 }

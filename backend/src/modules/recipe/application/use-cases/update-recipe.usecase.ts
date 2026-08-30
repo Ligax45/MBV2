@@ -8,6 +8,7 @@ import {
 import type { AuthenticatedUser } from '../../../auth/domain/auth-user.model';
 import { toRecipeResponse } from '../recipe-response.util';
 import { canModifyRecipe } from '../recipe-authorization.util';
+import { RECIPE_VISIBILITIES } from '../../domain/recipe-visibility';
 import {
   RECIPE_REPOSITORY,
   type CreateRecipeParams,
@@ -35,11 +36,18 @@ function validateRecipeInput(input: CreateRecipeParams): void {
   assertUuid('recipeTypeId', input.recipeTypeId);
   if (!['facile', 'moyen', 'difficile'].includes(input.difficulty))
     throw new BadRequestException('difficulty is invalid');
-  if (typeof input.servings !== 'number' || input.servings < 0)
+  if (typeof input.servings !== 'number' || input.servings < 0 || input.servings > 99)
     throw new BadRequestException('servings is invalid');
 
   for (const equipmentId of input.equipmentIds ?? []) {
     assertUuid('equipmentIds', equipmentId);
+  }
+
+  if (
+    input.visibility != null &&
+    !RECIPE_VISIBILITIES.includes(input.visibility)
+  ) {
+    throw new BadRequestException('visibility is invalid');
   }
 }
 
@@ -63,9 +71,37 @@ export class UpdateRecipeUseCase {
     }
 
     const authorUserId = existing.authorUserId ?? actor.id;
+    const visibility =
+      input.visibility === 'private' || input.visibility === 'public'
+        ? input.visibility
+        : existing.visibility;
+
+    let moderationStatus = existing.moderationStatus;
+    let moderationComment = existing.moderationComment;
+    let reviewedAt = existing.reviewedAt;
+    let reviewedByUserId = existing.reviewedByUserId;
+
+    if (visibility === 'private') {
+      moderationStatus = 'approved';
+      moderationComment = null;
+    } else if (
+      existing.visibility === 'private' ||
+      existing.moderationStatus === 'rejected'
+    ) {
+      moderationStatus = 'pending';
+      moderationComment = null;
+      reviewedAt = null;
+      reviewedByUserId = null;
+    }
+
     const recipe = await this.recipeRepo.update(trimmed, {
       ...input,
       authorUserId,
+      visibility,
+      moderationStatus,
+      moderationComment,
+      reviewedAt,
+      reviewedByUserId,
     });
     if (!recipe) throw new NotFoundException('Recette introuvable');
 

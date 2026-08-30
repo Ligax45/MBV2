@@ -17,6 +17,8 @@ export function mapBouchonToListItem(recipe: BouchonRecipe): RecipeListItem {
     creatorName: recipe.creatorName,
     recipeTypeId: 'autres',
     recipeTypeLabel: getRecipeTypeLabel('autres'),
+    visibility: 'public',
+    moderationStatus: 'approved',
   };
 }
 
@@ -38,6 +40,9 @@ export function mapBouchonDetailToView(detail: BouchonRecipeDetail): RecipeDetai
     equipmentLabels: getEquipmentLabels(detail.equipment),
     ingredients: detail.ingredients,
     steps: [...detail.steps].sort((a, b) => a.order - b.order),
+    visibility: 'public',
+    moderationStatus: 'approved',
+    moderationComment: null,
   };
 }
 
@@ -61,5 +66,8 @@ export function mapBouchonListItemToMinimalDetail(
     equipmentLabels: [],
     ingredients: [],
     steps: [],
+    visibility: 'public',
+    moderationStatus: 'approved',
+    moderationComment: null,
   };
 }

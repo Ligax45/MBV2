@@ -4,6 +4,8 @@ import { Injectable } from '@nestjs/common';
 import { Recipe } from '../../domain/entities/recipe.entity';
 import type {
   CreateRecipeParams,
+  RecipeListFilter,
+  RecipeModerationUpdateParams,
   RecipeRepository,
 } from '../../domain/repositories/recipe.repository';
 import { EquipmentOrmEntity } from '../mikroorm/equipment.orm-entity';
@@ -34,8 +36,21 @@ export class MikroOrmRecipeRepository implements RecipeRepository {
     return this.toDomain(r, details);
   }
 
-  async findAll(): Promise<Recipe[]> {
-    const rows = await this.repo.findAll({
+  async findAll(filter: RecipeListFilter = {}): Promise<Recipe[]> {
+    const where: Record<string, unknown> = {};
+    if (filter.listedPublic) {
+      where.visibility = 'public';
+      where.moderationStatus = 'approved';
+    }
+    if (filter.pendingPublic) {
+      where.visibility = 'public';
+      where.moderationStatus = 'pending';
+    }
+    if (filter.authorUserId) {
+      where.author = filter.authorUserId;
+    }
+
+    const rows = await this.repo.find(where, {
       populate: ['recipeType', 'author'],
       orderBy: { createdAt: 'desc' },
     });
@@ -60,6 +75,11 @@ export class MikroOrmRecipeRepository implements RecipeRepository {
     entity.prepMinutes = params.prepMinutes ?? 0;
     entity.cookMinutes = params.cookMinutes ?? 0;
     entity.restMinutes = params.restMinutes ?? 0;
+    entity.visibility = params.visibility ?? 'public';
+    entity.moderationStatus = params.moderationStatus ?? 'pending';
+    entity.moderationComment = params.moderationComment ?? null;
+    entity.reviewedAt = params.reviewedAt ?? null;
+    entity.reviewedByUserId = params.reviewedByUserId ?? null;
 
     em.persist(entity);
     await em.flush();
@@ -92,10 +112,49 @@ export class MikroOrmRecipeRepository implements RecipeRepository {
     entity.prepMinutes = params.prepMinutes ?? 0;
     entity.cookMinutes = params.cookMinutes ?? 0;
     entity.restMinutes = params.restMinutes ?? 0;
+    if (params.visibility) {
+      entity.visibility = params.visibility;
+    }
+    if (params.moderationStatus) {
+      entity.moderationStatus = params.moderationStatus;
+    }
+    if (params.moderationComment !== undefined) {
+      entity.moderationComment = params.moderationComment;
+    }
+    if (params.reviewedAt !== undefined) {
+      entity.reviewedAt = params.reviewedAt;
+    }
+    if (params.reviewedByUserId !== undefined) {
+      entity.reviewedByUserId = params.reviewedByUserId;
+    }
 
     await em.flush();
     await this.replaceDetails(id, params);
     await em.populate(entity, ['recipeType', 'author']);
+
+    const details = await this.loadDetails(id);
+    return this.toDomain(entity, details);
+  }
+
+  async updateModeration(
+    id: string,
+    params: RecipeModerationUpdateParams,
+  ): Promise<Recipe | null> {
+    const entity = await this.repo.findOne(
+      { id },
+      { populate: ['recipeType', 'author'] },
+    );
+    if (!entity) return null;
+
+    entity.moderationStatus = params.moderationStatus;
+    entity.moderationComment = params.moderationComment;
+    entity.reviewedAt = params.reviewedAt;
+    entity.reviewedByUserId = params.reviewedByUserId;
+
+    await this.repo.getEntityManager().flush();
+    await this.repo
+      .getEntityManager()
+      .populate(entity, ['recipeType', 'author']);
 
     const details = await this.loadDetails(id);
     return this.toDomain(entity, details);
@@ -230,6 +289,11 @@ export class MikroOrmRecipeRepository implements RecipeRepository {
       details?.ingredients ?? [],
       details?.steps ?? [],
       details?.equipment ?? [],
+      r.visibility,
+      r.moderationStatus,
+      r.moderationComment ?? null,
+      r.reviewedAt ?? null,
+      r.reviewedByUserId ?? null,
     );
   }
 }

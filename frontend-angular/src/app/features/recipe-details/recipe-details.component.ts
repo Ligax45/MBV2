@@ -12,6 +12,7 @@ import {
   formatMinutes,
   getDifficultyLabel,
 } from '@core/utils/recipe-format.util';
+import { isPubliclyListed } from '@core/utils/recipe-visibility.util';
 import { AlertService } from '@shared/services/alert.service';
 
 type DetailTab = 'ingredients' | 'steps';
@@ -47,7 +48,30 @@ export class RecipeDetailsComponent implements OnInit {
     () => this.isAuthor() || this.currentUser.canModerateRecipes(),
   );
 
+  protected readonly canFavorite = computed(() => {
+    const detail = this.recipe();
+    return !!detail && isPubliclyListed(detail);
+  });
+
+  protected readonly statusBadge = computed(() => {
+    const detail = this.recipe();
+    if (!detail) return null;
+    if (detail.visibility === 'private') {
+      return { kind: 'private', label: 'Privée' };
+    }
+    if (detail.moderationStatus === 'pending') {
+      return { kind: 'pending', label: 'En attente de validation' };
+    }
+    if (detail.moderationStatus === 'rejected') {
+      return { kind: 'rejected', label: 'Refusée' };
+    }
+    return null;
+  });
+
+  protected readonly fromModeration = signal(false);
+
   ngOnInit(): void {
+    this.fromModeration.set(this.route.snapshot.queryParamMap.get('from') === 'moderation');
     const id = this.route.snapshot.paramMap.get('recipeId');
     if (!id) {
       this.pageFailed.set(true);
@@ -84,7 +108,7 @@ export class RecipeDetailsComponent implements OnInit {
 
   protected toggleLike(): void {
     const detail = this.recipe();
-    if (!detail || this.togglingFavorite()) {
+    if (!detail || this.togglingFavorite() || !this.canFavorite()) {
       return;
     }
 

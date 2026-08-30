@@ -49,7 +49,9 @@
 }
 
 .sidebar__nav {
+  display: flex;
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   padding: 0.5rem 0.875rem 0;
 }

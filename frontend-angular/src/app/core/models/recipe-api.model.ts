@@ -1,4 +1,6 @@
 export type RecipeDifficulty = 'facile' | 'moyen' | 'difficile';
+export type RecipeVisibility = 'public' | 'private';
+export type RecipeModerationStatus = 'pending' | 'approved' | 'rejected';
 
 export interface RecipeTypeSummary {
   id: string;
@@ -50,6 +52,7 @@ export interface CreateRecipePayload {
   ingredients?: CreateRecipeIngredientPayload[];
   steps?: CreateRecipeStepPayload[];
   equipmentIds?: string[];
+  visibility?: RecipeVisibility;
 }
 
 /** Réponse JSON de GET /recipes/:id, POST /recipes, PATCH /recipes/:id */
@@ -76,4 +79,7 @@ export interface RecipeApiResponse {
   createdAt: string;
   updatedAt: string;
   isFavorite?: boolean;
+  visibility: RecipeVisibility;
+  moderationStatus: RecipeModerationStatus;
+  moderationComment: string | null;
 }

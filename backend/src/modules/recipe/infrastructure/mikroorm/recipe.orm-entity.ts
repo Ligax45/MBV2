@@ -1,4 +1,8 @@
 import { EntitySchema, ReferenceKind } from '@mikro-orm/core';
+import type {
+  RecipeModerationStatus,
+  RecipeVisibility,
+} from '../../domain/recipe-visibility';
 import { RecipeTypeOrmEntity } from './recipe-type.orm-entity';
 import { UserOrmEntity } from './user.orm-entity';
 
@@ -24,6 +28,16 @@ export class RecipeOrmEntity {
   cookMinutes: number = 0;
 
   restMinutes: number = 0;
+
+  visibility: RecipeVisibility = 'public';
+
+  moderationStatus: RecipeModerationStatus = 'approved';
+
+  moderationComment?: string | null;
+
+  reviewedAt?: Date | null;
+
+  reviewedByUserId?: string | null;
 
   createdAt: Date = new Date();
 
@@ -60,6 +74,28 @@ export const RecipeOrmEntitySchema = new EntitySchema<RecipeOrmEntity>({
     prepMinutes: { type: 'smallint', fieldName: 'prep_minutes', default: 0 },
     cookMinutes: { type: 'smallint', fieldName: 'cook_minutes', default: 0 },
     restMinutes: { type: 'smallint', fieldName: 'rest_minutes', default: 0 },
+    visibility: { type: 'string', length: 20, default: 'public' },
+    moderationStatus: {
+      type: 'string',
+      length: 20,
+      fieldName: 'moderation_status',
+      default: 'approved',
+    },
+    moderationComment: {
+      type: 'text',
+      nullable: true,
+      fieldName: 'moderation_comment',
+    },
+    reviewedAt: {
+      type: 'Date',
+      nullable: true,
+      fieldName: 'reviewed_at',
+    },
+    reviewedByUserId: {
+      type: 'uuid',
+      nullable: true,
+      fieldName: 'reviewed_by_user_id',
+    },
     createdAt: {
       type: 'Date',
       fieldName: 'created_at',

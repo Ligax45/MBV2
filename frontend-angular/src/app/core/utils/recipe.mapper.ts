@@ -43,6 +43,9 @@ export function mapRecipeToListItem(api: RecipeApiResponse): RecipeListItem {
     recipeTypeId: api.recipeType.id,
     recipeTypeLabel: api.recipeType.label,
     isFavorited: api.isFavorite ?? false,
+    visibility: api.visibility ?? 'public',
+    moderationStatus: api.moderationStatus ?? 'approved',
+    moderationComment: api.moderationComment ?? null,
   };
 }
 
@@ -74,5 +77,8 @@ export function mapRecipeToDetail(api: RecipeDetailApiResponse): RecipeDetail {
       content: item.content,
     })),
     isFavorited: api.isFavorite ?? false,
+    visibility: api.visibility ?? 'public',
+    moderationStatus: api.moderationStatus ?? 'approved',
+    moderationComment: api.moderationComment ?? null,
   };
 }

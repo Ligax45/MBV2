@@ -69,15 +69,6 @@
   color: var(--muted-foreground);
 }
 
-.create-recipe-form__error {
-  margin: 0;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  color: var(--p-red-700, #b91c1c);
-  background: var(--p-red-50, #fef2f2);
-  font-size: 0.875rem;
-}
-
 .create-recipe-form__actions {
   display: flex;
   justify-content: flex-end;
@@ -99,6 +90,10 @@
   font-weight: 500;
 }
 
+.field__required {
+  color: var(--p-red-500, #ef4444);
+}
+
 .field__label--icon {
   display: inline-flex;
   align-items: center;
@@ -110,9 +105,42 @@
   color: var(--muted-foreground);
 }
 
-.field__error {
-  color: var(--p-red-500, #ef4444);
-  font-size: 0.875rem;
+.field__control-wrap {
+  position: relative;
+}
+
+.field__control-wrap--error {
+  margin-bottom: 2.25rem;
+}
+
+.field__tooltip {
+  position: absolute;
+  left: 0.5rem;
+  top: calc(100% + 0.4rem);
+  z-index: 4;
+  max-width: min(calc(100% - 1rem), 20rem);
+  padding: 0.4rem 0.7rem;
+  border-radius: 0.375rem;
+  background: var(--p-red-600, #dc2626);
+  color: #fff;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.16);
+  pointer-events: none;
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0.85rem;
+    bottom: 100%;
+    border: 6px solid transparent;
+    border-bottom-color: var(--p-red-600, #dc2626);
+  }
+}
+
+.field__control.ng-invalid,
+:host ::ng-deep .p-select.ng-invalid {
+  border-color: var(--p-red-500, #ef4444);
 }
 
 .w-full {
@@ -230,20 +258,20 @@
   white-space: nowrap;
 }
 
-:host ::ng-deep .servings-field {
-  .p-inputnumber {
-    width: auto;
-  }
+.servings-field__input {
+  width: 2.25rem;
+  min-height: 2rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: 1.25;
+  text-align: center;
+}
 
-  .servings-field__input {
-    width: 3rem;
-    min-height: 2rem;
-    padding: 0;
-    line-height: 1.25;
-    border: none;
-    box-shadow: none;
-    background: transparent;
-  }
+.servings-field__input:focus {
+  outline: none;
 }
 
 /* Équipement */
@@ -251,6 +279,57 @@
   border: none;
   margin: 0;
   padding: 0;
+}
+
+.visibility-field {
+  border: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.visibility-field__options {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .visibility-field__options {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.visibility-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--muted) 30%, transparent);
+  cursor: pointer;
+}
+
+.visibility-option:has(input:checked) {
+  border-color: var(--foreground);
+}
+
+.visibility-option input {
+  margin-top: 0.2rem;
+}
+
+.visibility-option strong {
+  display: block;
+  font-size: 0.875rem;
+}
+
+.visibility-option__hint {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
 }
 
 .equipment-field__chips {

@@ -10,7 +10,7 @@ import { InputText } from 'primeng/inputtext';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { Select } from 'primeng/select';
 import { Textarea } from 'primeng/textarea';
-import type { EquipmentSummary, RecipeDifficulty, RecipeDetailApiResponse } from '@core/models/recipe-api.model';
+import type { EquipmentSummary, RecipeDifficulty, RecipeDetailApiResponse, RecipeVisibility } from '@core/models/recipe-api.model';
 import type { RecipeIngredient } from '@core/models/recipe-ingredient.model';
 import type { RecipeStep } from '@core/models/recipe-step.model';
 import { RecipeApiService } from '@core/services/recipe-api.service';
@@ -28,6 +28,22 @@ import {
 import { buildCreateRecipePayload } from './utils/create-recipe-payload.util';
 import { createRecipeFieldId } from './utils/create-recipe-id.util';
 import { mapApiToRecipeForm } from './utils/recipe-form.mapper';
+
+type RequiredRecipeField = 'title' | 'description' | 'recipeType' | 'difficulty';
+
+const REQUIRED_FIELD_ORDER: RequiredRecipeField[] = [
+  'title',
+  'description',
+  'recipeType',
+  'difficulty',
+];
+
+const REQUIRED_FIELD_ELEMENT_IDS: Record<RequiredRecipeField, string> = {
+  title: 'recipe-title',
+  description: 'recipe-description',
+  recipeType: 'recipe-type-field',
+  difficulty: 'recipe-difficulty-field',
+};
 
 @Component({
   selector: 'app-create-recipe',
@@ -57,12 +73,14 @@ export class CreateRecipeComponent implements OnInit {
     steps: [],
   });
 
-  protected readonly titleError = signal<string | null>(null);
-  protected readonly formError = signal<string | null>(null);
+  protected readonly fieldErrors = signal<Partial<Record<RequiredRecipeField, string>>>({});
   protected readonly submitting = signal(false);
   protected readonly typesLoading = signal(true);
   protected readonly recipeLoading = signal(false);
   protected readonly imageCleared = signal(false);
+  protected readonly servingsDraft = signal(
+    String(INITIAL_CREATE_RECIPE_FORM.servings),
+  );
 
   protected readonly recipeTypeOptions = signal<{ label: string; value: string }[]>([]);
 
@@ -92,30 +110,55 @@ export class CreateRecipeComponent implements OnInit {
     this.loadEquipment();
   }
 
+  protected fieldError(field: RequiredRecipeField): string | null {
+    return this.fieldErrors()[field] ?? null;
+  }
+
   protected updateTitle(value: string): void {
     this.patchForm({ title: value });
-    this.titleError.set(null);
-    this.formError.set(null);
+    this.clearFieldError('title');
   }
 
   protected updateDescription(value: string): void {
     this.patchForm({ description: value });
-    this.formError.set(null);
+    this.clearFieldError('description');
   }
 
-  protected updateServings(value: number | null): void {
-    const servings = value && value >= 1 ? Math.min(value, 999) : 1;
+  protected onServingsInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const digits = input.value.replace(/\D/g, '').slice(0, 2);
+    input.value = digits;
+    this.servingsDraft.set(digits);
+    if (digits === '') {
+      return;
+    }
+    const n = Number(digits);
+    if (n < 1) {
+      return;
+    }
+    this.patchForm({ servings: Math.min(n, 99) });
+  }
+
+  protected onServingsBlur(): void {
+    const digits = this.servingsDraft();
+    const n = Number(digits);
+    const servings = !digits || n < 1 ? 1 : Math.min(n, 99);
     this.patchForm({ servings });
+    this.servingsDraft.set(String(servings));
   }
 
   protected updateRecipeType(value: string | null): void {
     this.patchForm({ recipeType: value ?? '' });
-    this.formError.set(null);
+    this.clearFieldError('recipeType');
   }
 
   protected updateDifficulty(value: RecipeDifficulty | null): void {
     this.patchForm({ difficulty: value ?? '' });
-    this.formError.set(null);
+    this.clearFieldError('difficulty');
+  }
+
+  protected updateVisibility(value: RecipeVisibility): void {
+    this.patchForm({ visibility: value });
   }
 
   protected updateTime(field: keyof RecipeTimeForm, value: number | null): void {
@@ -222,25 +265,27 @@ export class CreateRecipeComponent implements OnInit {
 
     const data = this.form();
     const title = data.title.trim();
+    const errors: Partial<Record<RequiredRecipeField, string>> = {};
     if (!title) {
-      this.titleError.set('Le titre est obligatoire');
-      return;
+      errors.title = 'Le titre est obligatoire';
     }
     if (!data.description.trim()) {
-      this.formError.set('La description est obligatoire.');
-      return;
+      errors.description = 'La description est obligatoire.';
     }
     if (!data.recipeType) {
-      this.formError.set('Sélectionnez un type de recette.');
-      return;
+      errors.recipeType = 'Sélectionnez un type de recette.';
     }
     if (!data.difficulty) {
-      this.formError.set('Sélectionnez une difficulté.');
+      errors.difficulty = 'Sélectionnez une difficulté.';
+    }
+
+    this.fieldErrors.set(errors);
+    const firstInvalid = REQUIRED_FIELD_ORDER.find((field) => errors[field]);
+    if (firstInvalid) {
+      this.scrollToField(firstInvalid);
       return;
     }
 
-    this.titleError.set(null);
-    this.formError.set(null);
     this.submitting.set(true);
 
     const editId = this.editRecipeId();
@@ -254,7 +299,13 @@ export class CreateRecipeComponent implements OnInit {
     saveRecipe$.pipe(switchMap((saved) => this.uploadPhotoIfNeeded(saved, photo))).subscribe({
       next: (saved) => {
         this.submitting.set(false);
-        this.alertService.success(saved.title, editId ? 'Recette mise à jour' : 'Recette créée', 4000);
+        const created = !editId;
+        const successTitle = editId
+          ? 'Recette mise à jour'
+          : saved.visibility === 'private'
+            ? 'Recette enregistrée, visible uniquement par vous'
+            : 'Recette envoyée, en attente de validation';
+        this.alertService.success(saved.title, created ? successTitle : 'Recette mise à jour', 4000);
         void this.router.navigate(['/recette', saved.id]);
       },
       error: (err: unknown) => {
@@ -318,6 +369,7 @@ export class CreateRecipeComponent implements OnInit {
 
         this.imageCleared.set(false);
         this.form.set(mapApiToRecipeForm(api));
+        this.servingsDraft.set(String(this.form().servings));
         this.recipeLoading.set(false);
       },
       error: (err: unknown) => {
@@ -354,6 +406,33 @@ export class CreateRecipeComponent implements OnInit {
       }
     }
     return isEdit ? 'Une erreur est survenue lors de la modification.' : 'Une erreur est survenue lors de la création.';
+  }
+
+  private clearFieldError(field: RequiredRecipeField): void {
+    this.fieldErrors.update((current) => {
+      if (!current[field]) {
+        return current;
+      }
+      const next = { ...current };
+      delete next[field];
+      return next;
+    });
+  }
+
+  private scrollToField(field: RequiredRecipeField): void {
+    const elementId = REQUIRED_FIELD_ELEMENT_IDS[field];
+    setTimeout(() => {
+      const el = document.getElementById(elementId);
+      if (!el) {
+        return;
+      }
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const focusTarget =
+        el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement
+          ? el
+          : (el.querySelector('input, textarea, [role="combobox"]') as HTMLElement | null);
+      focusTarget?.focus({ preventScroll: true });
+    }, 0);
   }
 
   private patchForm(partial: Partial<CreateRecipeFormData>): void {

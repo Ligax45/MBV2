@@ -16,10 +16,24 @@ export class RecipeApiService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = environment.apiUrl;
 
-  getRecipes(favoritesOnly = false): Observable<RecipeApiResponse[]> {
-    const params = favoritesOnly ? { favorites: 'true' } : undefined;
+  getRecipes(
+    options: { favoritesOnly?: boolean; mineOnly?: boolean } = {},
+  ): Observable<RecipeApiResponse[]> {
+    const params: Record<string, string> = {};
+    if (options.favoritesOnly) {
+      params['favorites'] = 'true';
+    }
+    if (options.mineOnly) {
+      params['mine'] = 'true';
+    }
     return this.http.get<RecipeApiResponse[]>(`${this.baseUrl}/recipes`, {
       params,
+    });
+  }
+
+  getPendingRecipes(): Observable<RecipeApiResponse[]> {
+    return this.http.get<RecipeApiResponse[]>(`${this.baseUrl}/recipes`, {
+      params: { pending: 'true' },
     });
   }
 
@@ -63,6 +77,23 @@ export class RecipeApiService {
 
   deleteRecipe(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/recipes/${id}`);
+  }
+
+  approveRecipe(id: string): Observable<RecipeDetailApiResponse> {
+    return this.http.post<RecipeDetailApiResponse>(
+      `${this.baseUrl}/recipes/${id}/approve`,
+      {},
+    );
+  }
+
+  rejectRecipe(
+    id: string,
+    comment?: string,
+  ): Observable<RecipeDetailApiResponse> {
+    return this.http.post<RecipeDetailApiResponse>(
+      `${this.baseUrl}/recipes/${id}/reject`,
+      { comment },
+    );
   }
 
   addRecipeFavorite(id: string): Observable<{ success: boolean; isFavorite: boolean }> {

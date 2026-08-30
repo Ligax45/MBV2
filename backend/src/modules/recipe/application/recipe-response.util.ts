@@ -40,6 +40,9 @@ export function toRecipeResponse(
       label: item.label,
     })),
     isFavorite: options.isFavorite ?? false,
+    visibility: recipe.visibility,
+    moderationStatus: recipe.moderationStatus,
+    moderationComment: recipe.moderationComment,
   };
 }
 
@@ -63,5 +66,8 @@ export function toRecipeListItemResponse(
     createdAt: recipe.createdAt.toISOString(),
     updatedAt: recipe.updatedAt.toISOString(),
     isFavorite: options.isFavorite ?? false,
+    visibility: recipe.visibility,
+    moderationStatus: recipe.moderationStatus,
+    moderationComment: recipe.moderationComment,
   };
 }

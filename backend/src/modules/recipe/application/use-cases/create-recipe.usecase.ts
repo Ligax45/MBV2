@@ -1,5 +1,6 @@
 import { Inject, Injectable, BadRequestException } from '@nestjs/common';
 import { toRecipeResponse } from '../recipe-response.util';
+import { RECIPE_VISIBILITIES } from '../../domain/recipe-visibility';
 import {
   RECIPE_REPOSITORY,
   type CreateRecipeParams,
@@ -27,11 +28,18 @@ function validateRecipeInput(input: CreateRecipeParams): void {
   assertUuid('recipeTypeId', input.recipeTypeId);
   if (!['facile', 'moyen', 'difficile'].includes(input.difficulty))
     throw new BadRequestException('difficulty is invalid');
-  if (typeof input.servings !== 'number' || input.servings < 0)
+  if (typeof input.servings !== 'number' || input.servings < 0 || input.servings > 99)
     throw new BadRequestException('servings is invalid');
 
   for (const equipmentId of input.equipmentIds ?? []) {
     assertUuid('equipmentIds', equipmentId);
+  }
+
+  if (
+    input.visibility != null &&
+    !RECIPE_VISIBILITIES.includes(input.visibility)
+  ) {
+    throw new BadRequestException('visibility is invalid');
   }
 }
 
@@ -43,9 +51,15 @@ export class CreateRecipeUseCase {
 
   async execute(input: CreateRecipeParams, authorUserId: string) {
     validateRecipeInput(input);
+    const visibility = input.visibility === 'private' ? 'private' : 'public';
     const recipe = await this.recipeRepo.create({
       ...input,
       authorUserId,
+      visibility,
+      moderationStatus: visibility === 'private' ? 'approved' : 'pending',
+      moderationComment: null,
+      reviewedAt: null,
+      reviewedByUserId: null,
     });
     return toRecipeResponse(recipe);
   }
