@@ -12,4 +12,10 @@ export const libraryRoutes: Routes = [
       import('./library.component').then((m) => m.LibraryComponent),
     data: { favoritesOnly: true },
   },
+  {
+    path: 'bibliotheque/mes-recettes',
+    loadComponent: () =>
+      import('./library.component').then((m) => m.LibraryComponent),
+    data: { mineOnly: true },
+  },
 ];

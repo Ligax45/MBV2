@@ -138,8 +138,8 @@
 
 .recipe-card__meta {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
   gap: 0.5rem;
   margin-top: 0.625rem;
   font-size: 0.8125rem;

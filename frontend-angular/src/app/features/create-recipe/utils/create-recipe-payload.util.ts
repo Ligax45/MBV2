@@ -36,6 +36,7 @@ export function buildCreateRecipePayload(
     ingredients,
     steps,
     equipmentIds: form.equipment,
+    visibility: form.visibility,
   };
 
   if (options?.clearImage) {

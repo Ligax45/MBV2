@@ -98,6 +98,11 @@ export class MikroOrmRecipeFavoriteRepository implements RecipeFavoriteRepositor
       [],
       [],
       [],
+      r.visibility,
+      r.moderationStatus,
+      r.moderationComment ?? null,
+      r.reviewedAt ?? null,
+      r.reviewedByUserId ?? null,
     );
   }
 }

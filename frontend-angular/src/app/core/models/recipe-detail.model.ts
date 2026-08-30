@@ -1,4 +1,8 @@
-import type { RecipeDifficulty } from './recipe-api.model';
+import type {
+  RecipeDifficulty,
+  RecipeModerationStatus,
+  RecipeVisibility,
+} from './recipe-api.model';
 import type { RecipeIngredient } from './recipe-ingredient.model';
 import type { RecipeStep } from './recipe-step.model';
 
@@ -21,4 +25,7 @@ export interface RecipeDetail {
   ingredients: RecipeIngredient[];
   steps: RecipeStep[];
   isFavorited?: boolean;
+  visibility: RecipeVisibility;
+  moderationStatus: RecipeModerationStatus;
+  moderationComment: string | null;
 }

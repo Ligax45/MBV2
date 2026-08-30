@@ -1,7 +1,10 @@
 <div class="recipe-details-page">
-  <a class="recipe-details-page__back" routerLink="/bibliotheque">
+  <a
+    class="recipe-details-page__back"
+    [routerLink]="fromModeration() ? '/moderation' : '/bibliotheque'"
+  >
     <i class="pi pi-arrow-left" aria-hidden="true"></i>
-    Retour à la bibliothèque
+    {{ fromModeration() ? 'Retour' : 'Retour à la bibliothèque' }}
   </a>
 
   @if (loading()) {
@@ -55,6 +58,11 @@
             >
               {{ difficultyLabel(detail.difficulty) }}
             </span>
+            @if (statusBadge(); as badge) {
+              <span class="badge-status" [class]="'badge-status--' + badge.kind">
+                {{ badge.label }}
+              </span>
+            }
             <span class="recipe-details__author-date">
               Par {{ detail.creatorName }} &bull; {{ formatDate(detail.createdAt) }}
             </span>
@@ -101,19 +109,21 @@
             </div>
           </div>
 
-          <button
-            type="button"
-            class="recipe-details__favorite"
-            [class.recipe-details__favorite--active]="isLiked()"
-            [disabled]="togglingFavorite()"
-            (click)="toggleLike()"
-          >
-            <i
-              [class]="isLiked() ? 'pi pi-heart-fill' : 'pi pi-heart'"
-              aria-hidden="true"
-            ></i>
-            {{ isLiked() ? 'Recette aimée' : 'Aimer cette recette' }}
-          </button>
+          @if (canFavorite()) {
+            <button
+              type="button"
+              class="recipe-details__favorite"
+              [class.recipe-details__favorite--active]="isLiked()"
+              [disabled]="togglingFavorite()"
+              (click)="toggleLike()"
+            >
+              <i
+                [class]="isLiked() ? 'pi pi-heart-fill' : 'pi pi-heart'"
+                aria-hidden="true"
+              ></i>
+              {{ isLiked() ? 'Recette aimée' : 'Aimer cette recette' }}
+            </button>
+          }
         </div>
       </div>
 
@@ -183,6 +193,13 @@
               <li>{{ label }}</li>
             }
           </ul>
+        </section>
+      }
+
+      @if (detail.moderationStatus === 'rejected' && detail.moderationComment) {
+        <section class="recipe-details__rejection" aria-label="Motif du refus">
+          <h3 class="recipe-details__rejection-title">Motif du refus</h3>
+          <p class="recipe-details__moderation-comment">{{ detail.moderationComment }}</p>
         </section>
       }
     </article>

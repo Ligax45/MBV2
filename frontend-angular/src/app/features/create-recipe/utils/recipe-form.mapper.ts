@@ -13,7 +13,7 @@ export function mapApiToRecipeForm(api: RecipeDetailApiResponse): CreateRecipeFo
     description: api.description,
     photo: null,
     photoPreview: hasCustomImage ? previewUrl : null,
-    servings: api.servings,
+    servings: Math.min(Math.max(api.servings, 1), 99),
     recipeType: api.recipeType.id,
     difficulty: api.difficulty,
     equipment: api.equipment.map((item) => item.id),
@@ -33,5 +33,6 @@ export function mapApiToRecipeForm(api: RecipeDetailApiResponse): CreateRecipeFo
       order: item.order,
       content: item.content,
     })),
+    visibility: api.visibility === 'private' ? 'private' : 'public',
   };
 }

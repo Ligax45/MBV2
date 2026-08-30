@@ -1,3 +1,5 @@
+import { UserRole } from './user-role.enum';
+
 export interface JwtPayload {
   sub: string;
   pseudo?: string;
@@ -8,5 +10,5 @@ export interface JwtPayload {
 export interface AuthenticatedUser {
   id: string;
   pseudo: string;
-  role: string;
+  role: UserRole;
 }

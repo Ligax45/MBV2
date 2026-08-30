@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { UserRole } from '../domain/user-role.enum';
+import { UserRole, isUserRole } from '../domain/user-role.enum';
 import { JwtKeyService } from '../infrastructure/jwt-key.service';
 import type { AuthenticatedUser, JwtPayload } from '../domain/auth-user.model';
 
@@ -21,10 +21,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException('Type de token invalide');
     }
 
+    const role = payload.role ?? UserRole.User;
+
     return {
       id: payload.sub,
       pseudo: payload.pseudo ?? '',
-      role: payload.role ?? UserRole.User,
+      role: isUserRole(role) ? role : UserRole.User,
     };
   }
 }

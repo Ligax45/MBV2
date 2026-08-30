@@ -1,0 +1,95 @@
+<div class="moderation-page">
+  <h1 class="moderation-page__title">Modération des recettes</h1>
+  <p class="moderation-page__subtitle">
+    Validez ou refusez les recettes publiques en attente. Seuls les administrateurs et
+    les modérateurs peuvent effectuer ces actions.
+  </p>
+
+  @if (loading()) {
+    <div class="moderation-page__state" role="status">
+      <p-progressSpinner ariaLabel="Chargement des recettes en attente" />
+    </div>
+  } @else if (recipes().length === 0) {
+    <p class="moderation-page__empty">Aucune recette en attente de validation.</p>
+  } @else {
+    <ul class="moderation-list">
+      @for (recipe of recipes(); track recipe.id) {
+        <li class="moderation-item">
+          <div class="moderation-item__row">
+            <div class="moderation-item__info">
+              <p class="moderation-item__title">{{ recipe.title }}</p>
+              <p class="moderation-item__meta">
+                Par {{ recipe.creatorName }} · {{ formatDate(recipe.createdAt) }}
+                @if (recipe.recipeTypeLabel) {
+                  · {{ recipe.recipeTypeLabel }}
+                }
+              </p>
+            </div>
+            <div class="moderation-item__actions">
+              <a
+                class="moderation-item__view"
+                [routerLink]="['/recette', recipe.id]"
+                [queryParams]="{ from: 'moderation' }"
+                aria-label="Voir le détail de la recette"
+                title="Voir le détail"
+              >
+                <i class="pi pi-eye" aria-hidden="true"></i>
+              </a>
+              <button
+                type="button"
+                class="moderation-item__btn moderation-item__btn--approve"
+                [disabled]="actingId() !== null"
+                (click)="onApprove(recipe)"
+              >
+                Approuver
+              </button>
+              <button
+                type="button"
+                class="moderation-item__btn moderation-item__btn--reject"
+                [disabled]="actingId() !== null"
+                (click)="startReject(recipe)"
+              >
+                Refuser
+              </button>
+            </div>
+          </div>
+
+          @if (rejectingId() === recipe.id) {
+            <form class="moderation-item__form" (submit)="confirmReject(recipe); $event.preventDefault()">
+              <label class="moderation-item__form-label" [attr.for]="'reject-comment-' + recipe.id">
+                Motif du refus
+              </label>
+              <textarea
+                class="moderation-item__form-input"
+                [id]="'reject-comment-' + recipe.id"
+                rows="3"
+                placeholder="Expliquez pourquoi cette recette est refusée…"
+                [ngModel]="rejectComment()"
+                (ngModelChange)="rejectComment.set($event)"
+                [ngModelOptions]="{ standalone: true }"
+                required
+              ></textarea>
+              <div class="moderation-item__form-actions">
+                <button
+                  type="button"
+                  class="moderation-item__btn"
+                  [disabled]="actingId() !== null"
+                  (click)="cancelReject()"
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  class="moderation-item__btn moderation-item__btn--reject"
+                  [disabled]="actingId() !== null"
+                >
+                  Confirmer le refus
+                </button>
+              </div>
+            </form>
+          }
+        </li>
+      }
+    </ul>
+  }
+</div>

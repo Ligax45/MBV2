@@ -11,6 +11,7 @@ import {
   formatMinutes,
   getDifficultyLabel,
 } from '@core/utils/recipe-format.util';
+import { isPubliclyListed } from '@core/utils/recipe-visibility.util';
 import { AlertService } from '@shared/services/alert.service';
 
 const STAR_COUNT = 5;
@@ -31,6 +32,20 @@ export class RecipeCardComponent {
   private readonly alertService = inject(AlertService);
 
   protected readonly isLiked = computed(() => this.recipe().isFavorited ?? false);
+  protected readonly canFavorite = computed(() => isPubliclyListed(this.recipe()));
+  protected readonly statusBadge = computed(() => {
+    const item = this.recipe();
+    if (item.visibility === 'private') {
+      return { kind: 'private', label: 'Privée' };
+    }
+    if (item.moderationStatus === 'pending') {
+      return { kind: 'pending', label: 'En attente' };
+    }
+    if (item.moderationStatus === 'rejected') {
+      return { kind: 'rejected', label: 'Refusée' };
+    }
+    return null;
+  });
   protected readonly togglingFavorite = signal(false);
   protected readonly starIndexes = Array.from({ length: STAR_COUNT }, (_, i) => i + 1);
 
@@ -73,6 +88,10 @@ export class RecipeCardComponent {
   toggleLike(event: Event): void {
     event.preventDefault();
     event.stopPropagation();
+
+    if (!this.canFavorite()) {
+      return;
+    }
 
     if (!this.currentUser.isAuthenticated()) {
       void this.router.navigate(['/connexion'], {

@@ -1,4 +1,5 @@
 import type { RecipeDifficulty } from '@core/models/recipe-api.model';
+import type { RecipeVisibility } from '@core/models/recipe-api.model';
 import type { RecipeIngredient } from '@core/models/recipe-ingredient.model';
 import type { RecipeStep } from '@core/models/recipe-step.model';
 
@@ -21,6 +22,7 @@ export interface CreateRecipeFormData {
   time: RecipeTimeForm;
   ingredients: RecipeIngredient[];
   steps: RecipeStep[];
+  visibility: RecipeVisibility;
 }
 
 export const INITIAL_CREATE_RECIPE_FORM: CreateRecipeFormData = {
@@ -39,4 +41,5 @@ export const INITIAL_CREATE_RECIPE_FORM: CreateRecipeFormData = {
   },
   ingredients: [],
   steps: [],
+  visibility: 'public',
 };

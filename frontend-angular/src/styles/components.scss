@@ -119,6 +119,31 @@
   color: var(--badge-hard-text);
 }
 
+.badge-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.625rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.badge-status--private {
+  background-color: var(--muted);
+  color: var(--muted-foreground);
+}
+
+.badge-status--pending {
+  background-color: var(--badge-medium-bg);
+  color: var(--badge-medium-text);
+}
+
+.badge-status--rejected {
+  background-color: var(--badge-hard-bg);
+  color: var(--badge-hard-text);
+}
+
 .badge-category {
   display: inline-flex;
   align-items: center;

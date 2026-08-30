@@ -1,14 +1,46 @@
 <nav class="nav-list" aria-label="Navigation principale">
-  @for (link of navLinks(); track link.path) {
-    <a
-      class="btn btn-ghost btn-nav"
-      [routerLink]="link.path"
-      routerLinkActive="active"
-      [routerLinkActiveOptions]="{ exact: link.path === '/' || link.path === '/bibliotheque' }"
-      (click)="onLinkClick()"
-    >
-      <i [class]="link.icon" aria-hidden="true"></i>
-      {{ link.label }}
-    </a>
+  @if (ctaLink(); as cta) {
+    <div class="nav-list__cta">
+      <a
+        class="btn btn-nav btn-nav--cta"
+        [routerLink]="cta.path"
+        routerLinkActive="active"
+        (click)="onLinkClick()"
+      >
+        <i [class]="cta.icon" aria-hidden="true"></i>
+        {{ cta.label }}
+      </a>
+    </div>
+  }
+
+  <div class="nav-list__main">
+    @for (link of navLinks(); track link.path) {
+      <a
+        class="btn btn-ghost btn-nav"
+        [routerLink]="link.path"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: link.path === '/' || link.path === '/bibliotheque' }"
+        (click)="onLinkClick()"
+      >
+        <i [class]="link.icon" aria-hidden="true"></i>
+        {{ link.label }}
+      </a>
+    }
+  </div>
+
+  @if (staffLinks().length > 0) {
+    <div class="nav-list__staff">
+      @for (link of staffLinks(); track link.path) {
+        <a
+          class="btn btn-ghost btn-nav"
+          [routerLink]="link.path"
+          routerLinkActive="active"
+          (click)="onLinkClick()"
+        >
+          <i [class]="link.icon" aria-hidden="true"></i>
+          {{ link.label }}
+        </a>
+      }
+    </div>
   }
 </nav>

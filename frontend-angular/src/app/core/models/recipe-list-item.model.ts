@@ -1,4 +1,4 @@
-import type { RecipeDifficulty } from './recipe-api.model';
+import type { RecipeDifficulty, RecipeModerationStatus, RecipeVisibility } from './recipe-api.model';
 
 /** Modèle d'affichage pour une carte recette (bibliothèque). */
 export interface RecipeListItem {
@@ -14,4 +14,7 @@ export interface RecipeListItem {
   recipeTypeLabel: string;
   averageRating?: number | null;
   isFavorited?: boolean;
+  visibility: RecipeVisibility;
+  moderationStatus: RecipeModerationStatus;
+  moderationComment?: string | null;
 }

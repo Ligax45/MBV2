@@ -7,21 +7,23 @@
           [src]="recipe().imageUrl"
           [alt]="recipe().title"
         />
-        <button
-          type="button"
-          class="recipe-card__like"
-          [class.recipe-card__like--active]="isLiked()"
-          [disabled]="togglingFavorite()"
-          [attr.aria-label]="
-            isLiked() ? 'Retirer des favoris' : 'Ajouter aux favoris'
-          "
-          (click)="toggleLike($event)"
-        >
-          <i
-            [class]="isLiked() ? 'pi pi-heart-fill' : 'pi pi-heart'"
-            aria-hidden="true"
-          ></i>
-        </button>
+        @if (canFavorite()) {
+          <button
+            type="button"
+            class="recipe-card__like"
+            [class.recipe-card__like--active]="isLiked()"
+            [disabled]="togglingFavorite()"
+            [attr.aria-label]="
+              isLiked() ? 'Retirer des favoris' : 'Ajouter aux favoris'
+            "
+            (click)="toggleLike($event)"
+          >
+            <i
+              [class]="isLiked() ? 'pi pi-heart-fill' : 'pi pi-heart'"
+              aria-hidden="true"
+            ></i>
+          </button>
+        }
         @if (recipe().recipeTypeLabel) {
           <span class="recipe-card__category">
             {{ recipe().recipeTypeLabel }}
@@ -48,10 +50,15 @@
       </span>
       <span
         class="badge-difficulty"
-        [class]="'badge-difficulty--' + recipe().difficulty"
+          [class]="'badge-difficulty--' + recipe().difficulty"
       >
         {{ difficultyLabel(recipe().difficulty) }}
       </span>
+      @if (statusBadge(); as badge) {
+        <span class="badge-status" [class]="'badge-status--' + badge.kind">
+          {{ badge.label }}
+        </span>
+      }
     </div>
 
     <ng-template #footer>

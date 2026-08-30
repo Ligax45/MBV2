@@ -30,12 +30,21 @@ export class RecipeDataService {
     return this.api.getRecipeTypes();
   }
 
-  getRecipes(favoritesOnly = false): Observable<RecipeListItem[]> {
+  getRecipes(options: { favoritesOnly?: boolean; mineOnly?: boolean } = {}): Observable<RecipeListItem[]> {
     if (environment.useMockData) {
-      return this.bouchon.getRecipes(favoritesOnly);
+      return this.bouchon.getRecipes(options.favoritesOnly === true);
     }
     return this.api
-      .getRecipes(favoritesOnly)
+      .getRecipes(options)
+      .pipe(map((items) => items.map(mapRecipeToListItem)));
+  }
+
+  getPendingRecipes(): Observable<RecipeListItem[]> {
+    if (environment.useMockData) {
+      return of([]);
+    }
+    return this.api
+      .getPendingRecipes()
       .pipe(map((items) => items.map(mapRecipeToListItem)));
   }
 
@@ -52,6 +61,14 @@ export class RecipeDataService {
         return throwError(() => err);
       }),
     );
+  }
+
+  approveRecipe(id: string): Observable<RecipeDetail> {
+    return this.api.approveRecipe(id).pipe(map(mapRecipeToDetail));
+  }
+
+  rejectRecipe(id: string, comment?: string): Observable<RecipeDetail> {
+    return this.api.rejectRecipe(id, comment).pipe(map(mapRecipeToDetail));
   }
 
   deleteRecipe(id: string): Observable<void> {

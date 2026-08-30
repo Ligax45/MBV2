@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { AuthModule } from '../auth/auth.module';
 import { AddRecipeFavoriteUseCase } from './application/use-cases/add-recipe-favorite.usecase';
+import { ApproveRecipeUseCase } from './application/use-cases/approve-recipe.usecase';
 import { CreateRecipeUseCase } from './application/use-cases/create-recipe.usecase';
 import { UpdateRecipeUseCase } from './application/use-cases/update-recipe.usecase';
 import { UploadRecipeImageUseCase } from './application/use-cases/upload-recipe-image.usecase';
@@ -10,6 +11,7 @@ import { GetEquipmentUseCase } from './application/use-cases/get-equipment.useca
 import { GetRecipeByIdUseCase } from './application/use-cases/get-recipe-by-id.usecase';
 import { GetRecipeTypesUseCase } from './application/use-cases/get-recipe-types.usecase';
 import { GetRecipesUseCase } from './application/use-cases/get-recipes.usecase';
+import { RejectRecipeUseCase } from './application/use-cases/reject-recipe.usecase';
 import { RemoveRecipeFavoriteUseCase } from './application/use-cases/remove-recipe-favorite.usecase';
 import { RECIPE_FAVORITE_REPOSITORY } from './domain/repositories/recipe-favorite.repository';
 import { RECIPE_REPOSITORY } from './domain/repositories/recipe.repository';
@@ -83,6 +85,8 @@ import { RecipeController } from './presentation/recipe.controller';
     UploadRecipeImageUseCase,
     AddRecipeFavoriteUseCase,
     RemoveRecipeFavoriteUseCase,
+    ApproveRecipeUseCase,
+    RejectRecipeUseCase,
     {
       provide: RECIPE_REPOSITORY,
       useClass: MikroOrmRecipeRepository,

@@ -252,6 +252,22 @@
           "enumItems": [],
           "mappedType": "datetime"
         },
+        "custom_claims_allowlist": {
+          "name": "custom_claims_allowlist",
+          "type": "text[]",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "'{}'",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "array"
+        },
         "discovery_cached_at": {
           "name": "discovery_cached_at",
           "type": "timestamptz(6)",
@@ -6070,6 +6086,42 @@
           "enumItems": [],
           "mappedType": "string"
         },
+        "moderation_comment": {
+          "name": "moderation_comment",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "text"
+        },
+        "moderation_status": {
+          "name": "moderation_status",
+          "type": "varchar(20)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 20,
+          "precision": null,
+          "scale": null,
+          "default": "'approved'",
+          "comment": null,
+          "enumItems": [
+            "pending",
+            "approved",
+            "rejected"
+          ],
+          "mappedType": "enum"
+        },
         "prep_minutes": {
           "name": "prep_minutes",
           "type": "smallint",
@@ -6118,6 +6170,38 @@
           "enumItems": [],
           "mappedType": "smallint"
         },
+        "reviewed_at": {
+          "name": "reviewed_at",
+          "type": "timestamp(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "reviewed_by_user_id": {
+          "name": "reviewed_by_user_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
         "servings": {
           "name": "servings",
           "type": "smallint",
@@ -6165,6 +6249,25 @@
           "comment": null,
           "enumItems": [],
           "mappedType": "datetime"
+        },
+        "visibility": {
+          "name": "visibility",
+          "type": "varchar(20)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 20,
+          "precision": null,
+          "scale": null,
+          "default": "'public'",
+          "comment": null,
+          "enumItems": [
+            "public",
+            "private"
+          ],
+          "mappedType": "enum"
         }
       },
       "indexes": [
@@ -6200,6 +6303,17 @@
         },
         {
           "columnNames": [
+            "moderation_status",
+            "visibility"
+          ],
+          "composite": true,
+          "constraint": false,
+          "keyName": "idx_recipes_visibility_moderation",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
             "id"
           ],
           "composite": false,
@@ -6223,6 +6337,12 @@
           "columnName": "difficulty"
         },
         {
+          "name": "recipes_moderation_status_check",
+          "expression": "\"moderation_status\" in ('pending', 'approved', 'rejected')",
+          "definition": "check (\"moderation_status\" in ('pending', 'approved', 'rejected'))",
+          "columnName": "moderation_status"
+        },
+        {
           "name": "recipes_prep_minutes_check",
           "expression": "prep_minutes >= 0",
           "definition": "CHECK ((prep_minutes >= 0))",
@@ -6236,9 +6356,15 @@
         },
         {
           "name": "recipes_servings_check",
-          "expression": "servings >= 0",
-          "definition": "CHECK ((servings >= 0))",
+          "expression": "(servings >= 0) AND (servings <= 99)",
+          "definition": "CHECK (((servings >= 0) AND (servings <= 99)))",
           "columnName": "servings"
+        },
+        {
+          "name": "recipes_visibility_check",
+          "expression": "\"visibility\" in ('public', 'private')",
+          "definition": "check (\"visibility\" in ('public', 'private'))",
+          "columnName": "visibility"
         }
       ],
       "foreignKeys": {
@@ -6252,6 +6378,18 @@
             "id"
           ],
           "referencedTableName": "public.users"
+        },
+        "fk_recipes_reviewed_by": {
+          "columnNames": [
+            "reviewed_by_user_id"
+          ],
+          "constraintName": "fk_recipes_reviewed_by",
+          "localTableName": "public.recipes",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.users",
+          "deleteRule": "set null"
         },
         "fk_recipes_type": {
           "columnNames": [
@@ -6823,13 +6961,7 @@
           "unique": true
         }
       ],
-      "checks": [
-        {
-          "name": "messages_payload_exclusive",
-          "definition": "CHECK (((payload IS NULL) OR (binary_payload IS NULL))) NOT VALID",
-          "columnName": "binary_payload"
-        }
-      ],
+      "checks": [],
       "foreignKeys": {},
       "comment": null
     },
@@ -7272,6 +7404,22 @@
           "comment": null,
           "enumItems": [],
           "mappedType": "datetime"
+        },
+        "versioning_status": {
+          "name": "versioning_status",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "'DISABLED'",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "text"
         }
       },
       "indexes": [
@@ -7638,6 +7786,22 @@
       "name": "objects",
       "schema": "storage",
       "columns": {
+        "archived_at": {
+          "name": "archived_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
         "bucket_id": {
           "name": "bucket_id",
           "type": "text",
@@ -7685,6 +7849,38 @@
           "comment": null,
           "enumItems": [],
           "mappedType": "uuid"
+        },
+        "is_delete_marker": {
+          "name": "is_delete_marker",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "false",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "boolean"
+        },
+        "is_versioned": {
+          "name": "is_versioned",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "false",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "boolean"
         },
         "last_accessed_at": {
           "name": "last_accessed_at",
@@ -8794,7 +8990,13 @@
         "lte",
         "gt",
         "gte",
-        "in"
+        "in",
+        "like",
+        "ilike",
+        "is",
+        "match",
+        "imatch",
+        "isdistinct"
       ]
     },
     "storage.buckettype": {
