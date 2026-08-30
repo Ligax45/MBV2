@@ -41,21 +41,20 @@
   padding: 0 0.875rem;
   text-decoration: none;
   border: none;
-  border-radius: var(--radius-pill);
+  border-radius: var(--sidebar-nav-radius);
   color: var(--sidebar-text);
   font-weight: 400;
 }
 
 .btn-nav:hover:not(.active) {
   background-color: var(--sidebar-hover-bg);
-  color: var(--foreground);
+  color: var(--sidebar-foreground);
 }
 
 .btn-nav.active {
   background-color: var(--sidebar-active-bg);
   color: var(--sidebar-text-active);
   font-weight: 500;
-  box-shadow: var(--sidebar-shadow);
 }
 
 .btn-nav .pi {

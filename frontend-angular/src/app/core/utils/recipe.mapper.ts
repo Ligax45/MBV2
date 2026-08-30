@@ -40,6 +40,7 @@ export function mapRecipeToListItem(api: RecipeApiResponse): RecipeListItem {
     createdAt: api.createdAt,
     difficulty: api.difficulty,
     creatorName: resolveCreatorName(api.authorName),
+    recipeTypeId: api.recipeType.id,
     recipeTypeLabel: api.recipeType.label,
     isFavorited: api.isFavorite ?? false,
   };

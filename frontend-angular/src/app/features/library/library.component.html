@@ -5,22 +5,48 @@
   </header>
 
   <div class="library-page__controls">
-    <button
-      type="button"
-      class="library-page__filter"
-      [class.library-page__filter--active]="favoritesOnly()"
-      [attr.aria-pressed]="favoritesOnly()"
-      (click)="toggleFavorites()"
-    >
-      <i class="pi pi-heart" aria-hidden="true"></i>
-      Mes favoris
-    </button>
+    <div class="library-page__filters">
+      <button
+        type="button"
+        class="library-page__filter library-page__filter--all"
+        [class.library-page__filter--all-active]="selectedRecipeTypeId() === null"
+        [attr.aria-pressed]="selectedRecipeTypeId() === null"
+        (click)="selectAllTypes()"
+      >
+        Tous
+      </button>
 
-    <div class="library-page__search">
-      <app-recipe-search-bar
-        [value]="searchQuery()"
-        (valueChange)="onSearchChange($event)"
-      />
+      @for (type of visibleRecipeTypes(); track type.id) {
+        <button
+          type="button"
+          class="library-page__filter library-page__filter--type"
+          [class.library-page__filter--type-active]="selectedRecipeTypeId() === type.id"
+          [attr.aria-pressed]="selectedRecipeTypeId() === type.id"
+          (click)="toggleRecipeType(type.id)"
+        >
+          {{ type.label }}
+        </button>
+      }
+    </div>
+
+    <div class="library-page__search-row">
+      <div class="library-page__search">
+        <app-recipe-search-bar
+          [value]="searchQuery()"
+          (valueChange)="onSearchChange($event)"
+        />
+      </div>
+
+      <button
+        type="button"
+        class="library-page__filter library-page__filter--favorites"
+        [class.library-page__filter--active]="favoritesOnly()"
+        [attr.aria-pressed]="favoritesOnly()"
+        (click)="toggleFavorites()"
+      >
+        <i class="pi pi-heart" aria-hidden="true"></i>
+        Mes favoris
+      </button>
     </div>
   </div>
 
@@ -33,11 +59,50 @@
       <p class="library-page__empty">Les recettes n'ont pas pu être chargées.</p>
     </div>
   } @else if (filteredRecipes().length === 0) {
-    <p-message
-      severity="info"
-      [text]="emptyMessage()"
-      styleClass="library-page__message"
-    />
+    <div class="library-page__empty-state" role="status">
+      <div class="library-page__empty-icon" aria-hidden="true">
+        @switch (emptyIcon()) {
+          @case ('heart') {
+            <i class="pi pi-heart"></i>
+          }
+          @case ('search') {
+            <i class="pi pi-search"></i>
+          }
+          @case ('filter') {
+            <i class="pi pi-filter"></i>
+          }
+          @default {
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M22 18v28M22 22h-3a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h3M42 18v28M42 26h3a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-3"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+              />
+              <circle cx="32" cy="32" r="13" stroke="currentColor" stroke-width="2.5" />
+              <circle
+                cx="32"
+                cy="32"
+                r="8"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-dasharray="3 3"
+                opacity="0.55"
+              />
+            </svg>
+          }
+        }
+      </div>
+
+      <h2 class="library-page__empty-title">{{ emptyTitle() }}</h2>
+      <p class="library-page__empty-text">{{ emptyMessage() }}</p>
+
+      @if (hasActiveFilters()) {
+        <button type="button" class="library-page__empty-action" (click)="clearFilters()">
+          Réinitialiser les filtres
+        </button>
+      }
+    </div>
   } @else {
     <div class="library-page__grid">
       @for (recipe of filteredRecipes(); track recipe.id) {

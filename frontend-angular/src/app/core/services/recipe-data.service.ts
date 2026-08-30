@@ -1,9 +1,11 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, catchError, map, throwError } from 'rxjs';
+import { Observable, catchError, delay, map, of, throwError } from 'rxjs';
 
+import { BOUCHON_RECIPE_TYPES } from '@core/data/bouchon-recipe-types.data';
 import type { RecipeDetail } from '@core/models/recipe-detail.model';
 import type { RecipeListItem } from '@core/models/recipe-list-item.model';
+import type { RecipeTypeSummary } from '@core/models/recipe-api.model';
 import { mapRecipeToDetail, mapRecipeToListItem } from '@core/utils/recipe.mapper';
 
 import { environment } from '../../../environments/environment';
@@ -18,6 +20,15 @@ import { RecipeBouchonService } from './recipe-bouchon.service';
 export class RecipeDataService {
   private readonly bouchon = inject(RecipeBouchonService);
   private readonly api = inject(RecipeApiService);
+
+  getRecipeTypes(): Observable<RecipeTypeSummary[]> {
+    if (environment.useMockData) {
+      return of(
+        BOUCHON_RECIPE_TYPES.map((type) => ({ id: type.id, label: type.label })),
+      ).pipe(delay(200));
+    }
+    return this.api.getRecipeTypes();
+  }
 
   getRecipes(favoritesOnly = false): Observable<RecipeListItem[]> {
     if (environment.useMockData) {

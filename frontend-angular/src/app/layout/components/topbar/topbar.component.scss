@@ -4,14 +4,14 @@
   flex-shrink: 0;
   align-items: center;
   gap: 0.5rem;
-  border-bottom: 1px solid var(--sidebar-border);
+  border-bottom: 1px solid var(--sidebar-divider);
   background-color: var(--sidebar-bg);
   padding: 0 0.75rem;
 }
 
 .topbar__menu-btn {
   display: flex;
-  color: var(--foreground);
+  color: var(--sidebar-foreground);
 }
 
 .topbar__brand {
@@ -27,13 +27,14 @@
   width: 1.75rem;
   height: 1.75rem;
   border-radius: 50%;
-  background-color: var(--primary);
-  color: var(--primary-foreground);
+  background-color: var(--sidebar-logo-accent);
+  color: #ffffff;
 }
 
 .topbar__title {
-  font-weight: 700;
-  color: var(--foreground);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 400;
+  color: var(--sidebar-foreground);
 }
 
 @media (min-width: 768px) {
