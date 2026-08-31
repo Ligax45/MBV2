@@ -155,7 +155,7 @@
 
 .photo-field__upload {
   display: flex;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 16 / 10;
   width: 100%;
   max-width: 20rem;
   cursor: pointer;
@@ -192,7 +192,7 @@
 
 .photo-field__preview {
   position: relative;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 16 / 10;
   width: 100%;
   max-width: 20rem;
   overflow: hidden;
@@ -212,8 +212,22 @@
   top: 0.5rem;
   right: 0.5rem;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
+  justify-content: flex-end;
   gap: 0.5rem;
+}
+
+:host ::ng-deep .photo-field__recrop.p-button {
+  padding: 0.375rem 0.625rem;
+  border: none;
+  background: rgb(0 0 0 / 55%);
+  color: #fff;
+  font-size: 0.75rem;
+}
+
+:host ::ng-deep .photo-field__recrop.p-button:hover {
+  background: rgb(0 0 0 / 70%);
 }
 
 .photo-field__change {
@@ -389,13 +403,33 @@
 
 .dynamic-list__item--ingredient {
   display: grid;
-  grid-template-columns: 1.5rem 7rem 11rem minmax(12rem, 1fr) 2.5rem;
+  grid-template-columns: 2.5rem 1.5rem 7rem 11rem minmax(12rem, 1fr) 2.5rem;
   align-items: center;
   gap: 0.75rem;
 }
 
 .dynamic-list__item--step {
   align-items: flex-start;
+}
+
+.dynamic-list__step-fields {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.dynamic-list__step-title {
+  width: 100%;
+  min-width: 0;
+  font-weight: 600;
+
+  &::placeholder {
+    color: var(--placeholder-foreground);
+    font-weight: 400;
+    opacity: 1;
+  }
 }
 
 .dynamic-list__index {
@@ -443,6 +477,90 @@
 }
 
 .dynamic-list__step-content {
-  flex: 1;
+  width: 100%;
   min-width: 0;
+  min-height: 7.5rem;
+  resize: vertical;
+}
+
+.dynamic-list__drag-handle {
+  display: flex;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--muted-foreground);
+  cursor: grab;
+  touch-action: none;
+
+  &:hover {
+    background: color-mix(in srgb, var(--muted) 50%, transparent);
+    color: var(--foreground);
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.dynamic-list__item.cdk-drag-preview {
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--foreground) 15%, transparent);
+}
+
+.dynamic-list__item.cdk-drag-placeholder {
+  opacity: 0.4;
+}
+
+.cdk-drop-list-dragging .dynamic-list__item:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.photo-crop-dialog__hint {
+  margin: 0 0 1rem;
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.photo-crop-dialog__cropper {
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--muted) 40%, transparent);
+
+  image-cropper {
+    --cropper-outline-color: rgb(45 27 19 / 45%);
+    --cropper-overlay-color: var(--background);
+    max-height: min(55vh, 22rem);
+    padding: 0;
+  }
+}
+
+.photo-crop-dialog__zoom {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.photo-crop-dialog__zoom-label {
+  flex-shrink: 0;
+  color: var(--foreground);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.photo-crop-dialog__zoom-input {
+  width: 100%;
+  accent-color: var(--primary);
+}
+
+.photo-crop-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
 }

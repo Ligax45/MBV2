@@ -33,6 +33,7 @@ export function toRecipeResponse(
     steps: recipe.steps.map((step) => ({
       id: step.id,
       order: step.order,
+      title: step.title,
       content: step.content,
     })),
     equipment: recipe.equipment.map((item) => ({

@@ -19,10 +19,14 @@ export function buildCreateRecipePayload(
 
   const steps = form.steps
     .filter((item) => item.content.trim())
-    .map((item) => ({
-      order: item.order,
-      content: item.content.trim(),
-    }));
+    .map((item) => {
+      const trimmedTitle = item.title.trim();
+      return {
+        order: item.order,
+        content: item.content.trim(),
+        ...(trimmedTitle ? { title: trimmedTitle } : {}),
+      };
+    });
 
   const payload: CreateRecipePayload = {
     title: form.title.trim(),

@@ -209,6 +209,7 @@ export class MikroOrmRecipeRepository implements RecipeRepository {
       steps: steps.map((step) => ({
         id: step.id,
         order: step.stepOrder,
+        title: step.title ?? null,
         content: step.content,
       })),
       equipment: recipeEquipment.map((link) => ({
@@ -248,6 +249,8 @@ export class MikroOrmRecipeRepository implements RecipeRepository {
       const step = new RecipeStepOrmEntity();
       step.recipe = recipeRef;
       step.stepOrder = item.order > 0 ? item.order : index + 1;
+      const trimmedTitle = item.title?.trim();
+      step.title = trimmedTitle || null;
       step.content = item.content.trim();
       em.persist(step);
     });
