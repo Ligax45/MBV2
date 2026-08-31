@@ -1,15 +1,18 @@
-﻿import { HttpErrorResponse } from '@angular/common/http';
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+﻿import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, computed, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Button } from 'primeng/button';
 import { Card } from 'primeng/card';
+import { Dialog } from 'primeng/dialog';
 import { Divider } from 'primeng/divider';
 import { InputNumber } from 'primeng/inputnumber';
 import { InputText } from 'primeng/inputtext';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { Select } from 'primeng/select';
 import { Textarea } from 'primeng/textarea';
+import { ImageCropperComponent, type ImageTransform } from 'ngx-image-cropper';
 import type { EquipmentSummary, RecipeDifficulty, RecipeDetailApiResponse, RecipeVisibility } from '@core/models/recipe-api.model';
 import type { RecipeIngredient } from '@core/models/recipe-ingredient.model';
 import type { RecipeStep } from '@core/models/recipe-step.model';
@@ -21,12 +24,19 @@ import { switchMap, of } from 'rxjs';
 import { DIFFICULTY_OPTIONS } from './constants/difficulty-options.constant';
 import { INGREDIENT_UNITS } from './constants/ingredient-units.constant';
 import {
+  RECIPE_PHOTO_ACCEPT,
+  RECIPE_PHOTO_ASPECT_RATIO,
+  RECIPE_PHOTO_EXPORT_WIDTH,
+  RECIPE_PHOTO_MAX_SIZE_BYTES,
+} from './constants/recipe-photo.constant';
+import {
   INITIAL_CREATE_RECIPE_FORM,
   type CreateRecipeFormData,
   type RecipeTimeForm,
 } from './models/create-recipe-form.model';
 import { buildCreateRecipePayload } from './utils/create-recipe-payload.util';
 import { createRecipeFieldId } from './utils/create-recipe-id.util';
+import { blobToRecipePhotoFile, isAcceptedRecipePhoto } from './utils/recipe-photo.util';
 import { mapApiToRecipeForm } from './utils/recipe-form.mapper';
 
 type RequiredRecipeField = 'title' | 'description' | 'recipeType' | 'difficulty';
@@ -47,11 +57,29 @@ const REQUIRED_FIELD_ELEMENT_IDS: Record<RequiredRecipeField, string> = {
 
 @Component({
   selector: 'app-create-recipe',
-  imports: [FormsModule, Card, InputText, Textarea, InputNumber, Select, Button, Divider, ProgressSpinner],
+  imports: [
+    FormsModule,
+    Card,
+    InputText,
+    Textarea,
+    InputNumber,
+    Select,
+    Button,
+    Divider,
+    ProgressSpinner,
+    Dialog,
+    ImageCropperComponent,
+    CdkDropList,
+    CdkDrag,
+    CdkDragHandle,
+  ],
   templateUrl: './create-recipe.component.html',
   styleUrl: './create-recipe.component.scss',
 })
 export class CreateRecipeComponent implements OnInit {
+  @ViewChild(ImageCropperComponent)
+  private imageCropper?: ImageCropperComponent;
+
   private readonly alertService = inject(AlertService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -96,6 +124,16 @@ export class CreateRecipeComponent implements OnInit {
   }));
 
   protected readonly pageBusy = computed(() => this.typesLoading() || this.recipeLoading());
+
+  protected readonly recipePhotoAccept = RECIPE_PHOTO_ACCEPT;
+  protected readonly recipePhotoAspectRatio = RECIPE_PHOTO_ASPECT_RATIO;
+  protected readonly recipePhotoExportWidth = RECIPE_PHOTO_EXPORT_WIDTH;
+  protected readonly photoCropVisible = signal(false);
+  protected readonly pendingCropFile = signal<File | null>(null);
+  protected readonly cropZoom = signal(1);
+  protected cropTransform: ImageTransform = { scale: 1, translateUnit: 'px' };
+
+  private pendingCropFileName = '';
 
   ngOnInit(): void {
     const editId = this.route.snapshot.paramMap.get('recipeId');
@@ -173,18 +211,72 @@ export class CreateRecipeComponent implements OnInit {
     const file = input.files?.[0] ?? null;
     input.value = '';
     if (!file) {
-      this.clearPhoto();
       return;
     }
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      this.imageCleared.set(false);
-      this.patchForm({
-        photo: file,
-        photoPreview: reader.result as string,
-      });
-    };
-    reader.readAsDataURL(file);
+    if (!isAcceptedRecipePhoto(file)) {
+      this.alertService.warning('Choisissez une image (JPEG, PNG ou WebP).');
+      return;
+    }
+    if (file.size > RECIPE_PHOTO_MAX_SIZE_BYTES) {
+      this.alertService.warning("L'image ne doit pas dépasser 10 Mo.");
+      return;
+    }
+    this.openPhotoCrop(file);
+  }
+
+  protected openPhotoRecrop(): void {
+    const photo = this.form().photo;
+    if (!photo) {
+      return;
+    }
+    this.openPhotoCrop(photo);
+  }
+
+  protected onPhotoCropVisibleChange(visible: boolean): void {
+    if (visible) {
+      this.photoCropVisible.set(true);
+      return;
+    }
+    this.cancelPhotoCrop();
+  }
+
+  protected cancelPhotoCrop(): void {
+    this.photoCropVisible.set(false);
+    this.pendingCropFile.set(null);
+    this.pendingCropFileName = '';
+  }
+
+  protected onCropZoomChange(zoom: number): void {
+    this.cropZoom.set(zoom);
+    this.cropTransform = { ...this.cropTransform, scale: zoom };
+  }
+
+  protected onCropWheel(event: WheelEvent): void {
+    event.preventDefault();
+    const delta = event.deltaY > 0 ? -0.08 : 0.08;
+    const nextZoom = Math.min(3, Math.max(1, Number((this.cropZoom() + delta).toFixed(2))));
+    this.onCropZoomChange(nextZoom);
+  }
+
+  protected onCropImageLoadFailed(): void {
+    this.alertService.error('Impossible de charger cette image.');
+    this.cancelPhotoCrop();
+  }
+
+  protected async confirmPhotoCrop(): Promise<void> {
+    if (!this.imageCropper) {
+      return;
+    }
+    try {
+      const result = await this.imageCropper.crop('blob');
+      const blob = result?.blob;
+      if (!blob) {
+        return;
+      }
+      this.applyCroppedPhoto(blob);
+    } catch {
+      this.alertService.error('Impossible de recadrer cette photo.');
+    }
   }
 
   protected clearPhoto(): void {
@@ -226,11 +318,18 @@ export class CreateRecipeComponent implements OnInit {
     });
   }
 
+  protected dropIngredient(event: CdkDragDrop<RecipeIngredient[]>): void {
+    const ingredients = [...this.form().ingredients];
+    moveItemInArray(ingredients, event.previousIndex, event.currentIndex);
+    this.patchForm({ ingredients });
+  }
+
   protected addStep(): void {
     const steps = this.form().steps;
     const newOrder = steps.length > 0 ? Math.max(...steps.map((s) => s.order)) + 1 : 1;
     const step: RecipeStep = {
       id: createRecipeFieldId('step'),
+      title: '',
       content: '',
       order: newOrder,
     };
@@ -244,9 +343,17 @@ export class CreateRecipeComponent implements OnInit {
     this.patchForm({ steps: remaining });
   }
 
-  protected updateStep(id: string, content: string): void {
+  protected updateStep(id: string, field: 'title' | 'content', value: string): void {
     this.patchForm({
-      steps: this.form().steps.map((s) => (s.id === id ? { ...s, content } : s)),
+      steps: this.form().steps.map((s) => (s.id === id ? { ...s, [field]: value } : s)),
+    });
+  }
+
+  protected dropStep(event: CdkDragDrop<RecipeStep[]>): void {
+    const steps = [...this.form().steps];
+    moveItemInArray(steps, event.previousIndex, event.currentIndex);
+    this.patchForm({
+      steps: steps.map((step, index) => ({ ...step, order: index + 1 })),
     });
   }
 
@@ -433,6 +540,28 @@ export class CreateRecipeComponent implements OnInit {
           : (el.querySelector('input, textarea, [role="combobox"]') as HTMLElement | null);
       focusTarget?.focus({ preventScroll: true });
     }, 0);
+  }
+
+  private openPhotoCrop(file: File): void {
+    this.pendingCropFile.set(file);
+    this.pendingCropFileName = file.name;
+    this.cropZoom.set(1);
+    this.cropTransform = { scale: 1, translateUnit: 'px' };
+    this.photoCropVisible.set(true);
+  }
+
+  private applyCroppedPhoto(blob: Blob): void {
+    const file = blobToRecipePhotoFile(blob, this.pendingCropFileName);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      this.imageCleared.set(false);
+      this.patchForm({
+        photo: file,
+        photoPreview: reader.result as string,
+      });
+      this.cancelPhotoCrop();
+    };
+    reader.readAsDataURL(file);
   }
 
   private patchForm(partial: Partial<CreateRecipeFormData>): void {

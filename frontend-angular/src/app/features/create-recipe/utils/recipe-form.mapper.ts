@@ -31,6 +31,7 @@ export function mapApiToRecipeForm(api: RecipeDetailApiResponse): CreateRecipeFo
     steps: api.steps.map((item) => ({
       id: item.id,
       order: item.order,
+      title: item.title ?? '',
       content: item.content,
     })),
     visibility: api.visibility === 'private' ? 'private' : 'public',

@@ -14,6 +14,7 @@ export interface CreateRecipeIngredientParams {
 
 export interface CreateRecipeStepParams {
   order: number;
+  title?: string | null;
   content: string;
 }
 

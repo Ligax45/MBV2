@@ -16,6 +16,8 @@
   --accent-foreground: #2d1b13;
   --muted: #f3e8d9;
   --muted-foreground: #9a7b6a;
+  /* Placeholder AA 4.5:1 sur --card (#fff) et fonds clairs proches */
+  --placeholder-foreground: #7c746e;
   --border: #f3e8d9;
   --ring: #f59e0b;
   --card: #ffffff;
@@ -71,6 +73,8 @@ html.dark {
   --accent-foreground: #faf5f0;
   --muted: #2d1b13;
   --muted-foreground: #9a7b6a;
+  /* Placeholder AA 4.5:1 sur --card (#231810) */
+  --placeholder-foreground: #a39a92;
   --border: rgb(255 255 255 / 10%);
   --ring: #f59e0b;
   --card: #231810;

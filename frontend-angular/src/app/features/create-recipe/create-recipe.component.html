@@ -75,10 +75,18 @@
                   class="photo-field__image"
                 />
                 <div class="photo-field__actions">
+                  <p-button
+                    type="button"
+                    label="Recadrer"
+                    icon="pi pi-expand"
+                    size="small"
+                    styleClass="photo-field__recrop"
+                    (onClick)="openPhotoRecrop()"
+                  />
                   <label class="photo-field__change">
                     <input
                       type="file"
-                      accept="image/*"
+                      [accept]="recipePhotoAccept"
                       class="photo-field__input"
                       (change)="onPhotoSelected($event)"
                     />
@@ -100,7 +108,7 @@
               <label class="photo-field__upload">
                 <input
                   type="file"
-                  accept="image/*"
+                  [accept]="recipePhotoAccept"
                   class="photo-field__input"
                   (change)="onPhotoSelected($event)"
                 />
@@ -317,9 +325,17 @@
       </ng-template>
 
       <div class="create-recipe-form__section">
-        <ul class="dynamic-list">
+        <ul class="dynamic-list" cdkDropList (cdkDropListDropped)="dropIngredient($event)">
           @for (ing of form().ingredients; track ing.id; let i = $index) {
-            <li class="dynamic-list__item dynamic-list__item--ingredient">
+            <li class="dynamic-list__item dynamic-list__item--ingredient" cdkDrag>
+              <button
+                type="button"
+                class="dynamic-list__drag-handle"
+                cdkDragHandle
+                [attr.aria-label]="'Déplacer ingrédient ' + (i + 1)"
+              >
+                <i class="pi pi-bars" aria-hidden="true"></i>
+              </button>
               <span class="dynamic-list__index">{{ i + 1 }}.</span>
               <input
                 pInputText
@@ -385,20 +401,39 @@
       <ng-template #subtitle>Décrivez les étapes dans l'ordre</ng-template>
 
       <div class="create-recipe-form__section">
-        <ol class="dynamic-list dynamic-list--steps">
+        <ol class="dynamic-list dynamic-list--steps" cdkDropList (cdkDropListDropped)="dropStep($event)">
           @for (step of form().steps; track step.id; let i = $index) {
-            <li class="dynamic-list__item dynamic-list__item--step">
+            <li class="dynamic-list__item dynamic-list__item--step" cdkDrag>
+              <button
+                type="button"
+                class="dynamic-list__drag-handle"
+                cdkDragHandle
+                [attr.aria-label]="'Déplacer étape ' + (i + 1)"
+              >
+                <i class="pi pi-bars" aria-hidden="true"></i>
+              </button>
               <span class="dynamic-list__step-badge">{{ i + 1 }}</span>
-              <textarea
-                pTextarea
-                class="dynamic-list__step-content"
-                [placeholder]="'Étape ' + (i + 1) + '...'"
-                rows="3"
-                [ngModel]="step.content"
-                (ngModelChange)="updateStep(step.id, $event)"
-                [ngModelOptions]="{ standalone: true }"
-                [attr.aria-label]="'Étape ' + (i + 1)"
-              ></textarea>
+              <div class="dynamic-list__step-fields">
+                <input
+                  pInputText
+                  class="dynamic-list__step-title"
+                  placeholder="Titre de l'étape (optionnel)"
+                  [ngModel]="step.title"
+                  (ngModelChange)="updateStep(step.id, 'title', $event)"
+                  [ngModelOptions]="{ standalone: true }"
+                  [attr.aria-label]="'Titre étape ' + (i + 1)"
+                />
+                <textarea
+                  pTextarea
+                  class="dynamic-list__step-content"
+                  [placeholder]="'Décrivez l\'étape ' + (i + 1) + '...'"
+                  rows="5"
+                  [ngModel]="step.content"
+                  (ngModelChange)="updateStep(step.id, 'content', $event)"
+                  [ngModelOptions]="{ standalone: true }"
+                  [attr.aria-label]="'Description étape ' + (i + 1)"
+                ></textarea>
+              </div>
               <p-button
                 type="button"
                 icon="pi pi-trash"
@@ -440,4 +475,75 @@
       />
     </div>
   </form>
+
+  <p-dialog
+    header="Recadrer la photo"
+    [visible]="photoCropVisible()"
+    (visibleChange)="onPhotoCropVisibleChange($event)"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [closable]="true"
+    [dismissableMask]="false"
+    [style]="{ width: 'min(95vw, 34rem)' }"
+    styleClass="photo-crop-dialog"
+  >
+    <p class="photo-crop-dialog__hint">
+      Déplacez et zoomez la photo pour cadrer votre recette (format 16:10).
+    </p>
+
+    @if (photoCropVisible() && pendingCropFile(); as cropFile) {
+      <div class="photo-crop-dialog__cropper" (wheel)="onCropWheel($event)">
+        <image-cropper
+          [imageFile]="cropFile"
+          [maintainAspectRatio]="true"
+          [aspectRatio]="recipePhotoAspectRatio"
+          [allowMoveImage]="true"
+          [(transform)]="cropTransform"
+          [hideResizeSquares]="true"
+          [autoCrop]="false"
+          format="jpeg"
+          output="blob"
+          [imageQuality]="88"
+          [resizeToWidth]="recipePhotoExportWidth"
+          [onlyScaleDown]="true"
+          cropperFrameAriaLabel="Zone de recadrage de la photo"
+          (loadImageFailed)="onCropImageLoadFailed()"
+        />
+      </div>
+
+      <label class="photo-crop-dialog__zoom">
+        <span class="photo-crop-dialog__zoom-label">Zoom</span>
+        <input
+          type="range"
+          class="photo-crop-dialog__zoom-input"
+          min="1"
+          max="3"
+          step="0.05"
+          [ngModel]="cropZoom()"
+          (ngModelChange)="onCropZoomChange($event)"
+          [ngModelOptions]="{ standalone: true }"
+          aria-label="Zoom de la photo"
+        />
+      </label>
+    }
+
+    <ng-template #footer>
+      <div class="photo-crop-dialog__actions">
+        <p-button
+          type="button"
+          label="Annuler"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="cancelPhotoCrop()"
+        />
+        <p-button
+          type="button"
+          label="Valider"
+          icon="pi pi-check"
+          (onClick)="confirmPhotoCrop()"
+        />
+      </div>
+    </ng-template>
+  </p-dialog>
 </div>

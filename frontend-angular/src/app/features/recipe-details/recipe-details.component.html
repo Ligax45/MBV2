@@ -174,7 +174,12 @@
               @for (step of detail.steps; track step.id) {
                 <li class="recipe-details__step">
                   <span class="recipe-details__step-number">{{ step.order }}</span>
-                  <p class="recipe-details__step-content">{{ step.content }}</p>
+                  <div class="recipe-details__step-body">
+                    @if (step.title.trim()) {
+                      <h4 class="recipe-details__step-title">{{ step.title }}</h4>
+                    }
+                    <p class="recipe-details__step-content">{{ step.content }}</p>
+                  </div>
                 </li>
               }
             </ol>

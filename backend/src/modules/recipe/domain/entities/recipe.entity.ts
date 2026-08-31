@@ -18,6 +18,7 @@ export type RecipeIngredientSummary = {
 export type RecipeStepSummary = {
   id: string;
   order: number;
+  title: string | null;
   content: string;
 };
 

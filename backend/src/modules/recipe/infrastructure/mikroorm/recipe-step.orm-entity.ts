@@ -8,6 +8,8 @@ export class RecipeStepOrmEntity {
 
   stepOrder!: number;
 
+  title!: string | null;
+
   content!: string;
 }
 
@@ -23,6 +25,7 @@ export const RecipeStepOrmEntitySchema = new EntitySchema<RecipeStepOrmEntity>({
       nullable: false,
     },
     stepOrder: { type: 'integer', fieldName: 'step_order' },
+    title: { type: 'string', length: 120, nullable: true },
     content: { type: 'text' },
   },
 });

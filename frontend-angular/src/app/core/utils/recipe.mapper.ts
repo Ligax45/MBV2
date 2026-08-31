@@ -74,6 +74,7 @@ export function mapRecipeToDetail(api: RecipeDetailApiResponse): RecipeDetail {
     steps: api.steps.map((item) => ({
       id: item.id,
       order: item.order,
+      title: item.title ?? '',
       content: item.content,
     })),
     isFavorited: api.isFavorite ?? false,

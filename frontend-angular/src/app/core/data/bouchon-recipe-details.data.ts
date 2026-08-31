@@ -63,36 +63,42 @@ export const BOUCHON_RECIPE_DETAILS_TARTE_AUX_POMMES: BouchonRecipeDetail = {
     {
       id: '1',
       order: 1,
+      title: 'Préparer la pâte',
       content:
-        "Préparer la pâte : dans le robot, mélanger la farine et le sel. Ajouter le beurre en dés et mixer par à-coups jusqu'à obtenir un sablage. Verser l'eau et former une boule. Filmer et réserver 30 min au frais.",
+        "Dans le robot, mélanger la farine et le sel. Ajouter le beurre en dés et mixer par à-coups jusqu'à obtenir un sablage. Verser l'eau et former une boule. Filmer et réserver 30 min au frais.",
     },
     {
       id: '2',
       order: 2,
+      title: 'Cuire le fond à blanc',
       content:
         'Étaler la pâte sur un plan fariné, la foncer dans un moule à tarte (26 cm), piquer le fond à la fourchette. Enfourner à blanc 10 min à 180 °C.',
     },
     {
       id: '3',
       order: 3,
+      title: 'Préparer les pommes',
       content:
         'Pendant ce temps, éplucher les pommes, en couper la moitié en dés (pour la compotée) et l\'autre moitié en quartiers (pour le dessus).',
     },
     {
       id: '4',
       order: 4,
+      title: 'Cuire la compotée',
       content:
         "Faire fondre 50 g de beurre dans une casserole, ajouter les dés de pommes, le sucre et la cannelle. Cuire 10 min à feu moyen en remuant, jusqu'à obtenir une compotée. Laisser tiédir.",
     },
     {
       id: '5',
       order: 5,
+      title: 'Assembler et cuire',
       content:
         'Garnir le fond de tarte précuit avec la compotée. Disposer les quartiers de pommes en rosace sur le dessus. Enfourner 25 min à 180 °C.',
     },
     {
       id: '6',
       order: 6,
+      title: 'Finition',
       content:
         "À la sortie du four, faire fondre la confiture avec une cuillère d'eau et napper la tarte au pinceau. Servir tiède ou froid.",
     },

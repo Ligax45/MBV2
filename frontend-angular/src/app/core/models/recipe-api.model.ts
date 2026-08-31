@@ -23,6 +23,7 @@ export interface RecipeIngredientApi {
 export interface RecipeStepApi {
   id: string;
   order: number;
+  title: string | null;
   content: string;
 }
 
@@ -34,6 +35,7 @@ export interface CreateRecipeIngredientPayload {
 
 export interface CreateRecipeStepPayload {
   order: number;
+  title?: string | null;
   content: string;
 }
 
