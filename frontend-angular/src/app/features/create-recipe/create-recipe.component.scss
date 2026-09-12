@@ -105,6 +105,18 @@
   color: var(--muted-foreground);
 }
 
+.field__label--sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .field__control-wrap {
   position: relative;
 }
@@ -455,6 +467,11 @@
     text-overflow: unset;
     white-space: nowrap;
   }
+}
+
+.dynamic-list__name-field {
+  position: relative;
+  min-width: 0;
 }
 
 .dynamic-list__name {

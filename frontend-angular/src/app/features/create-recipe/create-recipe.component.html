@@ -360,15 +360,20 @@
                 panelStyleClass="ingredient-unit-panel"
                 [attr.aria-label]="'Unité ingrédient ' + (i + 1)"
               />
-              <input
-                pInputText
-                class="dynamic-list__name"
-                placeholder="Nom de l'ingrédient"
-                [ngModel]="ing.name"
-                (ngModelChange)="updateIngredient(ing.id, 'name', $event)"
-                [ngModelOptions]="{ standalone: true }"
-                [attr.aria-label]="'Nom ingrédient ' + (i + 1)"
-              />
+              <div class="dynamic-list__name-field">
+                <label [for]="'ingredient-name-' + ing.id" class="field__label--sr-only">
+                  Nom ingrédient {{ i + 1 }}
+                </label>
+                <input
+                  pInputText
+                  [id]="'ingredient-name-' + ing.id"
+                  class="dynamic-list__name"
+                  placeholder="Nom de l'ingrédient"
+                  [ngModel]="ing.name"
+                  (ngModelChange)="updateIngredient(ing.id, 'name', $event)"
+                  [ngModelOptions]="{ standalone: true }"
+                />
+              </div>
               <p-button
                 type="button"
                 icon="pi pi-trash"
@@ -414,14 +419,17 @@
               </button>
               <span class="dynamic-list__step-badge">{{ i + 1 }}</span>
               <div class="dynamic-list__step-fields">
+                <label [for]="'step-title-' + step.id" class="field__hint">
+                  Titre étape {{ i + 1 }} (optionnel)
+                </label>
                 <input
                   pInputText
+                  [id]="'step-title-' + step.id"
                   class="dynamic-list__step-title"
                   placeholder="Titre de l'étape (optionnel)"
                   [ngModel]="step.title"
                   (ngModelChange)="updateStep(step.id, 'title', $event)"
                   [ngModelOptions]="{ standalone: true }"
-                  [attr.aria-label]="'Titre étape ' + (i + 1)"
                 />
                 <textarea
                   pTextarea
