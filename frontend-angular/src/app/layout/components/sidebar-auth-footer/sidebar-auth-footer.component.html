@@ -1,0 +1,22 @@
+<div class="sidebar-auth-footer">
+  @if (isAuthenticated()) {
+    <div class="sidebar-auth-footer__user">
+      <div class="avatar avatar--sidebar">
+        <span class="avatar-fallback">{{ avatarInitials() }}</span>
+      </div>
+      <div class="sidebar-auth-footer__user-info">
+        <span class="sidebar-auth-footer__user-name">{{ pseudo() }}</span>
+        <span class="sidebar-auth-footer__user-role">{{ roleLabel() }}</span>
+      </div>
+    </div>
+    <button type="button" class="sidebar-auth-footer__action" (click)="onLogout()">
+      <i class="pi pi-sign-out" aria-hidden="true"></i>
+      Déconnexion
+    </button>
+  } @else {
+    <a class="sidebar-auth-footer__action" routerLink="/connexion" (click)="onLoginClick()">
+      <i class="pi pi-sign-in" aria-hidden="true"></i>
+      Connexion
+    </a>
+  }
+</div>
