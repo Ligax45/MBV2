@@ -34,5 +34,9 @@
     <div class="mobile-menu__nav">
       <app-nav-list (linkNavigate)="onClose()" />
     </div>
+
+    <div class="mobile-menu__footer">
+      <app-sidebar-auth-footer (action)="onClose()" />
+    </div>
   </aside>
 }

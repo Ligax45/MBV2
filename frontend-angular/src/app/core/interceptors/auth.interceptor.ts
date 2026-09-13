@@ -4,9 +4,15 @@ import { Router } from '@angular/router';
 import { catchError, switchMap, throwError } from 'rxjs';
 
 import { AuthService } from '@core/services/auth.service';
+import { connexionRedirectQueryParams } from '@core/utils/auth-navigation.util';
 
 function isAuthEndpoint(url: string): boolean {
   return /\/auth\/(login|register|refresh|logout|mfa)/.test(url);
+}
+
+function redirectToConnexion(router: Router): void {
+  const queryParams = connexionRedirectQueryParams(router.url);
+  void router.navigate(['/connexion'], queryParams ? { queryParams } : {});
 }
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
@@ -30,9 +36,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
       if (!auth.getRefreshToken()) {
         auth.logoutLocal();
-        void router.navigate(['/connexion'], {
-          queryParams: { returnUrl: router.url },
-        });
+        redirectToConnexion(router);
         return throwError(() => err);
       }
 
@@ -48,9 +52,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         }),
         catchError((refreshErr) => {
           auth.logoutLocal();
-          void router.navigate(['/connexion'], {
-            queryParams: { returnUrl: router.url },
-          });
+          redirectToConnexion(router);
           return throwError(() => refreshErr);
         }),
       );
