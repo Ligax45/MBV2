@@ -14,6 +14,7 @@ import {
   isMfaSetupRequiredResponse,
 } from '@core/models/auth-api.model';
 import { AuthService } from '@core/services/auth.service';
+import { resolvePostAuthReturnUrl } from '@core/utils/auth-navigation.util';
 import { AlertService } from '@shared/services/alert.service';
 
 type AuthView = 'login' | 'register' | 'mfa' | 'mfa-setup';
@@ -188,8 +189,11 @@ export class AuthComponent implements OnInit {
   }
 
   private navigateAfterAuth(): void {
-    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? '/';
-    void this.router.navigateByUrl(returnUrl);
+    const returnUrl = resolvePostAuthReturnUrl(
+      this.route.snapshot.queryParamMap.get('returnUrl'),
+      this.router.url,
+    );
+    void this.router.navigateByUrl(returnUrl, { replaceUrl: true });
   }
 
   private handleError(err: unknown, fallback: string): void {
