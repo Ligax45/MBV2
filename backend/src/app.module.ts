@@ -9,10 +9,7 @@ import { RecipeModule } from './modules/recipe/recipe.module';
 
 @Module({
   imports: [
-    MikroOrmModule.forRoot({
-      ...mikroOrmConfig,
-      autoLoadEntities: true,
-    }),
+    MikroOrmModule.forRoot(mikroOrmConfig),
     StorageModule,
     AuthModule,
     RecipeModule,
