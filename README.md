@@ -84,6 +84,18 @@ Application : [http://localhost:4200](http://localhost:4200)
 
 En développement, le proxy Angular redirige `/api` vers le backend (`proxy.conf.json` → port **3333**).
 
+### 3. Cursor + Impeccable (optionnel, UI design)
+
+Impeccable n’est pas versionné dans le dépôt. Après un clone, à la racine du mono-repo :
+
+```bash
+npx impeccable install --providers=cursor --scope=project
+```
+
+Puis dans le chat Cursor (mode Agent) : `/impeccable init`
+
+Mise à jour ultérieure : `npx impeccable update`
+
 ### Frontend et API
 
 Le frontend appelle l’API via le proxy (`/api` → port 3333).  

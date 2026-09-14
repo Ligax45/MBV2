@@ -1,0 +1,117 @@
+---
+description: Angular frontend conventions — mobile-first, responsive patterns, MBV2 project standards
+globs: frontend-angular/**/*
+alwaysApply: false
+---
+
+# Frontend Angular — Mobile-first & MBV2 conventions
+
+## Screen priority
+
+Design **mobile → tablet → desktop**. Always start with a small viewport (320–390px), then enhance.
+
+1. **Mobile** (default): single column, large touch targets, readable text, visible action bars.
+2. **Tablet** (`min-width: 768px`): 2-column grids, more spacing, sidebar visible.
+3. **Desktop**: `max-width` content containers, multi-column grids, generous padding.
+
+Never write desktop-only CSS and patch mobile with `max-width` media queries.
+
+## Breakpoints & tokens
+
+- Primary breakpoint: **768px** (`--breakpoint-md` in `src/styles/tokens.scss`).
+- Prefer `@media (min-width: 768px)` for desktop enhancements.
+- Use theme CSS variables (`--primary`, `--background`, `--card`, `--border`, `--radius-*`) — no hardcoded colors except existing semantic badges.
+- Full-height screens: `100dvh` (not `100vh` alone).
+- iOS safe areas: `env(safe-area-inset-top)` / `env(safe-area-inset-bottom)` on fixed headers and bottom bars.
+
+## Responsive layout (established patterns)
+
+### App shell (`layout.component`)
+
+- Shell: `height: 100dvh; overflow: hidden`.
+- Scrollable area: `flex: 1; min-height: 0; overflow: auto` (`min-height: 0` is **required** on flex scroll children).
+- Mobile: hidden sidebar, drawer menu (`mobile-menu`), reduced padding (`1.25rem 1rem`).
+- Desktop: fixed sidebar, `margin-left: var(--sidebar-width)`.
+
+### Immersive screens (e.g. cooking mode)
+
+- Route **outside layout** in `app.routes.ts` to hide sidebar/topbar.
+- Container: `height: 100dvh; max-height: 100dvh; overflow: hidden`.
+- Header + action bar: `flex-shrink: 0`.
+- Main content: only scrollable section (`min-height: 0; overflow-y: auto`).
+- **Never** let long content push critical bottom action bars off-screen.
+
+### Overlays & bottom sheets
+
+- Overlay: `position: fixed; inset: 0; z-index: 40; background: rgb(0 0 0 / 50%)`.
+- Panel: `position: fixed; z-index: 50`, bottom sheet `max-height: 70dvh`.
+- `role="dialog"` + `aria-modal="true"` on modal panels.
+
+## Touch targets & readability
+
+- Primary action buttons: **min-height 48px** (52px for primary CTAs).
+- `border-radius: var(--radius-pill)` for CTAs and filters.
+- `:focus-visible` with `var(--ring)` outline on all interactive controls.
+- Cooking/instruction text: `font-size ≥ 1.125rem`, `line-height: 1.6`, `white-space: pre-line`.
+
+## Angular — structure & patterns
+
+### Folder layout
+
+```
+features/<feature>/
+  <feature>.component.ts|html|scss
+  <feature>.routes.ts          # lazy load
+  components/                  # feature sub-components
+core/                          # services, models, guards, utils, mappers
+shared/                        # cross-cutting components/services (alerts…)
+layout/                        # shell, sidebar, topbar, mobile-menu
+```
+
+### Components
+
+- **Standalone** only, explicit `imports` in decorator.
+- Reactive state: **signals** + `computed()` — no BehaviorSubject for local UI state.
+- Template fields/methods: `protected readonly`.
+- Templates: native control flow `@if`, `@for`, `@else` — no `*ngIf`/`*ngFor`.
+- Lazy loading via `loadComponent` in `*.routes.ts`.
+
+### Imports
+
+TypeScript aliases: `@core/*`, `@shared/*`, `@layout/*`, `@features/*`.
+
+### Data
+
+- Domain models in `core/models/`, API DTOs in `recipe-api.model.ts`.
+- API → view mapping in `core/utils/*.mapper.ts`.
+- Display formatting in `core/utils/recipe-format.util.ts`.
+- Facade services: `RecipeDataService` — no direct HTTP calls from feature components.
+
+### UI library
+
+- PrimeNG for complex components (Dialog, Card, ProgressSpinner, Button…).
+- Icons: PrimeIcons (`pi pi-*`).
+- Global overrides in `src/styles/primeng-overrides.scss`.
+
+## CSS conventions
+
+- **BEM** with feature prefix: `.recipe-details__step-number`, `.cooking-mode__nav-btn--primary`.
+- One SCSS file per component (`styleUrl`); shared styles in `src/styles/`.
+- Responsive grids: `grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr))`.
+- Hero/detail: 1 column mobile → 2 columns at `768px`.
+- Page containers: centered `max-width` (`56rem` detail, `75rem` library).
+
+## Accessibility
+
+- `aria-label` on icon-only buttons.
+- `aria-live="polite"` for progress (e.g. step 2/6).
+- `role="status"` on loading states.
+- Images: descriptive `alt` attribute.
+
+## UI delivery checklist
+
+- [ ] Tested at 320px viewport — bottom buttons visible and tappable
+- [ ] Long content scrolls without hiding fixed bars
+- [ ] Safe areas respected on iPhone
+- [ ] Styles use CSS tokens, no magic color values
+- [ ] No desktop regression at 768px+

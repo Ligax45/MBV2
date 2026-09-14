@@ -1,0 +1,400 @@
+.cooking-mode {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+  background: var(--background);
+}
+
+.cooking-mode__state {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem 1.25rem;
+}
+
+.cooking-mode__empty {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 0.9375rem;
+  text-align: center;
+}
+
+.cooking-mode__back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--secondary);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.cooking-mode__back-link:hover {
+  color: var(--foreground);
+}
+
+.cooking-mode__back-link:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--ring) 50%, transparent);
+  outline-offset: 2px;
+  border-radius: var(--radius-md);
+}
+
+.cooking-mode__retry {
+  padding: 0.625rem 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background-color: var(--card);
+  color: var(--foreground);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.cooking-mode__retry:hover {
+  border-color: color-mix(in srgb, var(--primary) 35%, var(--border));
+  background-color: var(--accent);
+}
+
+.cooking-mode__retry:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--ring) 50%, transparent);
+  outline-offset: 2px;
+}
+
+.cooking-mode__surface {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+}
+
+.cooking-mode__header {
+  display: grid;
+  flex-shrink: 0;
+  grid-template-columns: 2.75rem 1fr auto;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  padding-top: max(0.75rem, env(safe-area-inset-top));
+  border-bottom: 1px solid var(--border);
+  background: var(--card);
+}
+
+.cooking-mode__header-btn {
+  display: flex;
+  width: 2.75rem;
+  height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--secondary);
+  font-size: 1.125rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.cooking-mode__header-btn:hover {
+  background: var(--muted);
+}
+
+.cooking-mode__header-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--ring) 50%, transparent);
+  outline-offset: 2px;
+}
+
+.cooking-mode__title {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--foreground);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cooking-mode__progress {
+  flex-shrink: 0;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--radius-pill);
+  background: var(--muted);
+  color: var(--secondary);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.cooking-mode__toolbar {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: center;
+  padding: 0.75rem 1rem 0;
+}
+
+.cooking-mode__ingredients-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--card);
+  color: var(--secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.cooking-mode__ingredients-btn:hover {
+  background: var(--muted);
+}
+
+.cooking-mode__ingredients-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--ring) 50%, transparent);
+  outline-offset: 2px;
+}
+
+.cooking-mode__content {
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 1rem 1.25rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cooking-mode__step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.cooking-mode__step-number {
+  display: flex;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.cooking-mode__step-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.cooking-mode__step-title {
+  margin: 0 0 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--foreground);
+  overflow-wrap: anywhere;
+}
+
+.cooking-mode__step-content {
+  margin: 0;
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  color: var(--foreground);
+  font-size: 1.125rem;
+  line-height: 1.6;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 768px) {
+  .cooking-mode__content {
+    max-width: 40rem;
+    margin: 0 auto;
+    width: 100%;
+    padding: 2rem 1.5rem;
+  }
+
+  .cooking-mode__step-content {
+    font-size: 1.25rem;
+  }
+}
+
+.cooking-mode__nav {
+  display: grid;
+  flex-shrink: 0;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--border);
+  background: var(--card);
+  box-shadow: 0 -4px 12px rgb(45 27 19 / 6%);
+}
+
+.cooking-mode__nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: var(--radius-pill);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.cooking-mode__nav-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--ring) 50%, transparent);
+  outline-offset: 2px;
+}
+
+.cooking-mode__nav-btn--secondary {
+  border: 1px solid var(--border);
+  background: var(--background);
+  color: var(--secondary);
+}
+
+.cooking-mode__nav-btn--secondary:hover:not(:disabled) {
+  background: var(--muted);
+}
+
+.cooking-mode__nav-btn--secondary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.cooking-mode__nav-btn--primary {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.cooking-mode__nav-btn--primary:hover {
+  background: color-mix(in srgb, var(--primary) 88%, #000);
+}
+
+.cooking-mode__sheet-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  background-color: var(--overlay-scrim);
+}
+
+.cooking-mode__sheet {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 50;
+  display: flex;
+  max-height: 70dvh;
+  flex-direction: column;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: var(--card);
+  box-shadow:
+    0 -10px 15px -3px rgb(0 0 0 / 12%),
+    0 -4px 6px -4px rgb(0 0 0 / 8%);
+}
+
+.cooking-mode__sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.cooking-mode__sheet-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.cooking-mode__sheet-close {
+  display: flex;
+  width: 2.75rem;
+  height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--secondary);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.cooking-mode__sheet-close:hover {
+  background: var(--muted);
+}
+
+.cooking-mode__sheet-close:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--ring) 50%, transparent);
+  outline-offset: 2px;
+}
+
+.cooking-mode__ingredients {
+  margin: 0;
+  padding: 1rem 1.25rem;
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  overflow-y: auto;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.cooking-mode__ingredient {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.cooking-mode__ingredient-number {
+  display: flex;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.cooking-mode__ingredient-text {
+  min-width: 0;
+  font-size: 0.9375rem;
+  color: var(--foreground);
+  overflow-wrap: anywhere;
+}

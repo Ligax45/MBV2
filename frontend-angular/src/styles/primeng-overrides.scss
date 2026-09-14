@@ -1,47 +1,315 @@
 /**
- * Ajustements PrimeNG pour rester cohérent avec les tokens MiamBook.
+ * Ajustements PrimeNG — palette MiamBook (clair + sombre).
+ * Les primitives viennent de tokens.scss ; ce fichier mappe les rôles PrimeNG.
  */
+
+html.light,
+html.dark {
+  --p-invalid-border: #ef4444;
+  --p-invalid-text: #dc2626;
+  --p-focus-glow: rgb(245 158 11 / 15%);
+  --p-overlay-shadow: 0 8px 24px rgb(45 27 19 / 12%);
+}
+
+html.dark {
+  --p-overlay-shadow: 0 8px 24px rgb(0 0 0 / 32%);
+}
 
 .p-component {
   font-family: var(--font-sans);
 }
 
-html.light .p-card {
+/* ——— Cartes ——— */
+
+html.light .p-card,
+html.dark .p-card {
   background: var(--card);
   border: none;
   border-radius: var(--radius-lg);
+  color: var(--foreground);
+}
+
+html.light .p-card {
   box-shadow: 0 2px 12px rgb(45 27 19 / 6%);
+}
+
+html.dark .p-card {
+  box-shadow: 0 2px 12px rgb(0 0 0 / 24%);
+}
+
+html.light .p-card .p-card-body,
+html.light .p-card .p-card-footer,
+html.dark .p-card .p-card-body,
+html.dark .p-card .p-card-footer {
   color: var(--foreground);
 }
 
 html.light .p-card .p-card-body,
-html.light .p-card .p-card-footer {
-  color: var(--foreground);
-}
-
-html.light .p-card .p-card-body {
+html.dark .p-card .p-card-body {
   padding: 1rem 1.25rem;
 }
 
-html.light .p-card .p-card-footer {
+html.light .p-card .p-card-footer,
+html.dark .p-card .p-card-footer {
   padding: 0.75rem 1.25rem;
   border-top: 1px solid var(--border);
 }
 
-html.light .p-inputtext {
+html.light .p-card .p-card-title,
+html.dark .p-card .p-card-title {
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+html.light .p-card .p-card-subtitle,
+html.dark .p-card .p-card-subtitle {
+  color: var(--secondary);
+}
+
+/* ——— Champs texte ——— */
+
+html.light .p-inputtext,
+html.dark .p-inputtext,
+html.light .p-inputnumber-input,
+html.dark .p-inputnumber-input,
+html.light .p-password-input,
+html.dark .p-password-input {
   background: var(--card);
   color: var(--foreground);
   border-color: var(--border);
+}
+
+html.light .p-inputtext,
+html.dark .p-inputtext {
   border-radius: var(--radius-pill);
   padding: 0.75rem 1rem 0.75rem 2.5rem;
 }
 
-html.light .p-inputtext:focus {
+html.light .p-inputnumber-input,
+html.dark .p-inputnumber-input,
+html.light .p-password-input,
+html.dark .p-password-input {
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+}
+
+html.light .p-inputtext::placeholder,
+html.dark .p-inputtext::placeholder,
+html.light .p-inputnumber-input::placeholder,
+html.dark .p-inputnumber-input::placeholder,
+html.light .p-password-input::placeholder,
+html.dark .p-password-input::placeholder {
+  color: var(--placeholder-foreground);
+  opacity: 1;
+}
+
+html.light .p-inputtext:enabled:hover,
+html.dark .p-inputtext:enabled:hover,
+html.light .p-inputnumber-input:enabled:hover,
+html.dark .p-inputnumber-input:enabled:hover,
+html.light .p-password-input:enabled:hover,
+html.dark .p-password-input:enabled:hover {
+  border-color: color-mix(in srgb, var(--primary) 30%, var(--border));
+}
+
+html.light .p-inputtext:enabled:focus,
+html.dark .p-inputtext:enabled:focus,
+html.light .p-inputnumber-input:enabled:focus,
+html.dark .p-inputnumber-input:enabled:focus,
+html.light .p-password-input:enabled:focus,
+html.dark .p-password-input:enabled:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgb(245 158 11 / 15%);
+  box-shadow: 0 0 0 2px var(--p-focus-glow);
+}
+
+html.light .p-iconfield .p-inputicon,
+html.dark .p-iconfield .p-inputicon {
+  color: var(--muted-foreground);
+}
+
+/* ——— Select ——— */
+
+html.light .p-select,
+html.dark .p-select {
+  background: var(--card);
+  border-color: var(--border);
+  color: var(--foreground);
+  border-radius: var(--radius-md);
+}
+
+html.light .p-select:not(.p-disabled):hover,
+html.dark .p-select:not(.p-disabled):hover {
+  border-color: color-mix(in srgb, var(--primary) 30%, var(--border));
+}
+
+html.light .p-select.p-focus,
+html.dark .p-select.p-focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--p-focus-glow);
+}
+
+html.light .p-select .p-select-label,
+html.dark .p-select .p-select-label {
+  color: var(--foreground);
+}
+
+html.light .p-select .p-select-label.p-placeholder,
+html.dark .p-select .p-select-label.p-placeholder {
+  color: var(--placeholder-foreground);
+}
+
+html.light .p-select-dropdown,
+html.dark .p-select-dropdown {
+  color: var(--secondary);
+}
+
+html.light .p-select-overlay,
+html.dark .p-select-overlay {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--p-overlay-shadow);
+  color: var(--foreground);
+}
+
+html.light .p-select-option,
+html.dark .p-select-option {
+  color: var(--foreground);
+}
+
+html.light .p-select-option:not(.p-select-option-selected):not(.p-disabled).p-focus,
+html.dark .p-select-option:not(.p-select-option-selected):not(.p-disabled).p-focus {
+  background: color-mix(in srgb, var(--primary) 8%, var(--muted));
+  color: var(--foreground);
+}
+
+html.light .p-select-option.p-select-option-selected,
+html.dark .p-select-option.p-select-option-selected {
+  background: color-mix(in srgb, var(--primary) 14%, var(--card));
+  color: var(--foreground);
 }
 
 .ingredient-unit-panel .p-select-option {
   min-height: 2.25rem;
   padding-block: 0.5rem;
+}
+
+/* ——— Boutons ——— */
+
+html.light .p-button-primary,
+html.dark .p-button-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+html.light .p-button-primary:not(:disabled):hover,
+html.dark .p-button-primary:not(:disabled):hover {
+  background: color-mix(in srgb, var(--primary) 88%, #000);
+  border-color: color-mix(in srgb, var(--primary) 88%, #000);
+  color: var(--primary-foreground);
+}
+
+html.light .p-button-outlined,
+html.dark .p-button-outlined {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--foreground);
+}
+
+html.light .p-button-outlined:not(:disabled):hover,
+html.dark .p-button-outlined:not(:disabled):hover {
+  background: var(--accent);
+  border-color: color-mix(in srgb, var(--primary) 35%, var(--border));
+  color: var(--foreground);
+}
+
+html.light .p-button-text,
+html.dark .p-button-text {
+  background: transparent;
+  border-color: transparent;
+  color: var(--secondary);
+}
+
+html.light .p-button-text:not(:disabled):hover,
+html.dark .p-button-text:not(:disabled):hover {
+  background: var(--accent);
+  color: var(--foreground);
+}
+
+html.light .p-button-danger,
+html.dark .p-button-danger {
+  color: var(--p-invalid-text);
+}
+
+html.light .p-button-danger.p-button-text:not(:disabled):hover,
+html.dark .p-button-danger.p-button-text:not(:disabled):hover {
+  background: color-mix(in srgb, var(--p-invalid-text) 10%, var(--card));
+  color: var(--p-invalid-text);
+}
+
+html.light .p-button:focus-visible,
+html.dark .p-button:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--ring) 50%, transparent);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+/* ——— Dialog ——— */
+
+html.light .p-dialog-mask,
+html.dark .p-dialog-mask {
+  background: rgb(0 0 0 / 50%);
+}
+
+html.light .p-dialog,
+html.dark .p-dialog {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--p-overlay-shadow);
+  color: var(--foreground);
+}
+
+html.light .p-dialog .p-dialog-header,
+html.dark .p-dialog .p-dialog-header {
+  border-bottom: 1px solid var(--border);
+  color: var(--foreground);
+}
+
+html.light .p-dialog .p-dialog-content,
+html.dark .p-dialog .p-dialog-content {
+  color: var(--foreground);
+}
+
+html.light .p-dialog .p-dialog-footer,
+html.dark .p-dialog .p-dialog-footer {
+  border-top: 1px solid var(--border);
+}
+
+/* ——— Divider ——— */
+
+html.light .p-divider-horizontal::before,
+html.dark .p-divider-horizontal::before {
+  border-top-color: var(--border);
+}
+
+/* ——— Progress spinner ——— */
+
+html.light .p-progressspinner-circle,
+html.dark .p-progressspinner-circle {
+  stroke: var(--primary);
+}
+
+/* ——— États invalides ——— */
+
+html.light .p-inputtext.ng-invalid,
+html.dark .p-inputtext.ng-invalid,
+html.light .p-select.ng-invalid,
+html.dark .p-select.ng-invalid,
+html.light .p-inputnumber.ng-invalid .p-inputnumber-input,
+html.dark .p-inputnumber.ng-invalid .p-inputnumber-input,
+html.light .p-password.ng-invalid .p-password-input,
+html.dark .p-password.ng-invalid .p-password-input {
+  border-color: var(--p-invalid-border);
 }

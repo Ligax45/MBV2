@@ -7,9 +7,13 @@
   ></button>
 
   <aside
+    id="mobile-menu-dialog"
     class="mobile-menu__drawer"
+    role="dialog"
     aria-modal="true"
     aria-label="Menu de navigation"
+    cdkTrapFocus
+    [cdkTrapFocusAutoCapture]="true"
   >
     <div class="mobile-menu__header">
       <div class="mobile-menu__logo">

@@ -1,4 +1,6 @@
-﻿import { Component, computed, inject, OnInit, signal } from '@angular/core';
+﻿import { NgOptimizedImage } from '@angular/common';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ProgressSpinner } from 'primeng/progressspinner';
@@ -19,7 +21,7 @@ type DetailTab = 'ingredients' | 'steps';
 
 @Component({
   selector: 'app-recipe-details',
-  imports: [RouterLink, ProgressSpinner],
+  imports: [NgOptimizedImage, RouterLink, ProgressSpinner],
   templateUrl: './recipe-details.component.html',
   styleUrl: './recipe-details.component.scss',
 })
@@ -37,6 +39,13 @@ export class RecipeDetailsComponent implements OnInit {
   protected readonly isLiked = computed(() => this.recipe()?.isFavorited ?? false);
   protected readonly togglingFavorite = signal(false);
   protected readonly activeTab = signal<DetailTab>('ingredients');
+  protected readonly recipeId = signal<string | null>(null);
+
+  protected readonly showTabs = computed(() => {
+    const detail = this.recipe();
+    if (!detail) return false;
+    return detail.ingredients.length > 0 && detail.steps.length > 0;
+  });
 
   protected readonly isAuthor = computed(() => {
     const detail = this.recipe();
@@ -70,8 +79,13 @@ export class RecipeDetailsComponent implements OnInit {
 
   protected readonly fromModeration = signal(false);
 
+  constructor() {
+    this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe((params) => {
+      this.fromModeration.set(params.get('from') === 'moderation');
+    });
+  }
+
   ngOnInit(): void {
-    this.fromModeration.set(this.route.snapshot.queryParamMap.get('from') === 'moderation');
     const id = this.route.snapshot.paramMap.get('recipeId');
     if (!id) {
       this.pageFailed.set(true);
@@ -79,6 +93,7 @@ export class RecipeDetailsComponent implements OnInit {
       this.alertService.warning('Recette introuvable.');
       return;
     }
+    this.recipeId.set(id);
     this.loadRecipe(id);
   }
 
@@ -102,8 +117,50 @@ export class RecipeDetailsComponent implements OnInit {
     return getDifficultyLabel(difficulty);
   }
 
-  protected setActiveTab(tab: DetailTab): void {
+  protected setActiveTab(tab: DetailTab, focusTab = false): void {
     this.activeTab.set(tab);
+    if (focusTab) {
+      this.focusTabButton(tab);
+    }
+  }
+
+  protected onTabListKeydown(event: KeyboardEvent): void {
+    const detail = this.recipe();
+    if (!detail || !this.showTabs()) return;
+
+    const tabs = this.availableTabs(detail);
+    if (tabs.length <= 1) return;
+
+    const currentIndex = tabs.indexOf(this.activeTab());
+    let nextIndex = currentIndex;
+
+    switch (event.key) {
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+        break;
+      case 'ArrowRight':
+      case 'ArrowDown':
+        nextIndex = (currentIndex + 1) % tabs.length;
+        break;
+      case 'Home':
+        nextIndex = 0;
+        break;
+      case 'End':
+        nextIndex = tabs.length - 1;
+        break;
+      default:
+        return;
+    }
+
+    event.preventDefault();
+    this.setActiveTab(tabs[nextIndex], true);
+  }
+
+  protected retryLoad(): void {
+    const id = this.recipeId();
+    if (!id) return;
+    this.loadRecipe(id);
   }
 
   protected toggleLike(): void {
@@ -159,6 +216,17 @@ export class RecipeDetailsComponent implements OnInit {
         this.alertService.error('Impossible de supprimer la recette.');
       },
     });
+  }
+
+  private availableTabs(detail: RecipeDetail): DetailTab[] {
+    const tabs: DetailTab[] = [];
+    if (detail.ingredients.length > 0) tabs.push('ingredients');
+    if (detail.steps.length > 0) tabs.push('steps');
+    return tabs;
+  }
+
+  private focusTabButton(tab: DetailTab): void {
+    document.getElementById(`recipe-details-tab-${tab}`)?.focus();
   }
 
   private loadRecipe(id: string): void {

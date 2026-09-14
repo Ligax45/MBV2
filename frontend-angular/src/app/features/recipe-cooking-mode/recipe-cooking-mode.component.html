@@ -1,0 +1,158 @@
+<div class="cooking-mode">
+  @if (loading()) {
+    <div class="cooking-mode__state" role="status">
+      <p-progressSpinner ariaLabel="Chargement du mode cuisine" />
+    </div>
+  } @else if (pageFailed()) {
+    <div class="cooking-mode__state" role="status">
+      <p class="cooking-mode__empty">Cette recette n'est pas disponible.</p>
+      @if (recipeId()) {
+        <button type="button" class="cooking-mode__retry" (click)="retryLoad()">
+          Réessayer
+        </button>
+      }
+      <a class="cooking-mode__back-link" routerLink="/bibliotheque">
+        <i class="pi pi-arrow-left" aria-hidden="true"></i>
+        Retour à la bibliothèque
+      </a>
+    </div>
+  } @else if (recipe(); as detail) {
+    @if (totalSteps() === 0) {
+      <div class="cooking-mode__state" role="status">
+        <p class="cooking-mode__empty">Cette recette n'a pas d'étapes à suivre.</p>
+        <a class="cooking-mode__back-link" [routerLink]="['/recette', detail.id]">
+          <i class="pi pi-arrow-left" aria-hidden="true"></i>
+          Retour à la recette
+        </a>
+      </div>
+    } @else {
+      <div class="cooking-mode__surface" [attr.inert]="ingredientsOpen() ? '' : null">
+        <header class="cooking-mode__header">
+          <button
+            type="button"
+            class="cooking-mode__header-btn"
+            aria-label="Quitter le mode cuisine"
+            (click)="quitCookingMode()"
+          >
+            <i class="pi pi-times" aria-hidden="true"></i>
+          </button>
+
+          <h1 class="cooking-mode__title">{{ detail.title }}</h1>
+
+          <span class="cooking-mode__progress" aria-live="polite">
+            {{ progressLabel() }}
+          </span>
+        </header>
+
+        @if (hasIngredients()) {
+          <div class="cooking-mode__toolbar">
+            <button
+              type="button"
+              class="cooking-mode__ingredients-btn"
+              [attr.aria-expanded]="ingredientsOpen()"
+              aria-controls="cooking-mode-ingredients-dialog"
+              [attr.aria-label]="
+                ingredientsOpen() ? 'Fermer la liste des ingrédients' : 'Voir les ingrédients'
+              "
+              (click)="openIngredients()"
+            >
+              <i class="pi pi-list" aria-hidden="true"></i>
+              Ingrédients
+            </button>
+          </div>
+        }
+
+        @if (currentStep(); as step) {
+          <main class="cooking-mode__content">
+            <article
+              class="cooking-mode__step"
+              [attr.aria-label]="'Étape ' + step.order + ' sur ' + totalSteps()"
+            >
+              <span class="cooking-mode__step-number" aria-hidden="true">{{ step.order }}</span>
+              <div class="cooking-mode__step-body">
+                @if (step.title.trim()) {
+                  <h2 class="cooking-mode__step-title">{{ step.title }}</h2>
+                }
+                <p class="cooking-mode__step-content">{{ step.content }}</p>
+              </div>
+            </article>
+          </main>
+        }
+
+        <nav class="cooking-mode__nav" aria-label="Navigation entre les étapes">
+          <button
+            type="button"
+            class="cooking-mode__nav-btn cooking-mode__nav-btn--secondary"
+            [disabled]="isFirstStep()"
+            aria-label="Étape précédente"
+            (click)="goToPreviousStep()"
+          >
+            <i class="pi pi-arrow-left" aria-hidden="true"></i>
+            Précédent
+          </button>
+
+          <button
+            type="button"
+            class="cooking-mode__nav-btn cooking-mode__nav-btn--primary"
+            [attr.aria-label]="isLastStep() ? 'Terminer la recette' : 'Étape suivante'"
+            (click)="goToNextStep()"
+          >
+            @if (isLastStep()) {
+              Terminer
+              <i class="pi pi-check" aria-hidden="true"></i>
+            } @else {
+              Suivant
+              <i class="pi pi-arrow-right" aria-hidden="true"></i>
+            }
+          </button>
+        </nav>
+      </div>
+
+      @if (ingredientsOpen()) {
+        <button
+          type="button"
+          class="cooking-mode__sheet-overlay"
+          aria-label="Fermer les ingrédients"
+          (click)="closeIngredients()"
+        ></button>
+
+        <div
+          id="cooking-mode-ingredients-dialog"
+          class="cooking-mode__sheet"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="cooking-mode-ingredients-title"
+          cdkTrapFocus
+          [cdkTrapFocusAutoCapture]="true"
+        >
+          <div class="cooking-mode__sheet-header">
+            <h2 id="cooking-mode-ingredients-title" class="cooking-mode__sheet-title">
+              Ingrédients
+            </h2>
+            <button
+              type="button"
+              class="cooking-mode__sheet-close"
+              aria-label="Fermer la liste des ingrédients"
+              (click)="closeIngredients()"
+            >
+              <i class="pi pi-times" aria-hidden="true"></i>
+            </button>
+          </div>
+
+          <ul class="cooking-mode__ingredients">
+            @for (ingredient of detail.ingredients; track ingredient.id; let i = $index) {
+              <li class="cooking-mode__ingredient">
+                <span class="cooking-mode__ingredient-number" aria-hidden="true">{{
+                  i + 1
+                }}</span>
+                <span class="cooking-mode__ingredient-text">{{
+                  formatIngredient(ingredient)
+                }}</span>
+              </li>
+            }
+          </ul>
+        </div>
+      }
+    }
+  }
+</div>

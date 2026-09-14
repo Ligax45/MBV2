@@ -1,3 +1,4 @@
+import { IMAGE_LOADER } from '@angular/common';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import {
   ApplicationConfig,
@@ -13,6 +14,8 @@ import { providePrimeNG } from 'primeng/config';
 
 import { authInterceptor } from '@core/interceptors/auth.interceptor';
 import { AuthService } from '@core/services/auth.service';
+import { ThemeService } from '@core/services/theme.service';
+import { recipeImageLoader } from '@core/utils/recipe-image-loader';
 
 import { routes } from './app.routes';
 
@@ -21,6 +24,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideHttpClient(withInterceptors([authInterceptor])),
     provideRouter(routes),
+    { provide: IMAGE_LOADER, useValue: recipeImageLoader },
     provideAnimationsAsync(),
     providePrimeNG({
       theme: {
@@ -32,6 +36,9 @@ export const appConfig: ApplicationConfig = {
       },
     }),
     MessageService,
-    provideAppInitializer(() => inject(AuthService).restoreSession()),
+    provideAppInitializer(() => {
+      inject(ThemeService).initialize();
+      inject(AuthService).restoreSession();
+    }),
   ],
 };

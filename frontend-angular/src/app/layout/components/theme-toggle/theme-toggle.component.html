@@ -1,0 +1,14 @@
+<button
+  type="button"
+  class="theme-toggle"
+  [class.theme-toggle--compact]="variant() === 'compact'"
+  [class.theme-toggle--sidebar]="variant() === 'sidebar'"
+  [attr.aria-label]="label()"
+  [attr.aria-pressed]="isDark()"
+  (click)="toggleTheme()"
+>
+  <i [class]="iconClass()" aria-hidden="true"></i>
+  @if (variant() === 'sidebar') {
+    <span>{{ isDark() ? 'Thème clair' : 'Thème sombre' }}</span>
+  }
+</button>

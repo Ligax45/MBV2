@@ -1,3 +1,14 @@
+:host {
+  display: block;
+  contain: layout style paint;
+}
+
+.recipe-card__shell {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
 .recipe-card__link {
   position: relative;
   z-index: 0;
@@ -15,21 +26,12 @@
 
 :host ::ng-deep .recipe-card {
   overflow: hidden;
-  transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease;
 }
 
 :host ::ng-deep .recipe-card .p-card-footer {
   padding-top: 0.75rem;
   margin-top: 0.75rem;
   border-top: 1px solid var(--border);
-}
-
-.recipe-card__link:hover ::ng-deep .recipe-card,
-.recipe-card__link:focus-visible ::ng-deep .recipe-card {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgb(45 27 19 / 10%);
 }
 
 .recipe-card__media {
@@ -40,27 +42,42 @@
 }
 
 .recipe-card__image {
-  width: 100%;
-  height: 100%;
   object-fit: cover;
-  transition: transform 0.35s ease;
 }
 
-.recipe-card__link:hover .recipe-card__image,
-.recipe-card__link:focus-visible .recipe-card__image {
-  transform: scale(1.04);
+@media (prefers-reduced-motion: no-preference) {
+  .recipe-card__image {
+    transition: transform 0.35s ease;
+  }
+
+  .recipe-card__link:hover .recipe-card__image,
+  .recipe-card__link:focus-visible .recipe-card__image {
+    transform: scale(1.04);
+  }
+
+  :host ::ng-deep .recipe-card {
+    transition:
+      transform 0.25s ease,
+      box-shadow 0.25s ease;
+  }
+
+  .recipe-card__link:hover ::ng-deep .recipe-card,
+  .recipe-card__link:focus-visible ::ng-deep .recipe-card {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-elevated);
+  }
 }
 
 .recipe-card__like {
   position: absolute;
   top: 0.625rem;
   right: 0.625rem;
-  z-index: 1;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  width: 2.75rem;
+  height: 2.75rem;
   border: none;
   border-radius: 50%;
   background-color: rgb(255 255 255 / 90%);
@@ -69,12 +86,22 @@
   transition:
     background-color 0.15s ease,
     color 0.15s ease,
-    transform 0.15s ease;
-  backdrop-filter: blur(4px);
+    transform 0.15s ease,
+    opacity 0.15s ease;
 }
 
-.recipe-card__like:hover {
+.recipe-card__like:hover:not(:disabled) {
   transform: scale(1.08);
+}
+
+.recipe-card__like:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--ring) 50%, transparent);
+  outline-offset: 2px;
+}
+
+.recipe-card__like:disabled {
+  opacity: 0.6;
+  cursor: wait;
 }
 
 .recipe-card__like--active {
@@ -94,11 +121,10 @@
   align-items: center;
   padding: 0.25rem 0.625rem;
   border-radius: var(--radius-pill);
-  background-color: rgb(255 255 255 / 92%);
+  background-color: rgb(255 255 255 / 94%);
   color: var(--primary);
   font-size: 0.75rem;
   font-weight: 600;
-  backdrop-filter: blur(4px);
   box-shadow: 0 2px 6px rgb(45 27 19 / 8%);
 }
 
@@ -126,7 +152,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.125rem;
-  color: #f59e0b;
+  color: var(--ring);
   font-size: 0.8125rem;
 }
 
@@ -163,6 +189,7 @@
   justify-content: space-between;
   gap: 0.5rem;
   width: 100%;
+  min-width: 0;
 }
 
 .recipe-card__author {

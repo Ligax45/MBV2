@@ -1,2 +1,15 @@
 docs/*
 !docs/conventions.md
+
+# Impeccable (per-dev install: npx impeccable install --providers=cursor --scope=project)
+.cursor/skills/impeccable/
+.cursor/agents/impeccable-*.md
+.cursor/hooks.json
+
+# Impeccable local / generated artifacts
+.impeccable/config.local.json
+.impeccable/build/
+.impeccable/mocks/
+.impeccable/review/
+.impeccable/critique/
+.impeccable/live/

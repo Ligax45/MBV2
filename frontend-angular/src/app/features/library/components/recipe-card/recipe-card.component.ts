@@ -1,4 +1,4 @@
-﻿import { DecimalPipe } from '@angular/common';
+﻿import { DecimalPipe, NgOptimizedImage } from '@angular/common';
 import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Card } from 'primeng/card';
@@ -18,12 +18,13 @@ const STAR_COUNT = 5;
 
 @Component({
   selector: 'app-recipe-card',
-  imports: [RouterLink, Card, DecimalPipe],
+  imports: [RouterLink, Card, DecimalPipe, NgOptimizedImage],
   templateUrl: './recipe-card.component.html',
   styleUrl: './recipe-card.component.scss',
 })
 export class RecipeCardComponent {
   readonly recipe = input.required<RecipeListItem>();
+  readonly priority = input(false);
   readonly favoriteChange = output<{ recipeId: string; isFavorited: boolean }>();
 
   private readonly recipeData = inject(RecipeDataService);
@@ -86,7 +87,6 @@ export class RecipeCardComponent {
   }
 
   toggleLike(event: Event): void {
-    event.preventDefault();
     event.stopPropagation();
 
     if (!this.canFavorite()) {

@@ -14,6 +14,11 @@
   } @else if (pageFailed()) {
     <div class="recipe-details-page__state" role="status">
       <p class="recipe-details-page__empty">Cette recette n'est pas disponible.</p>
+      @if (recipeId()) {
+        <button type="button" class="recipe-details-page__retry" (click)="retryLoad()">
+          Réessayer
+        </button>
+      }
     </div>
   } @else if (recipe(); as detail) {
     <article class="recipe-details">
@@ -21,7 +26,10 @@
         <div class="recipe-details__image-wrap">
           <img
             class="recipe-details__image"
-            [src]="detail.imageUrl"
+            [ngSrc]="detail.imageUrl"
+            fill
+            sizes="(max-width: 767px) 92vw, 28rem"
+            priority
             [alt]="detail.title"
           />
         </div>
@@ -42,6 +50,7 @@
                   type="button"
                   class="recipe-details__action-btn recipe-details__action-btn--delete"
                   [disabled]="deleting()"
+                  [attr.aria-busy]="deleting()"
                   (click)="onDeleteRecipe(detail)"
                 >
                   <i class="pi pi-trash" aria-hidden="true"></i>
@@ -64,7 +73,8 @@
               </span>
             }
             <span class="recipe-details__author-date">
-              Par {{ detail.creatorName }} &bull; {{ formatDate(detail.createdAt) }}
+              Par {{ detail.creatorName }} &bull;
+              <time [attr.datetime]="detail.createdAt">{{ formatDate(detail.createdAt) }}</time>
             </span>
           </div>
 
@@ -115,6 +125,8 @@
               class="recipe-details__favorite"
               [class.recipe-details__favorite--active]="isLiked()"
               [disabled]="togglingFavorite()"
+              [attr.aria-pressed]="isLiked()"
+              [attr.aria-busy]="togglingFavorite()"
               (click)="toggleLike()"
             >
               <i
@@ -127,37 +139,70 @@
         </div>
       </div>
 
+      @if (detail.steps.length > 0) {
+        <a class="recipe-details__cooking-cta" [routerLink]="['/recette', detail.id, 'cuisiner']">
+          <i class="pi pi-play" aria-hidden="true"></i>
+          Commencer à cuisiner
+        </a>
+      }
+
       @if (detail.ingredients.length > 0 || detail.steps.length > 0) {
         <div class="recipe-details__tabs-section">
-          <div class="recipe-details__tabs" role="tablist">
-            @if (detail.ingredients.length > 0) {
-              <button
-                type="button"
-                class="recipe-details__tab"
-                [class.recipe-details__tab--active]="activeTab() === 'ingredients'"
-                role="tab"
-                [attr.aria-selected]="activeTab() === 'ingredients'"
-                (click)="setActiveTab('ingredients')"
-              >
-                Ingrédients
-              </button>
-            }
-            @if (detail.steps.length > 0) {
-              <button
-                type="button"
-                class="recipe-details__tab"
-                [class.recipe-details__tab--active]="activeTab() === 'steps'"
-                role="tab"
-                [attr.aria-selected]="activeTab() === 'steps'"
-                (click)="setActiveTab('steps')"
-              >
-                Étapes
-              </button>
-            }
-          </div>
+          @if (showTabs()) {
+            <div
+              class="recipe-details__tabs"
+              role="tablist"
+              aria-label="Contenu de la recette"
+              (keydown)="onTabListKeydown($event)"
+            >
+              @if (detail.ingredients.length > 0) {
+                <button
+                  type="button"
+                  id="recipe-details-tab-ingredients"
+                  class="recipe-details__tab"
+                  [class.recipe-details__tab--active]="activeTab() === 'ingredients'"
+                  role="tab"
+                  [attr.aria-selected]="activeTab() === 'ingredients'"
+                  aria-controls="recipe-details-panel-ingredients"
+                  [attr.tabindex]="activeTab() === 'ingredients' ? 0 : -1"
+                  (click)="setActiveTab('ingredients')"
+                >
+                  Ingrédients
+                </button>
+              }
+              @if (detail.steps.length > 0) {
+                <button
+                  type="button"
+                  id="recipe-details-tab-steps"
+                  class="recipe-details__tab"
+                  [class.recipe-details__tab--active]="activeTab() === 'steps'"
+                  role="tab"
+                  [attr.aria-selected]="activeTab() === 'steps'"
+                  aria-controls="recipe-details-panel-steps"
+                  [attr.tabindex]="activeTab() === 'steps' ? 0 : -1"
+                  (click)="setActiveTab('steps')"
+                >
+                  Étapes
+                </button>
+              }
+            </div>
+          } @else {
+            <h2 class="recipe-details__section-title">
+              {{ detail.ingredients.length > 0 ? 'Ingrédients' : 'Étapes' }}
+            </h2>
+          }
 
-          @if (activeTab() === 'ingredients' && detail.ingredients.length > 0) {
-            <ul class="recipe-details__ingredients">
+          @if (
+            detail.ingredients.length > 0 &&
+            (activeTab() === 'ingredients' || !showTabs())
+          ) {
+            <ul
+              id="recipe-details-panel-ingredients"
+              class="recipe-details__ingredients"
+              [attr.role]="showTabs() ? 'tabpanel' : null"
+              [attr.aria-labelledby]="showTabs() ? 'recipe-details-tab-ingredients' : null"
+              [attr.tabindex]="showTabs() ? 0 : null"
+            >
               @for (ingredient of detail.ingredients; track ingredient.id; let i = $index) {
                 <li class="recipe-details__ingredient">
                   <span class="recipe-details__ingredient-number">{{ i + 1 }}</span>
@@ -169,8 +214,14 @@
             </ul>
           }
 
-          @if (activeTab() === 'steps' && detail.steps.length > 0) {
-            <ol class="recipe-details__steps">
+          @if (detail.steps.length > 0 && (activeTab() === 'steps' || !showTabs())) {
+            <ol
+              id="recipe-details-panel-steps"
+              class="recipe-details__steps"
+              [attr.role]="showTabs() ? 'tabpanel' : null"
+              [attr.aria-labelledby]="showTabs() ? 'recipe-details-tab-steps' : null"
+              [attr.tabindex]="showTabs() ? 0 : null"
+            >
               @for (step of detail.steps; track step.id) {
                 <li class="recipe-details__step">
                   <span class="recipe-details__step-number">{{ step.order }}</span>
