@@ -1,4 +1,5 @@
-﻿import { Component, computed, inject, OnInit, signal } from '@angular/core';
+﻿import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProgressSpinner } from 'primeng/progressspinner';
 
@@ -31,6 +32,7 @@ export class LibraryComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly currentUser = inject(CurrentUserService);
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly recipes = signal<RecipeListItem[]>([]);
   protected readonly recipeTypes = signal<RecipeTypeSummary[]>([]);
@@ -156,7 +158,7 @@ export class LibraryComponent implements OnInit {
   ngOnInit(): void {
     this.loadRecipeTypes();
 
-    this.route.data.subscribe((data) => {
+    this.route.data.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((data) => {
       const favoritesOnly = data['favoritesOnly'] === true;
       const mineOnly = data['mineOnly'] === true;
       if (favoritesOnly && !this.currentUser.isAuthenticated()) {

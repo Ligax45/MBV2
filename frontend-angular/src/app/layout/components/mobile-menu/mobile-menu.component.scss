@@ -5,7 +5,7 @@
   border: none;
   padding: 0;
   cursor: pointer;
-  background-color: rgb(0 0 0 / 50%);
+  background-color: var(--overlay-scrim);
 }
 
 .mobile-menu__drawer {

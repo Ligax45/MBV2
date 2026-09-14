@@ -76,8 +76,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   color: var(--foreground);
@@ -89,7 +89,13 @@
   background: var(--muted);
 }
 
+.moderation-item__view:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--ring) 50%, transparent);
+  outline-offset: 2px;
+}
+
 .moderation-item__btn {
+  min-height: var(--touch-target-min);
   padding: 0.4rem 0.75rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -107,7 +113,7 @@
 }
 
 .moderation-item__btn--approve:hover:not(:disabled) {
-  background-color: #bbf7d0;
+  background-color: color-mix(in srgb, var(--badge-easy-text) 18%, var(--badge-easy-bg));
 }
 
 .moderation-item__btn--reject {
@@ -117,7 +123,7 @@
 }
 
 .moderation-item__btn--reject:hover:not(:disabled) {
-  background-color: #fecaca;
+  background-color: color-mix(in srgb, var(--badge-hard-text) 16%, var(--badge-hard-bg));
 }
 
 .moderation-item__btn:disabled {

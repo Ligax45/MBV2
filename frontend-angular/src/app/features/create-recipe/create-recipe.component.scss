@@ -415,9 +415,48 @@
 
 .dynamic-list__item--ingredient {
   display: grid;
-  grid-template-columns: 2.5rem 1.5rem 7rem 11rem minmax(12rem, 1fr) 2.5rem;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.625rem;
+  grid-template-columns: 2.75rem minmax(4.5rem, 6rem) minmax(0, 1fr) 2.75rem;
+  grid-template-areas:
+    'handle index . delete'
+    'qty qty unit unit'
+    'name name name name';
+
+  > .dynamic-list__drag-handle {
+    grid-area: handle;
+  }
+
+  > .dynamic-list__index {
+    grid-area: index;
+    justify-self: start;
+  }
+
+  > .dynamic-list__qty {
+    grid-area: qty;
+  }
+
+  > p-select {
+    grid-area: unit;
+    min-width: 0;
+  }
+
+  > .dynamic-list__name-field {
+    grid-area: name;
+  }
+
+  > p-button {
+    grid-area: delete;
+    justify-self: end;
+  }
+}
+
+@media (min-width: 768px) {
+  .dynamic-list__item--ingredient {
+    gap: 0.75rem;
+    grid-template-columns: 2.75rem 1.5rem 7rem 11rem minmax(0, 1fr) 2.75rem;
+    grid-template-areas: 'handle index qty unit name delete';
+  }
 }
 
 .dynamic-list__item--step {
@@ -457,15 +496,22 @@
   min-width: 0;
 }
 
-:host ::ng-deep .dynamic-list__item--ingredient .dynamic-list__unit {
-  width: 100%;
-  min-width: 0;
+:host ::ng-deep .dynamic-list__item--ingredient {
+  .dynamic-list__unit {
+    width: 100%;
+    min-width: 0;
 
-  .p-select-label {
-    min-height: 1.25rem;
-    overflow: visible;
-    text-overflow: unset;
-    white-space: nowrap;
+    .p-select-label {
+      min-height: 1.25rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  > p-button .p-button {
+    width: 2.75rem;
+    height: 2.75rem;
   }
 }
 
@@ -502,8 +548,8 @@
 
 .dynamic-list__drag-handle {
   display: flex;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.75rem;
+  height: 2.75rem;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;

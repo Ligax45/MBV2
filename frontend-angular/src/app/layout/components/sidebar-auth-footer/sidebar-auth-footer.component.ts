@@ -3,10 +3,11 @@ import { Router, RouterLink } from '@angular/router';
 
 import { AuthService } from '@core/services/auth.service';
 import { CurrentUserService } from '@core/services/current-user.service';
+import { ThemeToggleComponent } from '@layout/components/theme-toggle/theme-toggle.component';
 
 @Component({
   selector: 'app-sidebar-auth-footer',
-  imports: [RouterLink],
+  imports: [RouterLink, ThemeToggleComponent],
   templateUrl: './sidebar-auth-footer.component.html',
   styleUrl: './sidebar-auth-footer.component.scss',
 })

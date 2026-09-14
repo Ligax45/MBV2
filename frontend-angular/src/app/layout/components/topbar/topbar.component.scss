@@ -37,6 +37,10 @@
   color: var(--sidebar-foreground);
 }
 
+.topbar__theme {
+  margin-left: auto;
+}
+
 @media (min-width: 768px) {
   .topbar {
     display: none;

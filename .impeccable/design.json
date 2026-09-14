@@ -1,0 +1,381 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-14T22:00:00.000Z",
+  "title": "Design System: MiamBook",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Orange MiamBook",
+        "canonical": "#ff9800",
+        "tonalRamp": [
+          "oklch(28% 0.08 65)",
+          "oklch(38% 0.12 65)",
+          "oklch(48% 0.15 65)",
+          "oklch(58% 0.17 65)",
+          "oklch(68% 0.18 65)",
+          "oklch(75% 0.17 65)",
+          "oklch(82% 0.14 65)",
+          "oklch(92% 0.06 65)"
+        ]
+      },
+      "foreground": {
+        "role": "neutral",
+        "displayName": "Chocolat texte",
+        "canonical": "#2d1b13",
+        "tonalRamp": [
+          "oklch(18% 0.03 55)",
+          "oklch(24% 0.04 55)",
+          "oklch(30% 0.05 55)",
+          "oklch(38% 0.05 55)",
+          "oklch(48% 0.04 55)",
+          "oklch(58% 0.03 55)",
+          "oklch(72% 0.02 55)",
+          "oklch(92% 0.01 55)"
+        ]
+      },
+      "background": {
+        "role": "neutral",
+        "displayName": "Crème fond",
+        "canonical": "#fff9f5",
+        "tonalRamp": [
+          "oklch(22% 0.03 55)",
+          "oklch(30% 0.04 55)",
+          "oklch(38% 0.04 55)",
+          "oklch(48% 0.03 55)",
+          "oklch(58% 0.03 55)",
+          "oklch(72% 0.02 60)",
+          "oklch(85% 0.02 65)",
+          "oklch(97% 0.01 70)"
+        ]
+      },
+      "sidebar-bg": {
+        "role": "neutral",
+        "displayName": "Sidebar espresso",
+        "canonical": "#1e1713",
+        "tonalRamp": [
+          "oklch(12% 0.02 55)",
+          "oklch(16% 0.02 55)",
+          "oklch(20% 0.02 55)",
+          "oklch(26% 0.03 55)",
+          "oklch(34% 0.03 55)",
+          "oklch(44% 0.03 55)",
+          "oklch(58% 0.02 55)",
+          "oklch(75% 0.01 55)"
+        ]
+      },
+      "sidebar-logo-accent": {
+        "role": "secondary",
+        "displayName": "Corail logo",
+        "canonical": "#e85d33",
+        "tonalRamp": [
+          "oklch(28% 0.10 35)",
+          "oklch(38% 0.13 35)",
+          "oklch(48% 0.16 35)",
+          "oklch(55% 0.18 35)",
+          "oklch(62% 0.19 35)",
+          "oklch(70% 0.17 35)",
+          "oklch(80% 0.12 35)",
+          "oklch(92% 0.05 35)"
+        ]
+      },
+      "secondary": {
+        "role": "neutral",
+        "displayName": "Brun secondaire",
+        "canonical": "#7a5c46",
+        "tonalRamp": [
+          "oklch(22% 0.04 55)",
+          "oklch(30% 0.05 55)",
+          "oklch(38% 0.06 55)",
+          "oklch(46% 0.07 55)",
+          "oklch(52% 0.07 55)",
+          "oklch(62% 0.06 55)",
+          "oklch(74% 0.04 55)",
+          "oklch(88% 0.02 55)"
+        ]
+      },
+      "meta-servings-text": {
+        "role": "secondary",
+        "displayName": "Pastille portions",
+        "canonical": "#9a3412",
+        "tonalRamp": [
+          "oklch(22% 0.06 45)",
+          "oklch(30% 0.08 45)",
+          "oklch(38% 0.10 45)",
+          "oklch(46% 0.12 45)",
+          "oklch(52% 0.13 45)",
+          "oklch(62% 0.12 45)",
+          "oklch(74% 0.08 45)",
+          "oklch(92% 0.04 45)"
+        ]
+      },
+      "favorite-text": {
+        "role": "secondary",
+        "displayName": "Favori actif",
+        "canonical": "#e11d48",
+        "tonalRamp": [
+          "oklch(28% 0.12 15)",
+          "oklch(38% 0.15 15)",
+          "oklch(48% 0.18 15)",
+          "oklch(55% 0.20 15)",
+          "oklch(62% 0.19 15)",
+          "oklch(70% 0.16 15)",
+          "oklch(80% 0.12 15)",
+          "oklch(92% 0.05 15)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display recette",
+        "purpose": "Titres de fiches et cartes recettes — Playfair Display uniquement."
+      },
+      "headline": {
+        "displayName": "Titre de page",
+        "purpose": "En-têtes de section (Bibliothèque, Admin) en DM Sans bold."
+      },
+      "body": {
+        "displayName": "Corps",
+        "purpose": "Texte courant, métadonnées, navigation secondaire."
+      },
+      "instruction": {
+        "displayName": "Instruction cuisine",
+        "purpose": "Contenu d'étape mode cuisson — minimum 1.125rem, line-height 1.6."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Labels formulaire, filtres, badges."
+      }
+    },
+    "shadows": [
+      {
+        "name": "card-rest",
+        "value": "0 2px 12px rgb(45 27 19 / 6%)",
+        "purpose": "Ombre au repos des p-card PrimeNG."
+      },
+      {
+        "name": "card-hover",
+        "value": "0 8px 24px rgb(45 27 19 / 10%)",
+        "purpose": "Lift au survol des cartes recettes bibliothèque."
+      },
+      {
+        "name": "action-bar",
+        "value": "0 -4px 12px rgb(45 27 19 / 6%)",
+        "purpose": "Barre de navigation fixe bas mode cuisson."
+      },
+      {
+        "name": "bottom-sheet",
+        "value": "0 -10px 15px -3px rgb(0 0 0 / 12%), 0 -4px 6px -4px rgb(0 0 0 / 8%)",
+        "purpose": "Panneau ingrédients mode cuisson."
+      },
+      {
+        "name": "overlay-scrim",
+        "value": "rgb(0 0 0 / 50%)",
+        "purpose": "Fond modal, drawer mobile menu — token --overlay-scrim."
+      },
+      {
+        "name": "shadow-elevated",
+        "value": "0 8px 24px color-mix(in srgb, var(--foreground) 10%, transparent)",
+        "purpose": "Élévation générique modales et popovers — token --shadow-elevated."
+      }
+    ],
+    "spacing": [
+      {
+        "name": "touch-target-min",
+        "value": "2.75rem",
+        "purpose": "Cible tactile minimale (44px) pour boutons icône et contrôles secondaires."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-standard",
+        "value": "0.15s ease",
+        "purpose": "Transitions par défaut boutons, couleurs, bordures."
+      },
+      {
+        "name": "ease-card",
+        "value": "0.25s ease",
+        "purpose": "Transform et ombre des cartes recettes au hover."
+      },
+      {
+        "name": "ease-image",
+        "value": "0.35s ease",
+        "purpose": "Zoom image carte recette au hover."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "0.01ms !important",
+        "purpose": "Neutralisation globale animation/transition sous prefers-reduced-motion: reduce (base.scss)."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "md",
+        "value": "768px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Action principale — navigation d'étape mode cuisson, progression.",
+      "html": "<button class=\"ds-btn-primary\" type=\"button\">Étape suivante</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 3rem; padding: 0.75rem 1rem; border: none; border-radius: var(--radius-pill, 9999px); background: var(--primary, #ff9800); color: var(--primary-foreground, #ffffff); font-family: var(--font-sans, 'DM Sans', system-ui, sans-serif); font-size: 1rem; font-weight: 600; cursor: pointer; transition: background-color 0.15s ease; } .ds-btn-primary:hover { background: color-mix(in srgb, var(--primary, #ff9800) 88%, #000); } .ds-btn-primary:focus-visible { outline: 2px solid color-mix(in srgb, var(--ring, #f59e0b) 50%, transparent); outline-offset: 2px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Action secondaire paire — retour étape précédente.",
+      "html": "<button class=\"ds-btn-secondary\" type=\"button\">Précédent</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 3rem; padding: 0.75rem 1rem; border: 1px solid var(--border, #f3e8d9); border-radius: var(--radius-pill, 9999px); background: var(--background, #fff9f5); color: var(--secondary, #7a5c46); font-family: var(--font-sans, 'DM Sans', system-ui, sans-serif); font-size: 1rem; font-weight: 600; cursor: pointer; transition: background-color 0.15s ease; } .ds-btn-secondary:hover:not(:disabled) { background: var(--muted, #f3e8d9); } .ds-btn-secondary:disabled { opacity: 0.4; cursor: not-allowed; } .ds-btn-secondary:focus-visible { outline: 2px solid color-mix(in srgb, var(--ring, #f59e0b) 50%, transparent); outline-offset: 2px; }"
+    },
+    {
+      "name": "Nav CTA",
+      "kind": "nav",
+      "refersTo": "button-nav-cta",
+      "description": "CTA sidebar « Créer une recette » — corail logo, centré.",
+      "html": "<a class=\"ds-nav-cta\" href=\"#\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M12 5v14M5 12h14\"/></svg> Créer une recette</a>",
+      "css": ".ds-nav-cta { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; height: 2.625rem; padding: 0 0.875rem; border: none; border-radius: var(--sidebar-nav-radius, 0.625rem); background-color: var(--sidebar-logo-accent, #e85d33); color: #ffffff; font-family: var(--font-sans, 'DM Sans', system-ui, sans-serif); font-size: 0.875rem; font-weight: 500; text-decoration: none; cursor: pointer; transition: background-color 0.15s ease; } .ds-nav-cta:hover { background-color: color-mix(in srgb, var(--sidebar-logo-accent, #e85d33) 82%, #000); color: #ffffff; } .ds-nav-cta:focus-visible { outline: 2px solid color-mix(in srgb, var(--ring, #f59e0b) 50%, transparent); outline-offset: 2px; }"
+    },
+    {
+      "name": "Nav Link",
+      "kind": "nav",
+      "refersTo": "button-nav",
+      "description": "Lien de navigation sidebar — état par défaut et actif.",
+      "html": "<a class=\"ds-nav-link ds-nav-link--active\" href=\"#\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M4 19.5A2.5 2.5 0 0 1 6.5 17H20\"/><path d=\"M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z\"/></svg> Bibliothèque</a>",
+      "css": ".ds-nav-link { display: inline-flex; align-items: center; justify-content: flex-start; gap: 0.5rem; width: 100%; height: 2.625rem; padding: 0 0.875rem; border: none; border-radius: var(--sidebar-nav-radius, 0.625rem); background: transparent; color: var(--sidebar-text, #9b9691); font-family: var(--font-sans, 'DM Sans', system-ui, sans-serif); font-size: 0.875rem; font-weight: 400; text-decoration: none; cursor: pointer; transition: background-color 0.15s ease, color 0.15s ease; } .ds-nav-link:hover:not(.ds-nav-link--active) { background-color: var(--sidebar-hover-bg, rgb(255 255 255 / 6%)); color: var(--sidebar-foreground, #ffffff); } .ds-nav-link--active { background-color: var(--sidebar-active-bg, #3e271c); color: var(--sidebar-text-active, #cf895c); font-weight: 500; } .ds-nav-link:focus-visible { outline: 2px solid color-mix(in srgb, var(--ring, #f59e0b) 50%, transparent); outline-offset: 2px; }"
+    },
+    {
+      "name": "Search Input",
+      "kind": "input",
+      "refersTo": "input-search",
+      "description": "Champ de recherche bibliothèque — pilule avec icône.",
+      "html": "<input class=\"ds-input-search\" type=\"search\" placeholder=\"Rechercher une recette…\" aria-label=\"Rechercher\" />",
+      "css": ".ds-input-search { width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem; border: 1px solid var(--border, #f3e8d9); border-radius: var(--radius-pill, 9999px); background: var(--card, #ffffff); color: var(--foreground, #2d1b13); font-family: var(--font-sans, 'DM Sans', system-ui, sans-serif); font-size: 0.875rem; transition: border-color 0.15s ease, box-shadow 0.15s ease; } .ds-input-search::placeholder { color: var(--placeholder-foreground, #7c746e); } .ds-input-search:focus { border-color: var(--primary, #ff9800); box-shadow: 0 0 0 2px rgb(245 158 11 / 15%); outline: none; }"
+    },
+    {
+      "name": "Filter Chip",
+      "kind": "chip",
+      "refersTo": "button-secondary",
+      "description": "Filtre pilule bibliothèque — état inactif et actif type.",
+      "html": "<button class=\"ds-chip ds-chip--active\" type=\"button\">Entrées</button>",
+      "css": ".ds-chip { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.625rem 1rem; border: 1px solid var(--border, #f3e8d9); border-radius: 999px; background-color: var(--background, #fff9f5); color: var(--foreground, #2d1b13); font-family: var(--font-sans, 'DM Sans', system-ui, sans-serif); font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: background-color 0.15s ease, border-color 0.15s ease; } .ds-chip:hover:not(.ds-chip--active) { border-color: color-mix(in srgb, var(--primary, #ff9800) 35%, var(--border, #f3e8d9)); background-color: var(--accent, #fef3e2); } .ds-chip--active { border-color: color-mix(in srgb, var(--primary, #ff9800) 45%, var(--border, #f3e8d9)); background-color: color-mix(in srgb, var(--primary, #ff9800) 12%, var(--background, #fff9f5)); color: var(--foreground, #2d1b13); } .ds-chip:focus-visible { outline: 2px solid color-mix(in srgb, var(--ring, #f59e0b) 50%, transparent); outline-offset: 2px; }"
+    },
+    {
+      "name": "Difficulty Badge",
+      "kind": "chip",
+      "refersTo": "button-secondary",
+      "description": "Badge sémantique difficulté recette.",
+      "html": "<span class=\"ds-badge ds-badge--medium\">Moyen</span>",
+      "css": ".ds-badge { display: inline-flex; align-items: center; padding: 0.2rem 0.625rem; border-radius: var(--radius-pill, 9999px); font-family: var(--font-sans, 'DM Sans', system-ui, sans-serif); font-size: 0.75rem; font-weight: 500; line-height: 1.4; } .ds-badge--easy { background-color: var(--badge-easy-bg, #dcfce7); color: var(--badge-easy-text, #166534); } .ds-badge--medium { background-color: var(--badge-medium-bg, #ffedd5); color: var(--badge-medium-text, #c2410c); } .ds-badge--hard { background-color: var(--badge-hard-bg, #fee2e2); color: var(--badge-hard-text, #b91c1c); }"
+    },
+    {
+      "name": "Recipe Card",
+      "kind": "card",
+      "refersTo": "card-recipe",
+      "description": "Carte recette bibliothèque — titre Playfair, média 16:10.",
+      "html": "<article class=\"ds-recipe-card\"><div class=\"ds-recipe-card__media\"></div><div class=\"ds-recipe-card__body\"><h3 class=\"ds-recipe-card__title\">Tarte aux pommes caramélisées</h3><p class=\"ds-recipe-card__meta\">45 min · Facile</p></div></article>",
+      "css": ".ds-recipe-card { overflow: hidden; border-radius: var(--radius-lg, 1.5rem); background: var(--card, #ffffff); color: var(--foreground, #2d1b13); box-shadow: 0 2px 12px rgb(45 27 19 / 6%); transition: transform 0.25s ease, box-shadow 0.25s ease; } .ds-recipe-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgb(45 27 19 / 10%); } .ds-recipe-card__media { aspect-ratio: 16 / 10; background: var(--muted, #f3e8d9); } .ds-recipe-card__body { padding: 1rem 1.25rem; } .ds-recipe-card__title { margin: 0; font-family: var(--font-display, 'Playfair Display', Georgia, serif); font-size: 1.0625rem; font-weight: 700; line-height: 1.35; } .ds-recipe-card__meta { margin: 0.625rem 0 0; font-family: var(--font-sans, 'DM Sans', system-ui, sans-serif); font-size: 0.8125rem; color: var(--secondary, #7a5c46); }"
+    },
+    {
+      "name": "Cooking Step Block",
+      "kind": "custom",
+      "refersTo": "card-recipe",
+      "description": "Bloc d'instruction mode cuisson — texte large, pré-line.",
+      "html": "<div class=\"ds-step\"><span class=\"ds-step__number\">2</span><div class=\"ds-step__body\"><h4 class=\"ds-step__title\">Mélanger les ingrédients</h4><p class=\"ds-step__content\">Dans un saladier, fouetter les œufs avec le sucre jusqu'à blanchiment.</p></div></div>",
+      "css": ".ds-step { display: flex; gap: 1rem; align-items: flex-start; font-family: var(--font-sans, 'DM Sans', system-ui, sans-serif); } .ds-step__number { display: flex; width: 2.5rem; height: 2.5rem; flex-shrink: 0; align-items: center; justify-content: center; border-radius: 50%; background: var(--primary, #ff9800); color: var(--primary-foreground, #ffffff); font-size: 1rem; font-weight: 700; } .ds-step__title { margin: 0 0 0.75rem; font-size: 1.25rem; font-weight: 600; line-height: 1.35; color: var(--foreground, #2d1b13); } .ds-step__content { margin: 0; padding: 1.25rem; border: 1px solid var(--border, #f3e8d9); border-radius: var(--radius-lg, 1.5rem); background: var(--card, #ffffff); color: var(--foreground, #2d1b13); font-size: 1.125rem; line-height: 1.6; white-space: pre-line; }"
+    },
+    {
+      "name": "Meta Pill",
+      "kind": "chip",
+      "refersTo": "button-secondary",
+      "description": "Pastille métadonnée détail recette — type, portions, temps.",
+      "html": "<span class=\"ds-meta-pill ds-meta-pill--servings\">4 portions</span>",
+      "css": ".ds-meta-pill { display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: var(--radius-pill, 9999px); font-family: var(--font-sans, 'DM Sans', system-ui, sans-serif); font-size: 0.8125rem; font-weight: 500; line-height: 1.4; } .ds-meta-pill--type { background-color: var(--meta-type-bg, #ffedd5); color: var(--meta-type-text, #c2410c); } .ds-meta-pill--servings { background-color: var(--meta-servings-bg, #fde8d4); color: var(--meta-servings-text, #9a3412); } .ds-meta-pill--prep { background-color: var(--meta-prep-bg, #dcfce7); color: var(--meta-prep-text, #166534); } .ds-meta-pill--cook { background-color: var(--meta-cook-bg, #fef3c7); color: var(--meta-cook-text, #b45309); }"
+    },
+    {
+      "name": "Icon Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Bouton icône tactile — menu, fermer, favori, thème.",
+      "html": "<button class=\"ds-btn-icon\" type=\"button\" aria-label=\"Menu\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M4 6h16M4 12h16M4 18h16\"/></svg></button>",
+      "css": ".ds-btn-icon { display: inline-flex; align-items: center; justify-content: center; width: var(--touch-target-min, 2.75rem); height: var(--touch-target-min, 2.75rem); padding: 0; border: none; border-radius: var(--radius-md, 0.75rem); background: transparent; color: inherit; cursor: pointer; transition: background-color 0.15s ease; } .ds-btn-icon:hover { background-color: var(--accent, #fef3e2); } .ds-btn-icon:focus-visible { outline: 2px solid color-mix(in srgb, var(--ring, #f59e0b) 50%, transparent); outline-offset: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Le carnet du four doux",
+    "overview": "MiamBook ressemble à un carnet de cuisine posé sur le plan de travail : fond crème chaud, encre chocolat, touches d'orange vif au bon moment. L'interface est mobile-first — pensée pour le téléphone en cuisine — avec une coquille sombre stable (sidebar/topbar) et un contenu lumineux, aéré, structuré. La paire Playfair Display + DM Sans donne du caractère éditorial aux titres de recettes sans sacrifier la lisibilité des listes et des instructions.\n\nLe système privilégie la clarté opérationnelle : grands boutons tactiles, texte d'instruction généreux en mode cuisson, barres d'action toujours visibles. L'expression visuelle reste domestique et chaleureuse, jamais clinique ni « dashboard SaaS ».",
+    "keyCharacteristics": [
+      "Palette crème-chocolat-orange, chaleur avant froideur",
+      "Typographie éditoriale pour les titres, sans pour le corps et les labels",
+      "Coins généreusement arrondis ; pilules pour CTAs, filtres et champs de recherche",
+      "Profondeur par élévation légère au survol, pas par empilement de bordures",
+      "Shell navigation sombre persistant ; contenu en zone claire scrollable",
+      "Thème clair/sombre via html.light / html.dark + tokens .dark",
+      "Mode cuisson immersif hors shell, optimisé 100dvh et safe areas iOS"
+    ],
+    "rules": [
+      {
+        "name": "La règle du orange rare",
+        "body": "Le primary orange apparaît sur les actions qui font progresser (CTA de navigation d'étape, puces numérotées, submit). Le corail logo (--sidebar-logo-accent) est réservé à la création et au branding shell. Ne pas diluer ces deux accents sur chaque contrôle.",
+        "section": "colors"
+      },
+      {
+        "name": "La règle du contraste placeholder",
+        "body": "--placeholder-foreground est calibré pour AA 4.5:1 sur --card et fonds clairs — ne pas le remplacer par --muted-foreground dans les champs.",
+        "section": "colors"
+      },
+      {
+        "name": "La règle Playfair ciblée",
+        "body": "Playfair Display uniquement sur les titres de recettes et en-têtes éditoriaux. Jamais sur les paragraphes d'instruction, les listes d'ingrédients ou la navigation — DM Sans y garde la lisibilité.",
+        "section": "typography"
+      },
+      {
+        "name": "La règle min-height: 0",
+        "body": "Tout enfant flex scrollable (.app-main, .cooking-mode__content) doit avoir min-height: 0 — sinon le scroll casse et les barres d'action disparaissent hors écran.",
+        "section": "layout"
+      },
+      {
+        "name": "La règle mobile-first stricte",
+        "body": "Styles par défaut pour 320–390px ; améliorations desktop via @media (min-width: 768px) uniquement. Jamais l'inverse.",
+        "section": "layout"
+      },
+      {
+        "name": "La règle flat-by-default",
+        "body": "Pas d'ombre sur les boutons ou champs au repos. L'élévation signale l'interaction (hover carte) ou la hiérarchie temporaire (sheet, barre fixe).",
+        "section": "elevation"
+      },
+      {
+        "name": "La règle touch-target-min",
+        "body": "Les boutons icône et contrôles tactiles secondaires utilisent var(--touch-target-min) (2.75rem / 44px). Les CTAs primaires visent min-height 3rem (48px+).",
+        "section": "components"
+      },
+      {
+        "name": "La règle thème sombre",
+        "body": "La classe .dark recalcule fond, carte, bordures et pastilles --meta-* via color-mix. La sidebar espresso reste inchangée entre thèmes.",
+        "section": "colors"
+      }
+    ],
+    "dos": [
+      "Do utiliser les variables CSS de tokens.scss (--primary, --background, --card, --radius-*) — pas de couleurs magiques sauf badges sémantiques déjà tokenisés.",
+      "Do utiliser var(--touch-target-min) (2.75rem / 44px) pour boutons icône ; min-height 3rem pour CTAs primaires.",
+      "Do respecter prefers-reduced-motion: reduce — transitions neutralisées dans base.scss.",
+      "Do appliquer Playfair Display aux titres de recettes et DM Sans au reste.",
+      "Do tester à 320px : barres d'action visibles, scroll sans masquer les contrôles fixes.",
+      "Do respecter 100dvh + safe areas sur les écrans immersifs (mode cuisson).",
+      "Do utiliser PrimeNG pour composants complexes, avec overrides dans primeng-overrides.scss (clair et .dark).",
+      "Do charger les images recettes via NgOptimizedImage + recipeImageLoader pour les URLs Supabase."
+    ],
+    "donts": [
+      "Don't écrire du CSS desktop-first puis rétrograder avec max-width — mobile est le défaut.",
+      "Don't mettre Playfair sur les instructions de cuisine ou les listes d'ingrédients.",
+      "Don't empiler ombres et bordures lourdes au repos — la profondeur répond à l'état.",
+      "Don't sortir le primary orange sur plus de 2–3 éléments d'action par écran.",
+      "Don't hardcoder des gris ou bleus génériques — la palette est chaude et brun-orangée.",
+      "Don't laisser le contenu long pousser les barres d'action hors viewport en mode cuisson."
+    ]
+  }
+}

@@ -38,6 +38,9 @@
   --sidebar-nav-radius: 0.625rem;
   --sidebar-width: 15rem;
   --topbar-height: 3.5rem;
+  --touch-target-min: 2.75rem;
+  --overlay-scrim: rgb(0 0 0 / 50%);
+  --shadow-elevated: 0 8px 24px color-mix(in srgb, var(--foreground) 10%, transparent);
   --breakpoint-md: 768px;
 
   /* Badges difficulté */
@@ -55,6 +58,16 @@
   --favorite-inactive-bg: #fff5ed;
   --favorite-inactive-text: #c2410c;
   --favorite-inactive-border: #f0d4b8;
+
+  /* Métadonnées recette (pastilles info détail) */
+  --meta-type-bg: var(--badge-medium-bg);
+  --meta-type-text: var(--badge-medium-text);
+  --meta-servings-bg: #fde8d4;
+  --meta-servings-text: #9a3412;
+  --meta-prep-bg: var(--badge-easy-bg);
+  --meta-prep-text: var(--badge-easy-text);
+  --meta-cook-bg: #fef3c7;
+  --meta-cook-text: #b45309;
 }
 
 html.light {
@@ -89,4 +102,13 @@ html.dark {
   --sidebar-logo-accent: #e85d33;
   --sidebar-shadow: none;
   --sidebar-nav-radius: 0.625rem;
+
+  --meta-type-bg: color-mix(in srgb, var(--badge-medium-text) 22%, var(--card));
+  --meta-type-text: #fdba74;
+  --meta-servings-bg: color-mix(in srgb, var(--meta-servings-text) 18%, var(--card));
+  --meta-servings-text: #fb923c;
+  --meta-prep-bg: color-mix(in srgb, var(--badge-easy-text) 20%, var(--card));
+  --meta-prep-text: #86efac;
+  --meta-cook-bg: color-mix(in srgb, var(--ring) 22%, var(--card));
+  --meta-cook-text: #fcd34d;
 }

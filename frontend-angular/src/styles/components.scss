@@ -28,8 +28,8 @@
 }
 
 .btn-icon {
-  width: 2.25rem;
-  height: 2.25rem;
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
   flex-shrink: 0;
   padding: 0;
 }

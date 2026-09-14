@@ -190,4 +190,10 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
   gap: 1.5rem;
+  contain: layout style;
+}
+
+.library-page__grid > app-recipe-card {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 22rem;
 }

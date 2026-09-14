@@ -2,7 +2,9 @@
   <button
     type="button"
     class="btn btn-ghost btn-icon topbar__menu-btn"
-    aria-label="Ouvrir le menu"
+    [attr.aria-label]="mobileMenuOpen() ? 'Fermer le menu' : 'Ouvrir le menu'"
+    [attr.aria-expanded]="mobileMenuOpen()"
+    aria-controls="mobile-menu-dialog"
     (click)="mobileMenuToggle.emit()"
   >
     <i class="pi pi-bars" aria-hidden="true"></i>
@@ -17,4 +19,6 @@
     </span>
     <span class="topbar__title">MiamBook</span>
   </div>
+
+  <app-theme-toggle class="topbar__theme" variant="compact" />
 </header>

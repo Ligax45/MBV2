@@ -1,73 +1,83 @@
-<a class="recipe-card__link" [routerLink]="['/recette', recipe().id]">
-  <p-card styleClass="recipe-card">
-    <ng-template #header>
-      <div class="recipe-card__media">
-        <img
-          class="recipe-card__image"
-          [src]="recipe().imageUrl"
-          [alt]="recipe().title"
-        />
-        @if (canFavorite()) {
-          <button
-            type="button"
-            class="recipe-card__like"
-            [class.recipe-card__like--active]="isLiked()"
-            [disabled]="togglingFavorite()"
-            [attr.aria-label]="
-              isLiked() ? 'Retirer des favoris' : 'Ajouter aux favoris'
-            "
-            (click)="toggleLike($event)"
-          >
-            <i
-              [class]="isLiked() ? 'pi pi-heart-fill' : 'pi pi-heart'"
-              aria-hidden="true"
-            ></i>
-          </button>
-        }
-        @if (recipe().recipeTypeLabel) {
-          <span class="recipe-card__category">
-            {{ recipe().recipeTypeLabel }}
+<div class="recipe-card__shell">
+  <a
+    class="recipe-card__link"
+    [routerLink]="['/recette', recipe().id]"
+    [attr.aria-label]="'Voir la recette ' + recipe().title"
+  >
+    <p-card styleClass="recipe-card">
+      <ng-template #header>
+        <div class="recipe-card__media">
+          <img
+            class="recipe-card__image"
+            [ngSrc]="recipe().imageUrl"
+            fill
+            sizes="(max-width: 767px) 92vw, (max-width: 1200px) 44vw, 20rem"
+            [priority]="priority()"
+            alt=""
+          />
+          @if (recipe().recipeTypeLabel) {
+            <span class="recipe-card__category">
+              {{ recipe().recipeTypeLabel }}
+            </span>
+          }
+        </div>
+      </ng-template>
+
+      <h3 class="recipe-card__title">{{ recipe().title }}</h3>
+
+      <div class="recipe-card__rating" [attr.aria-label]="'Note ' + starRating() + ' sur 5'">
+        <span class="recipe-card__stars" aria-hidden="true">
+          @for (star of starIndexes; track star) {
+            <i [class]="starIcon(star)"></i>
+          }
+        </span>
+        <span class="recipe-card__rating-value">{{ starRating() | number: '1.1-1' }}</span>
+      </div>
+
+      <div class="recipe-card__meta">
+        <span class="recipe-card__time">
+          <i class="pi pi-clock" aria-hidden="true"></i>
+          {{ formatTime(recipe().totalTimeMinutes) }}
+        </span>
+        <span
+          class="badge-difficulty"
+          [class]="'badge-difficulty badge-difficulty--' + recipe().difficulty"
+        >
+          {{ difficultyLabel(recipe().difficulty) }}
+        </span>
+        @if (statusBadge(); as badge) {
+          <span class="badge-status" [class]="'badge-status badge-status--' + badge.kind">
+            {{ badge.label }}
           </span>
         }
       </div>
-    </ng-template>
 
-    <h3 class="recipe-card__title">{{ recipe().title }}</h3>
+      <ng-template #footer>
+        <div class="recipe-card__footer">
+          <span class="recipe-card__author">Par {{ recipe().creatorName }}</span>
+          <time class="recipe-card__date" [attr.datetime]="recipe().createdAt">
+            {{ formatDate(recipe().createdAt) }}
+          </time>
+        </div>
+      </ng-template>
+    </p-card>
+  </a>
 
-    <div class="recipe-card__rating" [attr.aria-label]="'Note ' + starRating() + ' sur 5'">
-      <span class="recipe-card__stars" aria-hidden="true">
-        @for (star of starIndexes; track star) {
-          <i [class]="starIcon(star)"></i>
-        }
-      </span>
-      <span class="recipe-card__rating-value">{{ starRating() | number: '1.1-1' }}</span>
-    </div>
-
-    <div class="recipe-card__meta">
-      <span class="recipe-card__time">
-        <i class="pi pi-clock" aria-hidden="true"></i>
-        {{ formatTime(recipe().totalTimeMinutes) }}
-      </span>
-      <span
-        class="badge-difficulty"
-          [class]="'badge-difficulty--' + recipe().difficulty"
-      >
-        {{ difficultyLabel(recipe().difficulty) }}
-      </span>
-      @if (statusBadge(); as badge) {
-        <span class="badge-status" [class]="'badge-status--' + badge.kind">
-          {{ badge.label }}
-        </span>
-      }
-    </div>
-
-    <ng-template #footer>
-      <div class="recipe-card__footer">
-        <span class="recipe-card__author">Par {{ recipe().creatorName }}</span>
-        <time class="recipe-card__date" [attr.datetime]="recipe().createdAt">
-          {{ formatDate(recipe().createdAt) }}
-        </time>
-      </div>
-    </ng-template>
-  </p-card>
-</a>
+  @if (canFavorite()) {
+    <button
+      type="button"
+      class="recipe-card__like"
+      [class.recipe-card__like--active]="isLiked()"
+      [disabled]="togglingFavorite()"
+      [attr.aria-label]="isLiked() ? 'Retirer des favoris' : 'Ajouter aux favoris'"
+      [attr.aria-pressed]="isLiked()"
+      [attr.aria-busy]="togglingFavorite()"
+      (click)="toggleLike($event)"
+    >
+      <i
+        [class]="isLiked() ? 'pi pi-heart-fill' : 'pi pi-heart'"
+        aria-hidden="true"
+      ></i>
+    </button>
+  }
+</div>
