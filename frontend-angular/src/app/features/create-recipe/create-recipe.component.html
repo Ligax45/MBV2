@@ -1,15 +1,35 @@
-<div class="create-recipe-page">
+<div class="create-recipe-page" [attr.aria-busy]="pageBusy()">
   <h1 class="create-recipe-page__title">{{ pageTitle() }}</h1>
 
   @if (pageBusy()) {
-    <output class="create-recipe-page__loading">
+    <output class="create-recipe-page__loading" aria-live="polite">
       <p-progressSpinner ariaLabel="Chargement du formulaire" />
     </output>
+  } @else if (pageBlocked()) {
+    <div class="create-recipe-page__state" role="status">
+      @if (typesLoadFailed()) {
+        <p class="create-recipe-page__state-message">
+          Impossible de charger les types de recette. Vérifiez que le backend tourne et que les
+          migrations sont appliquées.
+        </p>
+        <button type="button" class="create-recipe-page__retry" (click)="retryLoadTypes()">
+          Réessayer
+        </button>
+      } @else if (recipeLoadFailed()) {
+        <p class="create-recipe-page__state-message">
+          Impossible de charger cette recette à modifier. Vérifiez votre connexion ou réessayez.
+        </p>
+        <button type="button" class="create-recipe-page__retry" (click)="retryLoadRecipe()">
+          Réessayer
+        </button>
+      }
+    </div>
   }
 
   <form
     class="create-recipe-form"
-    [class.create-recipe-form--hidden]="pageBusy()"
+    [class.create-recipe-form--hidden]="pageBusy() || pageBlocked()"
+    [attr.aria-hidden]="pageBusy() || pageBlocked() ? true : null"
     (submit)="onSubmit($event)"
   >
     <!-- Informations générales -->
@@ -73,6 +93,8 @@
                   [src]="form().photoPreview"
                   alt="Aperçu de la recette"
                   class="photo-field__image"
+                  loading="lazy"
+                  decoding="async"
                 />
                 <div class="photo-field__actions">
                   <p-button
@@ -257,6 +279,7 @@
                 type="button"
                 class="equipment-chip"
                 [class.equipment-chip--selected]="isEquipmentSelected(equip.id)"
+                [attr.aria-pressed]="isEquipmentSelected(equip.id)"
                 (click)="toggleEquipment(equip.id)"
               >
                 {{ equip.label }}
@@ -479,7 +502,7 @@
         [label]="submitLabel()"
         icon="pi pi-check"
         [loading]="submitting()"
-        [disabled]="submitting() || pageBusy()"
+        [disabled]="submitting() || pageBusy() || pageBlocked()"
       />
     </div>
   </form>

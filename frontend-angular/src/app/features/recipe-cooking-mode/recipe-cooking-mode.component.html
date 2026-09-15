@@ -1,6 +1,6 @@
-<div class="cooking-mode">
+<div class="cooking-mode" [attr.aria-busy]="loading()">
   @if (loading()) {
-    <div class="cooking-mode__state" role="status">
+    <div class="cooking-mode__state" role="status" aria-live="polite">
       <p-progressSpinner ariaLabel="Chargement du mode cuisine" />
     </div>
   } @else if (pageFailed()) {
@@ -26,7 +26,11 @@
         </a>
       </div>
     } @else {
-      <div class="cooking-mode__surface" [attr.inert]="ingredientsOpen() ? '' : null">
+      <span class="cooking-mode__step-announcer" aria-live="polite" aria-atomic="true">
+        {{ stepAnnouncement() }}
+      </span>
+
+      <div class="cooking-mode__surface" [attr.inert]="ingredientsOpen() ? true : null">
         <header class="cooking-mode__header">
           <button
             type="button"
@@ -39,7 +43,11 @@
 
           <h1 class="cooking-mode__title">{{ detail.title }}</h1>
 
-          <span class="cooking-mode__progress" aria-live="polite">
+          <span
+            class="cooking-mode__progress"
+            role="status"
+            [attr.aria-label]="'Progression : ' + progressLabel()"
+          >
             {{ progressLabel() }}
           </span>
         </header>
@@ -65,7 +73,9 @@
         @if (currentStep(); as step) {
           <main class="cooking-mode__content">
             <article
+              id="cooking-step-panel"
               class="cooking-mode__step"
+              tabindex="-1"
               [attr.aria-label]="'Étape ' + step.order + ' sur ' + totalSteps()"
             >
               <span class="cooking-mode__step-number" aria-hidden="true">{{ step.order }}</span>

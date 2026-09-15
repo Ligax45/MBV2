@@ -45,7 +45,20 @@
   border-radius: var(--radius-md);
 }
 
+.cooking-mode__step-announcer {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .cooking-mode__retry {
+  min-height: var(--touch-target-min);
   padding: 0.625rem 1.25rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-pill);
@@ -182,6 +195,13 @@
   display: flex;
   gap: 1rem;
   align-items: flex-start;
+  outline: none;
+}
+
+.cooking-mode__step:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--ring) 50%, transparent);
+  outline-offset: 4px;
+  border-radius: var(--radius-md);
 }
 
 .cooking-mode__step-number {
@@ -205,6 +225,7 @@
 
 .cooking-mode__step-title {
   margin: 0 0 0.75rem;
+  font-family: var(--font-sans);
   font-size: 1.25rem;
   font-weight: 600;
   line-height: 1.35;
@@ -219,6 +240,7 @@
   border-radius: var(--radius-lg);
   background: var(--card);
   color: var(--foreground);
+  font-family: var(--font-sans);
   font-size: 1.125rem;
   line-height: 1.6;
   white-space: pre-line;
@@ -247,7 +269,7 @@
   padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
   border-top: 1px solid var(--border);
   background: var(--card);
-  box-shadow: 0 -4px 12px rgb(45 27 19 / 6%);
+  box-shadow: 0 -4px 12px color-mix(in srgb, var(--foreground) 6%, transparent);
 }
 
 .cooking-mode__nav-btn {
@@ -318,8 +340,8 @@
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   background: var(--card);
   box-shadow:
-    0 -10px 15px -3px rgb(0 0 0 / 12%),
-    0 -4px 6px -4px rgb(0 0 0 / 8%);
+    0 -10px 15px -3px color-mix(in srgb, var(--foreground) 12%, transparent),
+    0 -4px 6px -4px color-mix(in srgb, var(--foreground) 8%, transparent);
 }
 
 .cooking-mode__sheet-header {

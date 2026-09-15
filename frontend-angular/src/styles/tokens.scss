@@ -39,6 +39,9 @@
   --sidebar-width: 15rem;
   --topbar-height: 3.5rem;
   --touch-target-min: 2.75rem;
+  --error-border: #ef4444;
+  --error-text: #dc2626;
+  --error-foreground: #ffffff;
   --overlay-scrim: rgb(0 0 0 / 50%);
   --shadow-elevated: 0 8px 24px color-mix(in srgb, var(--foreground) 10%, transparent);
   --breakpoint-md: 768px;
@@ -111,4 +114,8 @@ html.dark {
   --meta-prep-text: #86efac;
   --meta-cook-bg: color-mix(in srgb, var(--ring) 22%, var(--card));
   --meta-cook-text: #fcd34d;
+
+  --error-border: #f87171;
+  --error-text: #fca5a5;
+  --error-foreground: #1a100a;
 }

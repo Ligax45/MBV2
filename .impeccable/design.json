@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-14T22:00:00.000Z",
+  "generatedAt": "2026-09-15T19:00:00.000Z",
   "title": "Design System: MiamBook",
   "extensions": {
     "colorMeta": {
@@ -123,6 +123,21 @@
           "oklch(80% 0.12 15)",
           "oklch(92% 0.05 15)"
         ]
+      },
+      "error-text": {
+        "role": "secondary",
+        "displayName": "Erreur validation",
+        "canonical": "#dc2626",
+        "tonalRamp": [
+          "oklch(22% 0.10 25)",
+          "oklch(30% 0.14 25)",
+          "oklch(38% 0.18 25)",
+          "oklch(46% 0.20 25)",
+          "oklch(55% 0.22 25)",
+          "oklch(65% 0.20 25)",
+          "oklch(78% 0.14 25)",
+          "oklch(92% 0.06 25)"
+        ]
       }
     },
     "typographyMeta": {
@@ -160,13 +175,13 @@
       },
       {
         "name": "action-bar",
-        "value": "0 -4px 12px rgb(45 27 19 / 6%)",
-        "purpose": "Barre de navigation fixe bas mode cuisson."
+        "value": "0 -4px 12px color-mix(in srgb, var(--foreground) 6%, transparent)",
+        "purpose": "Barre de navigation fixe bas mode cuisson — thème-aware via --foreground."
       },
       {
         "name": "bottom-sheet",
-        "value": "0 -10px 15px -3px rgb(0 0 0 / 12%), 0 -4px 6px -4px rgb(0 0 0 / 8%)",
-        "purpose": "Panneau ingrédients mode cuisson."
+        "value": "0 -10px 15px -3px color-mix(in srgb, var(--foreground) 12%, transparent), 0 -4px 6px -4px color-mix(in srgb, var(--foreground) 8%, transparent)",
+        "purpose": "Panneau ingrédients mode cuisson — thème-aware."
       },
       {
         "name": "overlay-scrim",
@@ -303,6 +318,14 @@
       "description": "Bouton icône tactile — menu, fermer, favori, thème.",
       "html": "<button class=\"ds-btn-icon\" type=\"button\" aria-label=\"Menu\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M4 6h16M4 12h16M4 18h16\"/></svg></button>",
       "css": ".ds-btn-icon { display: inline-flex; align-items: center; justify-content: center; width: var(--touch-target-min, 2.75rem); height: var(--touch-target-min, 2.75rem); padding: 0; border: none; border-radius: var(--radius-md, 0.75rem); background: transparent; color: inherit; cursor: pointer; transition: background-color 0.15s ease; } .ds-btn-icon:hover { background-color: var(--accent, #fef3e2); } .ds-btn-icon:focus-visible { outline: 2px solid color-mix(in srgb, var(--ring, #f59e0b) 50%, transparent); outline-offset: 2px; }"
+    },
+    {
+      "name": "Error Input",
+      "kind": "input",
+      "refersTo": "input-search",
+      "description": "Champ invalide — bordure et message d'erreur via tokens --error-*.",
+      "html": "<div class=\"ds-field-error\"><input class=\"ds-input-error\" type=\"text\" aria-invalid=\"true\" aria-describedby=\"err-1\" /><p id=\"err-1\" class=\"ds-field-error__msg\">Ce champ est requis.</p></div>",
+      "css": ".ds-field-error { display: flex; flex-direction: column; gap: 0.375rem; } .ds-input-error { width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--error-border, #ef4444); border-radius: var(--radius-pill, 9999px); background: var(--card, #ffffff); color: var(--foreground, #2d1b13); font-family: var(--font-sans, 'DM Sans', system-ui, sans-serif); font-size: 0.875rem; } .ds-input-error:focus { outline: none; box-shadow: 0 0 0 2px color-mix(in srgb, var(--error-border, #ef4444) 25%, transparent); } .ds-field-error__msg { margin: 0; font-family: var(--font-sans, 'DM Sans', system-ui, sans-serif); font-size: 0.8125rem; color: var(--error-text, #dc2626); }"
     }
   ],
   "narrative": {
@@ -355,8 +378,18 @@
       },
       {
         "name": "La règle thème sombre",
-        "body": "La classe .dark recalcule fond, carte, bordures et pastilles --meta-* via color-mix. La sidebar espresso reste inchangée entre thèmes.",
+        "body": "La classe .dark recalcule fond, carte, bordures, pastilles --meta-* et tokens --error-* via color-mix. La sidebar espresso reste inchangée entre thèmes.",
         "section": "colors"
+      },
+      {
+        "name": "La règle erreur tokenisée",
+        "body": "Tout état de validation utilise --error-border et --error-text, mappés sur PrimeNG via --p-invalid-*. Pas de --p-red-* ni de hex rouge isolé.",
+        "section": "components"
+      },
+      {
+        "name": "La règle ombre thème-aware",
+        "body": "Sur les surfaces qui basculent clair/sombre, préférer color-mix(in srgb, var(--foreground) N%, transparent) aux ombres rgb(45 27 19 / …) figées.",
+        "section": "elevation"
       }
     ],
     "dos": [
@@ -367,7 +400,9 @@
       "Do tester à 320px : barres d'action visibles, scroll sans masquer les contrôles fixes.",
       "Do respecter 100dvh + safe areas sur les écrans immersifs (mode cuisson).",
       "Do utiliser PrimeNG pour composants complexes, avec overrides dans primeng-overrides.scss (clair et .dark).",
-      "Do charger les images recettes via NgOptimizedImage + recipeImageLoader pour les URLs Supabase."
+      "Do charger les images recettes via NgOptimizedImage + recipeImageLoader pour les URLs Supabase.",
+      "Do utiliser --error-border / --error-text pour tout état de validation — jamais --p-red-* ni hex rouge isolé.",
+      "Do préférer color-mix(in srgb, var(--foreground) N%, transparent) pour les ombres sur surfaces thème-aware."
     ],
     "donts": [
       "Don't écrire du CSS desktop-first puis rétrograder avec max-width — mobile est le défaut.",
@@ -375,7 +410,8 @@
       "Don't empiler ombres et bordures lourdes au repos — la profondeur répond à l'état.",
       "Don't sortir le primary orange sur plus de 2–3 éléments d'action par écran.",
       "Don't hardcoder des gris ou bleus génériques — la palette est chaude et brun-orangée.",
-      "Don't laisser le contenu long pousser les barres d'action hors viewport en mode cuisson."
+      "Don't laisser le contenu long pousser les barres d'action hors viewport en mode cuisson.",
+      "Don't hardcoder des ombres rgb(45 27 19 / …) sur des composants qui doivent fonctionner en thème sombre."
     ]
   }
 }
