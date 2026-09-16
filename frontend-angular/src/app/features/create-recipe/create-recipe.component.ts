@@ -104,7 +104,9 @@ export class CreateRecipeComponent implements OnInit {
   protected readonly fieldErrors = signal<Partial<Record<RequiredRecipeField, string>>>({});
   protected readonly submitting = signal(false);
   protected readonly typesLoading = signal(true);
+  protected readonly typesLoadFailed = signal(false);
   protected readonly recipeLoading = signal(false);
+  protected readonly recipeLoadFailed = signal(false);
   protected readonly imageCleared = signal(false);
   protected readonly servingsDraft = signal(
     String(INITIAL_CREATE_RECIPE_FORM.servings),
@@ -124,6 +126,9 @@ export class CreateRecipeComponent implements OnInit {
   }));
 
   protected readonly pageBusy = computed(() => this.typesLoading() || this.recipeLoading());
+  protected readonly pageBlocked = computed(
+    () => this.typesLoadFailed() || (this.isEditMode() && this.recipeLoadFailed()),
+  );
 
   protected readonly recipePhotoAccept = RECIPE_PHOTO_ACCEPT;
   protected readonly recipePhotoAspectRatio = RECIPE_PHOTO_ASPECT_RATIO;
@@ -357,6 +362,17 @@ export class CreateRecipeComponent implements OnInit {
     });
   }
 
+  protected retryLoadTypes(): void {
+    this.loadRecipeTypes();
+  }
+
+  protected retryLoadRecipe(): void {
+    const editId = this.editRecipeId();
+    if (editId) {
+      this.loadRecipeForEdit(editId);
+    }
+  }
+
   protected onCancel(): void {
     const editId = this.editRecipeId();
     if (editId) {
@@ -424,13 +440,17 @@ export class CreateRecipeComponent implements OnInit {
   }
 
   private loadRecipeTypes(): void {
+    this.typesLoading.set(true);
+    this.typesLoadFailed.set(false);
     this.recipeApi.getRecipeTypes().subscribe({
       next: (types) => {
         this.recipeTypeOptions.set(types.map((t) => ({ label: t.label, value: t.id })));
         this.typesLoading.set(false);
+        this.typesLoadFailed.set(false);
       },
       error: () => {
         this.typesLoading.set(false);
+        this.typesLoadFailed.set(true);
         this.alertService.error(
           'Impossible de charger les types de recette. Lancez les migrations backend (npm run migration:up).',
         );
@@ -460,6 +480,7 @@ export class CreateRecipeComponent implements OnInit {
 
   private loadRecipeForEdit(id: string): void {
     this.recipeLoading.set(true);
+    this.recipeLoadFailed.set(false);
     this.recipeApi.getRecipeById(id).subscribe({
       next: (api) => {
         const userId = this.currentUser.userId();
@@ -478,9 +499,11 @@ export class CreateRecipeComponent implements OnInit {
         this.form.set(mapApiToRecipeForm(api));
         this.servingsDraft.set(String(this.form().servings));
         this.recipeLoading.set(false);
+        this.recipeLoadFailed.set(false);
       },
       error: (err: unknown) => {
         this.recipeLoading.set(false);
+        this.recipeLoadFailed.set(true);
         if (err instanceof HttpErrorResponse && err.status === 404) {
           this.alertService.warning('Recette introuvable.');
         } else {

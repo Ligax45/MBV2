@@ -42,6 +42,9 @@ colors:
   badge-medium-text: "#c2410c"
   badge-hard-bg: "#fee2e2"
   badge-hard-text: "#b91c1c"
+  error-border: "#ef4444"
+  error-text: "#dc2626"
+  error-foreground: "#ffffff"
 typography:
   display:
     fontFamily: "'Playfair Display', Georgia, serif"
@@ -185,10 +188,11 @@ Une palette **chaude et domestique** : fonds crème, texte brun profond, orange 
 - **Favoris actif** : rose (`#fff1f2` fond, `#e11d48` texte, `#fecdd3` bordure).
 - **Favoris inactif** : pêche (`#fff5ed` fond, `#c2410c` texte, `#f0d4b8` bordure) — hover carte et état non favori.
 - **Pastilles métadonnées détail** (`--meta-*`) : type (orange badge), portions (pêche), préparation (vert), cuisson (ambre) — remappées en `.dark` via `color-mix` sur `--card`.
+- **Erreur / validation** (`--error-border`, `--error-text`, `--error-foreground`) : bordures et textes d'erreur formulaires ; mappés sur PrimeNG via `--p-invalid-border` / `--p-invalid-text` dans `primeng-overrides.scss`. En sombre : `#f87171` / `#fca5a5` / `#1a100a`.
 
 ### Thème sombre
 
-La classe `.dark` sur `html` recalcule fond (`#1a100a`), carte (`#231810`), bordures (`rgb(255 255 255 / 10%)`) et pastilles `--meta-*`. La sidebar espresso reste inchangée entre thèmes — ancrage visuel constant.
+La classe `.dark` sur `html` recalcule fond (`#1a100a`), carte (`#231810`), bordures (`rgb(255 255 255 / 10%)`), pastilles `--meta-*` et tokens `--error-*`. La sidebar espresso reste inchangée entre thèmes — ancrage visuel constant. Les badges difficulté (`--badge-*`) restent en valeurs claires (écart connu — à harmoniser si besoin).
 
 ### Named Rules
 
@@ -241,8 +245,9 @@ Système **hybride tonal + ombre légère**. Au repos, les surfaces sont plates 
 
 - **Carte au repos** (`0 2px 12px rgb(45 27 19 / 6%)`) : `p-card` PrimeNG en thème clair.
 - **Carte au survol** (`0 8px 24px rgb(45 27 19 / 10%)` + `translateY(-4px)`) : cartes bibliothèque.
-- **Barre d'action fixe** (`0 -4px 12px rgb(45 27 19 / 6%)`) : navigation bas mode cuisson.
-- **Bottom sheet** (`0 -10px 15px -3px rgb(0 0 0 / 12%), 0 -4px 6px -4px rgb(0 0 0 / 8%)`) : panneau ingrédients.
+- **Barre d'action fixe** (`0 -4px 12px color-mix(in srgb, var(--foreground) 6%, transparent)`) : navigation bas mode cuisson — préférer `color-mix` sur `--foreground` aux ombres `rgb(45 27 19 / …)` figées.
+- **Bottom sheet** (`color-mix` sur `--foreground` 12 % / 8 %) : panneau ingrédients mode cuisson.
+- **Carte au repos (legacy clair)** (`0 2px 12px rgb(45 27 19 / 6%)`) : encore présent sur certaines cartes bibliothèque — migrer vers `color-mix` quand la surface est thème-aware.
 - **Overlay** (`--overlay-scrim`, `rgb(0 0 0 / 50%)`) : fond modal/drawer/mobile menu, z-index 40.
 - **Élévation générique** (`--shadow-elevated`) : `0 8px 24px color-mix(foreground 10%, transparent)` — modales, popovers.
 
@@ -295,7 +300,7 @@ Bordures fines `1px solid var(--border)` pour séparer sans alourdir. Pas de coi
 - **Style :** fond `--card`, bordure `--border`, pilule (`--radius-pill`), padding avec espace icône gauche.
 - **Focus :** bordure `--primary`, glow `0 0 0 2px rgb(245 158 11 / 15%)`.
 - **Placeholder :** `--placeholder-foreground` (AA sur card).
-- **Erreur auth :** `#dc2626` (hors tokens — usage localisé formulaires).
+- **Erreur / invalide :** bordure `--error-border`, texte aide `--error-text` ; PrimeNG `.ng-invalid` et messages via `--p-invalid-*`. Messages d'erreur locaux (create-recipe) utilisent les mêmes tokens — pas de rouge hardcodé.
 
 ### Navigation
 
@@ -317,8 +322,9 @@ Bordures fines `1px solid var(--border)` pour séparer sans alourdir. Pas de coi
 ### Mode cuisson (signature)
 
 - **Écran immersif** hors layout shell, `100dvh`, header `--card` + barre nav fixe bas.
-- **Instruction :** bloc `--card` bordé, `--radius-lg`, texte 1.125rem+ line-height 1.6.
-- **Bottom sheet ingrédients :** `max-height: 70dvh`, coins sup `--radius-lg`, overlay 50%.
+- **Instruction :** bloc `--card` bordé, `--radius-lg`, texte 1.125rem+ line-height 1.6, police `--font-sans`.
+- **Bottom sheet ingrédients :** `max-height: 70dvh`, coins sup `--radius-lg`, overlay `--overlay-scrim`, `inert` sur le contenu principal quand le sheet est ouvert.
+- **Accessibilité :** région `aria-live="polite"` pour annoncer les changements d'étape ; panneau d'étape `#cooking-step-panel` focusable (`tabindex="-1"`) après navigation ; `aria-busy` pendant le chargement ; indicateur de progression avec `role="status"`.
 
 ## Do's and Don'ts
 
@@ -332,6 +338,8 @@ Bordures fines `1px solid var(--border)` pour séparer sans alourdir. Pas de coi
 - **Do** respecter `100dvh` + safe areas sur les écrans immersifs (mode cuisson).
 - **Do** utiliser PrimeNG pour composants complexes, avec overrides dans `primeng-overrides.scss` (clair et `.dark`).
 - **Do** charger les images recettes via `NgOptimizedImage` + `recipeImageLoader` pour les URLs Supabase.
+- **Do** utiliser `--error-border` / `--error-text` pour tout état de validation — jamais `--p-red-*` ni hex rouge isolé.
+- **Do** préférer `color-mix(in srgb, var(--foreground) N%, transparent)` pour les ombres sur surfaces thème-aware (mode cuisson, create-recipe).
 
 ### Don't:
 
@@ -341,3 +349,4 @@ Bordures fines `1px solid var(--border)` pour séparer sans alourdir. Pas de coi
 - **Don't** sortir le primary orange sur plus de 2–3 éléments d'action par écran.
 - **Don't** hardcoder des gris ou bleus génériques — la palette est chaude et brun-orangée.
 - **Don't** laisser le contenu long pousser les barres d'action hors viewport en mode cuisson.
+- **Don't** hardcoder des ombres `rgb(45 27 19 / …)` sur des composants qui doivent fonctionner en thème sombre — elles disparaissent visuellement sur fond sombre.

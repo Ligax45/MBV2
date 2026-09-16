@@ -76,6 +76,17 @@ export class RecipeCookingModeComponent implements OnInit {
     return `${this.currentStepIndex() + 1} / ${total}`;
   });
 
+  protected readonly stepAnnouncement = computed(() => {
+    const step = this.currentStep();
+    const total = this.totalSteps();
+    if (!step || total === 0) {
+      return '';
+    }
+    const title = step.title.trim();
+    const titlePart = title ? ` : ${title}` : '';
+    return `Étape ${step.order} sur ${total}${titlePart}`;
+  });
+
   protected readonly hasIngredients = computed(
     () => (this.recipe()?.ingredients.length ?? 0) > 0,
   );
@@ -106,6 +117,7 @@ export class RecipeCookingModeComponent implements OnInit {
     if (this.isFirstStep()) return;
     this.closeIngredients();
     this.currentStepIndex.update((index) => index - 1);
+    this.focusCurrentStep();
   }
 
   protected goToNextStep(): void {
@@ -120,6 +132,7 @@ export class RecipeCookingModeComponent implements OnInit {
     }
 
     this.currentStepIndex.update((index) => index + 1);
+    this.focusCurrentStep();
   }
 
   protected openIngredients(): void {
@@ -148,6 +161,15 @@ export class RecipeCookingModeComponent implements OnInit {
     }
 
     void this.router.navigate(['/recette', detail.id]);
+  }
+
+  private focusCurrentStep(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+    setTimeout(() => {
+      document.getElementById('cooking-step-panel')?.focus({ preventScroll: true });
+    }, 0);
   }
 
   private loadRecipe(id: string): void {

@@ -5,8 +5,8 @@
 
 html.light,
 html.dark {
-  --p-invalid-border: #ef4444;
-  --p-invalid-text: #dc2626;
+  --p-invalid-border: var(--error-border);
+  --p-invalid-text: var(--error-text);
   --p-focus-glow: rgb(245 158 11 / 15%);
   --p-overlay-shadow: 0 8px 24px rgb(45 27 19 / 12%);
 }
