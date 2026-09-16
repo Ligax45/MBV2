@@ -25,14 +25,17 @@
 
       <h3 class="recipe-card__title">{{ recipe().title }}</h3>
 
-      <div class="recipe-card__rating" [attr.aria-label]="'Note ' + starRating() + ' sur 5'">
-        <span class="recipe-card__stars" aria-hidden="true">
-          @for (star of starIndexes; track star) {
-            <i [class]="starIcon(star)"></i>
-          }
-        </span>
-        <span class="recipe-card__rating-value">{{ starRating() | number: '1.1-1' }}</span>
-      </div>
+      @if (showRating()) {
+        <div class="recipe-card__rating">
+          <app-recipe-star-rating
+            [rating]="recipe().averageRating ?? null"
+            [ariaLabel]="'Note ' + recipe().averageRating + ' sur 5'"
+          />
+          <span class="recipe-card__rating-count">
+            ({{ recipe().ratingCount }} avis)
+          </span>
+        </div>
+      }
 
       <div class="recipe-card__meta">
         <span class="recipe-card__time">

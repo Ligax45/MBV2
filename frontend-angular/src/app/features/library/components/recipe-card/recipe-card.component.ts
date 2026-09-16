@@ -1,4 +1,4 @@
-﻿import { DecimalPipe, NgOptimizedImage } from '@angular/common';
+﻿import { NgOptimizedImage } from '@angular/common';
 import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Card } from 'primeng/card';
@@ -12,14 +12,13 @@ import {
   getDifficultyLabel,
 } from '@core/utils/recipe-format.util';
 import { isPubliclyListed } from '@core/utils/recipe-visibility.util';
+import { RecipeStarRatingComponent } from '@shared/components/recipe-star-rating/recipe-star-rating.component';
 import { AlertService } from '@shared/services/alert.service';
 import { ConfirmDialogService } from '@shared/services/confirm-dialog.service';
 
-const STAR_COUNT = 5;
-
 @Component({
   selector: 'app-recipe-card',
-  imports: [RouterLink, Card, DecimalPipe, NgOptimizedImage],
+  imports: [RouterLink, Card, NgOptimizedImage, RecipeStarRatingComponent],
   templateUrl: './recipe-card.component.html',
   styleUrl: './recipe-card.component.scss',
 })
@@ -51,20 +50,9 @@ export class RecipeCardComponent {
     return null;
   });
   protected readonly togglingFavorite = signal(false);
-  protected readonly starIndexes = Array.from({ length: STAR_COUNT }, (_, i) => i + 1);
-
-  protected readonly starRating = computed(() => {
-    const rating = this.recipe().averageRating;
-    if (rating != null) {
-      return Math.min(STAR_COUNT, Math.max(0, rating));
-    }
-
-    let hash = 0;
-    for (const char of this.recipe().id) {
-      hash = char.charCodeAt(0) + ((hash << 5) - hash);
-    }
-    return Math.round((4 + (Math.abs(hash) % 10) / 10) * 10) / 10;
-  });
+  protected readonly showRating = computed(
+    () => (this.recipe().ratingCount ?? 0) > 0 && this.recipe().averageRating != null,
+  );
 
   protected formatDate(isoDate: string): string {
     return formatDateFr(isoDate);
@@ -76,17 +64,6 @@ export class RecipeCardComponent {
 
   protected difficultyLabel(difficulty: RecipeListItem['difficulty']): string {
     return getDifficultyLabel(difficulty);
-  }
-
-  protected starIcon(starIndex: number): string {
-    const rating = this.starRating();
-    if (rating >= starIndex) {
-      return 'pi pi-star-fill';
-    }
-    if (rating >= starIndex - 0.5) {
-      return 'pi pi-star-half-fill';
-    }
-    return 'pi pi-star';
   }
 
   toggleLike(event: Event): void {

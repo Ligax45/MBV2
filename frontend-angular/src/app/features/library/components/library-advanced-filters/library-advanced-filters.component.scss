@@ -1,0 +1,45 @@
+.library-advanced-filters {
+  display: grid;
+  gap: 1rem;
+  margin-top: 0.75rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--card) 92%, var(--muted));
+}
+
+.library-advanced-filters__group {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.library-advanced-filters__label {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--secondary);
+}
+
+.library-advanced-filters__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.library-advanced-filters__chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 0.875rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--background);
+  color: var(--foreground);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.library-advanced-filters__chip--active {
+  border-color: color-mix(in srgb, var(--primary) 45%, var(--border));
+  background: color-mix(in srgb, var(--primary) 12%, var(--background));
+}

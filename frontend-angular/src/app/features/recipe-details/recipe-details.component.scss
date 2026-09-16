@@ -285,6 +285,210 @@
   overflow-wrap: anywhere;
 }
 
+.recipe-details__community-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: 0.75rem;
+}
+
+.recipe-details__community-rating-count {
+  font-size: 0.875rem;
+  color: var(--secondary);
+}
+
+.recipe-details__rating-section {
+  margin-top: 0.75rem;
+}
+
+.recipe-details__complete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background-color: var(--card);
+  color: var(--foreground);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.recipe-details__complete-btn:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--primary) 35%, var(--border));
+  background-color: var(--accent);
+}
+
+.recipe-details__complete-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--ring) 50%, transparent);
+  outline-offset: 2px;
+}
+
+.recipe-details__complete-btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.recipe-details__user-rating {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background-color: var(--card);
+}
+
+.recipe-details__user-rating-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.recipe-details__comment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.recipe-details__comment-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.recipe-details__comment-input {
+  width: 100%;
+  min-height: 6rem;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--background);
+  color: var(--foreground);
+  font: inherit;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.recipe-details__comment-input:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--ring) 50%, transparent);
+  outline-offset: 2px;
+}
+
+.recipe-details__comment-input:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.recipe-details__comment-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.recipe-details__comment-hint {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+.recipe-details__comment-save {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.recipe-details__comment-save:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--primary) 88%, #000);
+}
+
+.recipe-details__comment-save:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.recipe-details__comments {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.recipe-details__comments-title {
+  margin: 0 0 1rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.recipe-details__comments-state {
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem 0;
+}
+
+.recipe-details__comments-empty {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 0.9375rem;
+}
+
+.recipe-details__comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recipe-details__comment-item {
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+}
+
+.recipe-details__comment-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.recipe-details__comment-author {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.recipe-details__comment-date {
+  font-size: 0.8125rem;
+  color: var(--muted-foreground);
+}
+
+.recipe-details__comment-body {
+  margin: 0;
+  color: var(--secondary);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
 .recipe-details__favorite {
   display: flex;
   align-items: center;

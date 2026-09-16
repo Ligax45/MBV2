@@ -13,6 +13,8 @@ export interface RecipeListItem {
   recipeTypeId: string;
   recipeTypeLabel: string;
   averageRating?: number | null;
+  ratingCount?: number;
+  favoriteCount?: number;
   isFavorited?: boolean;
   visibility: RecipeVisibility;
   moderationStatus: RecipeModerationStatus;

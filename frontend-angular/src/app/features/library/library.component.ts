@@ -14,14 +14,24 @@ import {
 } from '@core/utils/recipe-search.util';
 import { AlertService } from '@shared/services/alert.service';
 
+import { LibraryAdvancedFiltersComponent } from './components/library-advanced-filters/library-advanced-filters.component';
 import { RecipeCardComponent } from './components/recipe-card/recipe-card.component';
 import { RecipeSearchBarComponent } from './components/recipe-search-bar/recipe-search-bar.component';
+import {
+  DEFAULT_LIBRARY_ADVANCED_FILTERS,
+  libraryAdvancedFiltersCount,
+  libraryAdvancedFiltersToListQuery,
+  libraryAdvancedFiltersToQuery,
+  parseLibraryAdvancedFiltersFromParams,
+  type LibraryAdvancedFiltersState,
+} from './models/library-advanced-filters.model';
 
 @Component({
   selector: 'app-library',
   imports: [
     DragDropModule,
     RecipeSearchBarComponent,
+    LibraryAdvancedFiltersComponent,
     RecipeCardComponent,
     ProgressSpinner,
   ],
@@ -45,6 +55,18 @@ export class LibraryComponent implements OnInit {
   protected readonly favoritesOnly = signal(false);
   protected readonly mineOnly = signal(false);
   protected readonly selectedRecipeTypeId = signal<string | null>(null);
+  protected readonly advancedFiltersOpen = signal(false);
+  protected readonly advancedFilters = signal<LibraryAdvancedFiltersState>(
+    DEFAULT_LIBRARY_ADVANCED_FILTERS,
+  );
+
+  protected readonly isPublicLibrary = computed(
+    () => !this.favoritesOnly() && !this.mineOnly(),
+  );
+
+  protected readonly advancedFiltersActiveCount = computed(() =>
+    libraryAdvancedFiltersCount(this.advancedFilters()),
+  );
 
   protected readonly visibleRecipeTypes = computed(() =>
     this.recipeTypes().filter(
@@ -143,7 +165,8 @@ export class LibraryComponent implements OnInit {
   protected readonly hasActiveFilters = computed(
     () =>
       this.searchQuery().trim().length > 0 ||
-      this.selectedRecipeTypeId() !== null,
+      this.selectedRecipeTypeId() !== null ||
+      (this.isPublicLibrary() && this.advancedFiltersActiveCount() > 0),
   );
 
   protected readonly canReorderFavorites = computed(
@@ -170,6 +193,24 @@ export class LibraryComponent implements OnInit {
   ngOnInit(): void {
     this.loadRecipeTypes();
 
+    this.route.queryParamMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        if (!this.isPublicLibrary()) {
+          return;
+        }
+        this.advancedFilters.set(
+          parseLibraryAdvancedFiltersFromParams({
+            sort: params.get('sort') ?? undefined,
+            difficulty: params.get('difficulty') ?? undefined,
+            maxTotalMinutes: params.get('maxTotalMinutes') ?? undefined,
+            minTotalMinutes: params.get('minTotalMinutes') ?? undefined,
+            minRating: params.get('minRating') ?? undefined,
+          }),
+        );
+        this.loadRecipes();
+      });
+
     this.route.data.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((data) => {
       const favoritesOnly = data['favoritesOnly'] === true;
       const mineOnly = data['mineOnly'] === true;
@@ -187,6 +228,17 @@ export class LibraryComponent implements OnInit {
       }
       this.favoritesOnly.set(favoritesOnly);
       this.mineOnly.set(mineOnly);
+      this.advancedFilters.set(
+        parseLibraryAdvancedFiltersFromParams({
+          sort: this.route.snapshot.queryParamMap.get('sort') ?? undefined,
+          difficulty: this.route.snapshot.queryParamMap.get('difficulty') ?? undefined,
+          maxTotalMinutes:
+            this.route.snapshot.queryParamMap.get('maxTotalMinutes') ?? undefined,
+          minTotalMinutes:
+            this.route.snapshot.queryParamMap.get('minTotalMinutes') ?? undefined,
+          minRating: this.route.snapshot.queryParamMap.get('minRating') ?? undefined,
+        }),
+      );
       this.loadRecipes();
     });
   }
@@ -208,6 +260,35 @@ export class LibraryComponent implements OnInit {
   clearFilters(): void {
     this.searchQuery.set('');
     this.selectedRecipeTypeId.set(null);
+    if (this.isPublicLibrary()) {
+      this.resetAdvancedFilters();
+    }
+  }
+
+  toggleAdvancedFilters(): void {
+    this.advancedFiltersOpen.update((open) => !open);
+  }
+
+  onAdvancedFiltersChange(filters: LibraryAdvancedFiltersState): void {
+    this.advancedFilters.set(filters);
+    if (!this.isPublicLibrary()) {
+      return;
+    }
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: libraryAdvancedFiltersToQuery(filters),
+      replaceUrl: true,
+    });
+  }
+
+  resetAdvancedFilters(): void {
+    this.advancedFilters.set(DEFAULT_LIBRARY_ADVANCED_FILTERS);
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {},
+      replaceUrl: true,
+    });
+    this.loadRecipes();
   }
 
   onFavoriteReorder(event: CdkDragDrop<RecipeListItem[]>): void {
@@ -258,12 +339,15 @@ export class LibraryComponent implements OnInit {
     this.loading.set(true);
     this.loadFailed.set(false);
 
-    this.recipeData
-      .getRecipes({
-        favoritesOnly: this.favoritesOnly(),
-        mineOnly: this.mineOnly(),
-      })
-      .subscribe({
+    const query = {
+      favoritesOnly: this.favoritesOnly(),
+      mineOnly: this.mineOnly(),
+      ...(this.isPublicLibrary()
+        ? libraryAdvancedFiltersToListQuery(this.advancedFilters())
+        : {}),
+    };
+
+    this.recipeData.getRecipes(query).subscribe({
       next: (data) => {
         this.recipes.set(data);
         this.loading.set(false);

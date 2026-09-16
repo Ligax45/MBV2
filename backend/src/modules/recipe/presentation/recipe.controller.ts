@@ -30,7 +30,11 @@ import { GetRecipeTypesUseCase } from '../application/use-cases/get-recipe-types
 import { GetRecipesUseCase } from '../application/use-cases/get-recipes.usecase';
 import { RejectRecipeUseCase } from '../application/use-cases/reject-recipe.usecase';
 import { RemoveRecipeFavoriteUseCase } from '../application/use-cases/remove-recipe-favorite.usecase';
+import { MarkRecipeCompletedUseCase } from '../application/use-cases/mark-recipe-completed.usecase';
 import { ReorderRecipeFavoritesUseCase } from '../application/use-cases/reorder-recipe-favorites.usecase';
+import { GetRecipeCommentsUseCase } from '../application/use-cases/get-recipe-comments.usecase';
+import { SetRecipeCommentUseCase } from '../application/use-cases/set-recipe-comment.usecase';
+import { SetRecipeRatingUseCase } from '../application/use-cases/set-recipe-rating.usecase';
 import { UpdateRecipeUseCase } from '../application/use-cases/update-recipe.usecase';
 import { UploadRecipeImageUseCase } from '../application/use-cases/upload-recipe-image.usecase';
 import type { CreateRecipeParams } from '../domain/repositories/recipe.repository';
@@ -50,6 +54,10 @@ export class RecipeController {
     private readonly addRecipeFavorite: AddRecipeFavoriteUseCase,
     private readonly removeRecipeFavorite: RemoveRecipeFavoriteUseCase,
     private readonly reorderRecipeFavorites: ReorderRecipeFavoritesUseCase,
+    private readonly markRecipeCompleted: MarkRecipeCompletedUseCase,
+    private readonly setRecipeRating: SetRecipeRatingUseCase,
+    private readonly setRecipeComment: SetRecipeCommentUseCase,
+    private readonly getRecipeComments: GetRecipeCommentsUseCase,
     private readonly approveRecipe: ApproveRecipeUseCase,
     private readonly rejectRecipe: RejectRecipeUseCase,
   ) {}
@@ -60,12 +68,22 @@ export class RecipeController {
     @Query('favorites') favorites?: string,
     @Query('mine') mine?: string,
     @Query('pending') pending?: string,
+    @Query('sort') sort?: string,
+    @Query('difficulty') difficulty?: string,
+    @Query('maxTotalMinutes') maxTotalMinutes?: string,
+    @Query('minTotalMinutes') minTotalMinutes?: string,
+    @Query('minRating') minRating?: string,
     @CurrentUser() user?: AuthenticatedUser,
   ) {
     return this.getRecipes.execute({
       favoritesOnly: favorites === 'true',
       mineOnly: mine === 'true',
       pendingOnly: pending === 'true',
+      sort,
+      difficulty,
+      maxTotalMinutes,
+      minTotalMinutes,
+      minRating,
       user,
     });
   }
@@ -87,6 +105,15 @@ export class RecipeController {
     @CurrentUser() user: AuthenticatedUser,
   ) {
     return this.reorderRecipeFavorites.execute(body?.recipeIds ?? [], user);
+  }
+
+  @Get(':id/comments')
+  @UseGuards(OptionalJwtAuthGuard)
+  async listComments(
+    @Param('id') id: string,
+    @CurrentUser() user?: AuthenticatedUser,
+  ) {
+    return this.getRecipeComments.execute(id, user);
   }
 
   @Get(':id')
@@ -142,6 +169,35 @@ export class RecipeController {
     @CurrentUser() user: AuthenticatedUser,
   ) {
     return this.removeRecipeFavorite.execute(id, user);
+  }
+
+  @Post(':id/completed')
+  @UseGuards(JwtAuthGuard)
+  async markCompleted(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.markRecipeCompleted.execute(id, user);
+  }
+
+  @Put(':id/rating')
+  @UseGuards(JwtAuthGuard)
+  async setRating(
+    @Param('id') id: string,
+    @Body() body: { rating?: number },
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.setRecipeRating.execute(id, user, body?.rating);
+  }
+
+  @Put(':id/comment')
+  @UseGuards(JwtAuthGuard)
+  async setComment(
+    @Param('id') id: string,
+    @Body() body: { comment?: string },
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.setRecipeComment.execute(id, user, body?.comment);
   }
 
   @Post(':id/approve')

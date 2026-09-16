@@ -1,0 +1,46 @@
+.recipe-star-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.recipe-star-rating__stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.125rem;
+  color: color-mix(in srgb, var(--primary) 72%, var(--secondary));
+}
+
+.recipe-star-rating__stars--interactive {
+  gap: 0.25rem;
+}
+
+.recipe-star-rating__star-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.recipe-star-rating__star-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.recipe-star-rating__star-btn:hover:not(:disabled) {
+  background: var(--favorite-inactive-bg);
+  color: var(--favorite-text);
+}
+
+.recipe-star-rating__value {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--foreground);
+}

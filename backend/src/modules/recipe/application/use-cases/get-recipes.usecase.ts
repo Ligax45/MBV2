@@ -6,6 +6,10 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import type { AuthenticatedUser } from '../../../auth/domain/auth-user.model';
+import {
+  applyRecipeListQuery,
+  parseRecipeListQuery,
+} from '../recipe-list-query.util';
 import { toRecipeListItemResponse } from '../recipe-response.util';
 import {
   canModerateRecipes,
@@ -13,6 +17,8 @@ import {
 } from '../recipe-authorization.util';
 import { RECIPE_FAVORITE_REPOSITORY } from '../../domain/repositories/recipe-favorite.repository';
 import type { RecipeFavoriteRepository } from '../../domain/repositories/recipe-favorite.repository';
+import { RECIPE_RATING_REPOSITORY } from '../../domain/repositories/recipe-rating.repository';
+import type { RecipeRatingRepository } from '../../domain/repositories/recipe-rating.repository';
 import { RECIPE_REPOSITORY } from '../../domain/repositories/recipe.repository';
 import type { RecipeRepository } from '../../domain/repositories/recipe.repository';
 
@@ -21,6 +27,11 @@ export interface GetRecipesOptions {
   mineOnly?: boolean;
   pendingOnly?: boolean;
   user?: AuthenticatedUser;
+  sort?: string;
+  difficulty?: string;
+  maxTotalMinutes?: string;
+  minTotalMinutes?: string;
+  minRating?: string;
 }
 
 @Injectable()
@@ -29,6 +40,8 @@ export class GetRecipesUseCase {
     @Inject(RECIPE_REPOSITORY) private readonly recipeRepo: RecipeRepository,
     @Inject(RECIPE_FAVORITE_REPOSITORY)
     private readonly favoriteRepo: RecipeFavoriteRepository,
+    @Inject(RECIPE_RATING_REPOSITORY)
+    private readonly ratingRepo: RecipeRatingRepository,
   ) {}
 
   async execute(options: GetRecipesOptions = {}) {
@@ -39,6 +52,7 @@ export class GetRecipesUseCase {
       user,
     } = options;
     const userId = user?.id;
+    const listQuery = parseRecipeListQuery(options);
 
     if (pendingOnly) {
       if (!user) {
@@ -65,6 +79,19 @@ export class GetRecipesUseCase {
       );
     }
 
+    const hasAdvancedFilters =
+      listQuery.sort !== 'newest' ||
+      listQuery.difficulties.length > 0 ||
+      listQuery.maxTotalMinutes != null ||
+      listQuery.minTotalMinutes != null ||
+      listQuery.minRating != null;
+
+    if (hasAdvancedFilters && (favoritesOnly || mineOnly || pendingOnly)) {
+      throw new BadRequestException(
+        'Les filtres avancés ne sont disponibles que sur la bibliothèque publique',
+      );
+    }
+
     const recipes = pendingOnly
       ? await this.recipeRepo.findAll({ pendingPublic: true })
       : mineOnly
@@ -75,13 +102,39 @@ export class GetRecipesUseCase {
             )
           : await this.recipeRepo.findAll({ listedPublic: true });
 
+    const recipeIds = recipes.map((recipe) => recipe.id);
+    const [favoriteCounts, ratingStats] = await Promise.all([
+      this.favoriteRepo.getFavoriteCountsByRecipeIds(recipeIds),
+      this.ratingRepo.getStatsForRecipeIds(recipeIds),
+    ]);
+
     const favoriteIds = userId
       ? new Set(await this.favoriteRepo.findRecipeIdsByUserId(userId))
       : null;
 
-    return recipes.map((recipe) =>
+    const enriched = recipes.map((recipe) => {
+      const stats = ratingStats.get(recipe.id) ?? {
+        averageRating: null,
+        ratingCount: 0,
+      };
+      return {
+        recipe,
+        favoriteCount: favoriteCounts.get(recipe.id) ?? 0,
+        averageRating: stats.averageRating,
+        ratingCount: stats.ratingCount,
+      };
+    });
+
+    const filtered = favoritesOnly || mineOnly || pendingOnly
+      ? enriched
+      : applyRecipeListQuery(enriched, listQuery);
+
+    return filtered.map(({ recipe, favoriteCount, averageRating, ratingCount }) =>
       toRecipeListItemResponse(recipe, {
         isFavorite: favoriteIds?.has(recipe.id) ?? false,
+        favoriteCount,
+        averageRating,
+        ratingCount,
       }),
     );
   }

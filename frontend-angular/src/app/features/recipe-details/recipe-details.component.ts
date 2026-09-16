@@ -5,6 +5,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ProgressSpinner } from 'primeng/progressspinner';
 
+import type { RecipeComment } from '@core/models/recipe-comment.model';
 import type { RecipeDetail } from '@core/models/recipe-detail.model';
 import { CurrentUserService } from '@core/services/current-user.service';
 import { RecipeDataService } from '@core/services/recipe-data.service';
@@ -15,14 +16,17 @@ import {
   getDifficultyLabel,
 } from '@core/utils/recipe-format.util';
 import { isPubliclyListed } from '@core/utils/recipe-visibility.util';
+import { RecipeStarRatingComponent } from '@shared/components/recipe-star-rating/recipe-star-rating.component';
 import { AlertService } from '@shared/services/alert.service';
 import { ConfirmDialogService } from '@shared/services/confirm-dialog.service';
 
 type DetailTab = 'ingredients' | 'steps';
 
+const RECIPE_COMMENT_MAX_LENGTH = 2000;
+
 @Component({
   selector: 'app-recipe-details',
-  imports: [NgOptimizedImage, RouterLink, ProgressSpinner],
+  imports: [NgOptimizedImage, RouterLink, ProgressSpinner, RecipeStarRatingComponent],
   templateUrl: './recipe-details.component.html',
   styleUrl: './recipe-details.component.scss',
 })
@@ -40,6 +44,13 @@ export class RecipeDetailsComponent implements OnInit {
   protected readonly deleting = signal(false);
   protected readonly isLiked = computed(() => this.recipe()?.isFavorited ?? false);
   protected readonly togglingFavorite = signal(false);
+  protected readonly markingCompleted = signal(false);
+  protected readonly savingRating = signal(false);
+  protected readonly savingComment = signal(false);
+  protected readonly loadingComments = signal(false);
+  protected readonly comments = signal<RecipeComment[]>([]);
+  protected readonly commentDraft = signal('');
+  protected readonly commentMaxLength = RECIPE_COMMENT_MAX_LENGTH;
   protected readonly activeTab = signal<DetailTab>('ingredients');
   protected readonly recipeId = signal<string | null>(null);
 
@@ -62,6 +73,20 @@ export class RecipeDetailsComponent implements OnInit {
   protected readonly canFavorite = computed(() => {
     const detail = this.recipe();
     return !!detail && isPubliclyListed(detail);
+  });
+
+  protected readonly canRate = computed(() => {
+    const detail = this.recipe();
+    return !!detail && isPubliclyListed(detail);
+  });
+
+  protected readonly hasCompleted = computed(() => this.recipe()?.hasCompleted ?? false);
+
+  protected readonly userRating = computed(() => this.recipe()?.userRating ?? null);
+
+  protected readonly showCommunityRating = computed(() => {
+    const detail = this.recipe();
+    return !!detail && (detail.ratingCount ?? 0) > 0 && detail.averageRating != null;
   });
 
   protected readonly statusBadge = computed(() => {
@@ -163,6 +188,100 @@ export class RecipeDetailsComponent implements OnInit {
     const id = this.recipeId();
     if (!id) return;
     this.loadRecipe(id);
+  }
+
+  protected markCompleted(): void {
+    const detail = this.recipe();
+    if (!detail || this.markingCompleted() || this.hasCompleted() || !this.canRate()) {
+      return;
+    }
+
+    if (!this.currentUser.isAuthenticated()) {
+      void this.router.navigate(['/connexion'], {
+        queryParams: { returnUrl: this.router.url },
+      });
+      return;
+    }
+
+    this.markingCompleted.set(true);
+
+    this.recipeData.markRecipeCompleted(detail.id).subscribe({
+      next: () => {
+        this.markingCompleted.set(false);
+        this.recipe.set({ ...detail, hasCompleted: true });
+      },
+      error: () => {
+        this.markingCompleted.set(false);
+        this.alertService.error('Impossible d\u2019enregistrer la réalisation.');
+      },
+    });
+  }
+
+  protected onCommentInput(event: Event): void {
+    const value = (event.target as HTMLTextAreaElement).value;
+    this.commentDraft.set(value.slice(0, RECIPE_COMMENT_MAX_LENGTH));
+  }
+
+  protected saveComment(): void {
+    const detail = this.recipe();
+    if (!detail || this.savingComment() || !this.hasCompleted() || !this.canRate()) {
+      return;
+    }
+
+    if (!this.currentUser.isAuthenticated()) {
+      void this.router.navigate(['/connexion'], {
+        queryParams: { returnUrl: this.router.url },
+      });
+      return;
+    }
+
+    this.savingComment.set(true);
+
+    this.recipeData.setRecipeComment(detail.id, this.commentDraft()).subscribe({
+      next: (userComment) => {
+        this.savingComment.set(false);
+        this.commentDraft.set(userComment ?? '');
+        this.recipe.set({ ...detail, userComment });
+        this.loadComments(detail.id);
+        this.alertService.success('Commentaire enregistré.');
+      },
+      error: () => {
+        this.savingComment.set(false);
+        this.alertService.error('Impossible d\u2019enregistrer votre commentaire.');
+      },
+    });
+  }
+
+  protected onUserRatingChange(rating: number): void {
+    const detail = this.recipe();
+    if (!detail || this.savingRating() || !this.hasCompleted() || !this.canRate()) {
+      return;
+    }
+
+    if (!this.currentUser.isAuthenticated()) {
+      void this.router.navigate(['/connexion'], {
+        queryParams: { returnUrl: this.router.url },
+      });
+      return;
+    }
+
+    this.savingRating.set(true);
+
+    this.recipeData.setRecipeRating(detail.id, rating).subscribe({
+      next: (result) => {
+        this.savingRating.set(false);
+        this.recipe.set({
+          ...detail,
+          userRating: result.userRating,
+          averageRating: result.averageRating,
+          ratingCount: result.ratingCount,
+        });
+      },
+      error: () => {
+        this.savingRating.set(false);
+        this.alertService.error('Impossible d\u2019enregistrer votre note.');
+      },
+    });
   }
 
   protected toggleLike(): void {
@@ -272,8 +391,14 @@ export class RecipeDetailsComponent implements OnInit {
     this.recipeData.getRecipeById(id).subscribe({
       next: (data) => {
         this.recipe.set(data);
+        this.commentDraft.set(data.userComment ?? '');
         this.activeTab.set(data.ingredients.length > 0 ? 'ingredients' : 'steps');
         this.loading.set(false);
+        if (isPubliclyListed(data)) {
+          this.loadComments(data.id);
+        } else {
+          this.comments.set([]);
+        }
       },
       error: (err: unknown) => {
         this.pageFailed.set(true);
@@ -285,6 +410,21 @@ export class RecipeDetailsComponent implements OnInit {
             'Impossible de charger la recette. Vérifiez que le backend tourne.',
           );
         }
+      },
+    });
+  }
+
+  private loadComments(recipeId: string): void {
+    this.loadingComments.set(true);
+
+    this.recipeData.getRecipeComments(recipeId).subscribe({
+      next: (comments) => {
+        this.comments.set(comments);
+        this.loadingComments.set(false);
+      },
+      error: () => {
+        this.comments.set([]);
+        this.loadingComments.set(false);
       },
     });
   }
