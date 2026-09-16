@@ -108,4 +108,13 @@ export class RecipeApiService {
       `${this.baseUrl}/recipes/${id}/favorite`,
     );
   }
+
+  reorderRecipeFavorites(
+    recipeIds: string[],
+  ): Observable<{ success: boolean }> {
+    return this.http.put<{ success: boolean }>(
+      `${this.baseUrl}/recipes/favorites/order`,
+      { recipeIds },
+    );
+  }
 }

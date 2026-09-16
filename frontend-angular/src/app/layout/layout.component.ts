@@ -5,6 +5,7 @@ import { MobileMenuComponent } from '@layout/components/mobile-menu/mobile-menu.
 import { SidebarComponent } from '@layout/components/sidebar/sidebar.component';
 import { TopbarComponent } from '@layout/components/topbar/topbar.component';
 import { AlertContainerComponent } from '@shared/components/alert-container/alert-container.component';
+import { ConfirmDialogComponent } from '@shared/components/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-layout',
@@ -14,6 +15,7 @@ import { AlertContainerComponent } from '@shared/components/alert-container/aler
     MobileMenuComponent,
     RouterOutlet,
     AlertContainerComponent,
+    ConfirmDialogComponent,
   ],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.scss',

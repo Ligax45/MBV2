@@ -87,4 +87,11 @@ export class RecipeDataService {
       : this.api.removeRecipeFavorite(id);
     return request$.pipe(map(() => undefined));
   }
+
+  reorderRecipeFavorites(recipeIds: string[]): Observable<void> {
+    if (environment.useMockData) {
+      return this.bouchon.reorderRecipeFavorites(recipeIds);
+    }
+    return this.api.reorderRecipeFavorites(recipeIds).pipe(map(() => undefined));
+  }
 }

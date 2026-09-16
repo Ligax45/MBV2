@@ -1,6 +1,7 @@
 import type { EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -25,7 +26,7 @@ export class MikroOrmRecipeFavoriteRepository implements RecipeFavoriteRepositor
       { user: userId },
       {
         populate: ['recipe'],
-        orderBy: { createdAt: 'desc' },
+        orderBy: { sortOrder: 'asc', createdAt: 'asc' },
       },
     );
     return rows.map((row) => row.recipe.id);
@@ -36,7 +37,7 @@ export class MikroOrmRecipeFavoriteRepository implements RecipeFavoriteRepositor
       { user: userId },
       {
         populate: ['recipe', 'recipe.recipeType', 'recipe.author'],
-        orderBy: { createdAt: 'desc' },
+        orderBy: { sortOrder: 'asc', createdAt: 'asc' },
       },
     );
     return rows.map((row) => this.toDomain(row.recipe));
@@ -62,10 +63,48 @@ export class MikroOrmRecipeFavoriteRepository implements RecipeFavoriteRepositor
     }
 
     const em = this.favoriteRepo.getEntityManager();
+    const nextSortOrder = await this.getNextSortOrder(userId);
     const favorite = new RecipeFavoriteOrmEntity();
     favorite.user = em.getReference(UserOrmEntity, userId);
     favorite.recipe = em.getReference(RecipeOrmEntity, recipeId);
+    favorite.sortOrder = nextSortOrder;
     em.persist(favorite);
+    await em.flush();
+  }
+
+  async reorderFavorites(userId: string, recipeIds: string[]): Promise<void> {
+    const rows = await this.favoriteRepo.find(
+      { user: userId },
+      { populate: ['recipe'] },
+    );
+    const existingIds = new Set(rows.map((row) => row.recipe.id));
+
+    if (recipeIds.length !== existingIds.size) {
+      throw new BadRequestException(
+        'La liste doit contenir exactement vos recettes favorites',
+      );
+    }
+
+    for (const recipeId of recipeIds) {
+      if (!existingIds.has(recipeId)) {
+        throw new BadRequestException(
+          'La liste contient une recette qui n’est pas dans vos favoris',
+        );
+      }
+    }
+
+    const rowByRecipeId = new Map(
+      rows.map((row) => [row.recipe.id, row] as const),
+    );
+    const em = this.favoriteRepo.getEntityManager();
+
+    recipeIds.forEach((recipeId, index) => {
+      const row = rowByRecipeId.get(recipeId);
+      if (row) {
+        row.sortOrder = index;
+      }
+    });
+
     await em.flush();
   }
 
@@ -77,6 +116,17 @@ export class MikroOrmRecipeFavoriteRepository implements RecipeFavoriteRepositor
     if (!deleted) {
       throw new NotFoundException('Favori introuvable');
     }
+  }
+
+  private async getNextSortOrder(userId: string): Promise<number> {
+    const rows = await this.favoriteRepo.find(
+      { user: userId },
+      { fields: ['sortOrder'] },
+    );
+    if (rows.length === 0) {
+      return 0;
+    }
+    return Math.max(...rows.map((row) => row.sortOrder)) + 1;
   }
 
   private toDomain(r: RecipeOrmEntity): Recipe {

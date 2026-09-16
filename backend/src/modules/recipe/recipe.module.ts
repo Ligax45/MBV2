@@ -13,6 +13,7 @@ import { GetRecipeTypesUseCase } from './application/use-cases/get-recipe-types.
 import { GetRecipesUseCase } from './application/use-cases/get-recipes.usecase';
 import { RejectRecipeUseCase } from './application/use-cases/reject-recipe.usecase';
 import { RemoveRecipeFavoriteUseCase } from './application/use-cases/remove-recipe-favorite.usecase';
+import { ReorderRecipeFavoritesUseCase } from './application/use-cases/reorder-recipe-favorites.usecase';
 import { RECIPE_FAVORITE_REPOSITORY } from './domain/repositories/recipe-favorite.repository';
 import { RECIPE_REPOSITORY } from './domain/repositories/recipe.repository';
 import {
@@ -85,6 +86,7 @@ import { RecipeController } from './presentation/recipe.controller';
     UploadRecipeImageUseCase,
     AddRecipeFavoriteUseCase,
     RemoveRecipeFavoriteUseCase,
+    ReorderRecipeFavoritesUseCase,
     ApproveRecipeUseCase,
     RejectRecipeUseCase,
     {

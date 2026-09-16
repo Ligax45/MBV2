@@ -16,6 +16,7 @@ import {
 } from '@core/utils/recipe-format.util';
 import { isPubliclyListed } from '@core/utils/recipe-visibility.util';
 import { AlertService } from '@shared/services/alert.service';
+import { ConfirmDialogService } from '@shared/services/confirm-dialog.service';
 
 type DetailTab = 'ingredients' | 'steps';
 
@@ -30,6 +31,7 @@ export class RecipeDetailsComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly alertService = inject(AlertService);
+  private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly currentUser = inject(CurrentUserService);
 
   protected readonly recipe = signal<RecipeDetail | null>(null);
@@ -177,6 +179,47 @@ export class RecipeDetailsComponent implements OnInit {
     }
 
     const next = !this.isLiked();
+
+    if (!next) {
+      void this.confirmDialog
+        .confirm({
+          title: 'Retirer des favoris ?',
+          message: `Voulez-vous retirer « ${detail.title} » de vos favoris ?`,
+          confirmLabel: 'Retirer',
+          confirmSeverity: 'danger',
+        })
+        .then((confirmed) => {
+          if (confirmed) {
+            this.applyFavoriteChange(detail, false);
+          }
+        });
+      return;
+    }
+
+    this.applyFavoriteChange(detail, true);
+  }
+
+  protected onDeleteRecipe(detail: RecipeDetail): void {
+    if (!this.currentUser.userId() || this.deleting()) return;
+
+    void this.confirmDialog
+      .confirm({
+        title: 'Supprimer la recette ?',
+        message: `Supprimer « ${detail.title} » ? Cette action est irréversible.`,
+        confirmLabel: 'Supprimer',
+        confirmSeverity: 'danger',
+      })
+      .then((confirmed) => {
+        if (!confirmed) return;
+        this.deleteRecipe(detail);
+      });
+  }
+
+  private applyFavoriteChange(detail: RecipeDetail, next: boolean): void {
+    if (this.togglingFavorite()) {
+      return;
+    }
+
     this.togglingFavorite.set(true);
 
     this.recipeData.setRecipeFavorite(detail.id, next).subscribe({
@@ -191,14 +234,7 @@ export class RecipeDetailsComponent implements OnInit {
     });
   }
 
-  protected onDeleteRecipe(detail: RecipeDetail): void {
-    if (!this.currentUser.userId() || this.deleting()) return;
-
-    const confirmed = window.confirm(
-      `Supprimer « ${detail.title} » ? Cette action est irréversible.`,
-    );
-    if (!confirmed) return;
-
+  private deleteRecipe(detail: RecipeDetail): void {
     this.deleting.set(true);
 
     this.recipeData.deleteRecipe(detail.id).subscribe({

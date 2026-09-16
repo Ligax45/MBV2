@@ -18,25 +18,56 @@ import {
 @Injectable({ providedIn: 'root' })
 export class RecipeBouchonService {
   private readonly mockDelayMs = 200;
-  private readonly favoriteIds = new Set<string>();
+  private readonly favoriteOrder: string[] = [];
 
   getRecipes(favoritesOnly = false): Observable<RecipeListItem[]> {
-    let items = BOUCHON_RECIPES.map(mapBouchonToListItem).map((item) => ({
-      ...item,
-      isFavorited: this.favoriteIds.has(item.id),
-    }));
+    const itemsById = new Map(
+      BOUCHON_RECIPES.map(mapBouchonToListItem).map((item) => [
+        item.id,
+        {
+          ...item,
+          isFavorited: this.favoriteOrder.includes(item.id),
+        },
+      ]),
+    );
+
     if (favoritesOnly) {
-      items = items.filter((item) => item.isFavorited);
+      const items = this.favoriteOrder
+        .map((id) => itemsById.get(id))
+        .filter((item) => item != null);
+      return of(items).pipe(delay(this.mockDelayMs));
     }
-    return of(items).pipe(delay(this.mockDelayMs));
+
+    return of([...itemsById.values()]).pipe(delay(this.mockDelayMs));
+  }
+
+  private isFavorite(id: string): boolean {
+    return this.favoriteOrder.includes(id);
   }
 
   setRecipeFavorite(id: string, favorited: boolean): Observable<void> {
     if (favorited) {
-      this.favoriteIds.add(id);
+      if (!this.favoriteOrder.includes(id)) {
+        this.favoriteOrder.push(id);
+      }
     } else {
-      this.favoriteIds.delete(id);
+      const index = this.favoriteOrder.indexOf(id);
+      if (index >= 0) {
+        this.favoriteOrder.splice(index, 1);
+      }
     }
+    return of(undefined).pipe(delay(this.mockDelayMs));
+  }
+
+  reorderRecipeFavorites(recipeIds: string[]): Observable<void> {
+    const allowed = new Set(this.favoriteOrder);
+    if (
+      recipeIds.length !== this.favoriteOrder.length ||
+      recipeIds.some((id) => !allowed.has(id))
+    ) {
+      return throwError(() => new Error('INVALID_FAVORITE_ORDER'));
+    }
+    this.favoriteOrder.splice(0, this.favoriteOrder.length, ...recipeIds);
     return of(undefined).pipe(delay(this.mockDelayMs));
   }
 
@@ -44,7 +75,7 @@ export class RecipeBouchonService {
     if (id === BOUCHON_RECIPE_DETAILS_TARTE_AUX_POMMES.id) {
       return of({
         ...mapBouchonDetailToView(BOUCHON_RECIPE_DETAILS_TARTE_AUX_POMMES),
-        isFavorited: this.favoriteIds.has(id),
+        isFavorited: this.isFavorite(id),
       }).pipe(delay(this.mockDelayMs));
     }
 
@@ -55,7 +86,7 @@ export class RecipeBouchonService {
 
     return of({
       ...mapBouchonListItemToMinimalDetail(fromList),
-      isFavorited: this.favoriteIds.has(id),
+      isFavorited: this.isFavorite(id),
     }).pipe(delay(this.mockDelayMs));
   }
 }

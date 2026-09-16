@@ -10,6 +10,7 @@ import type { RecipeStep } from '@core/models/recipe-step.model';
 import { RecipeDataService } from '@core/services/recipe-data.service';
 import { formatIngredientLine } from '@core/utils/recipe-format.util';
 import { AlertService } from '@shared/services/alert.service';
+import { ConfirmDialogService } from '@shared/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-recipe-cooking-mode',
@@ -22,6 +23,7 @@ export class RecipeCookingModeComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly alertService = inject(AlertService);
+  private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly platformId = inject(PLATFORM_ID);
 
   protected readonly recipe = signal<RecipeDetail | null>(null);
@@ -154,10 +156,19 @@ export class RecipeCookingModeComponent implements OnInit {
     }
 
     if (this.currentStepIndex() > 0) {
-      const confirmed = window.confirm(
-        'Quitter le mode cuisine ? Votre progression ne sera pas sauvegardée.',
-      );
-      if (!confirmed) return;
+      void this.confirmDialog
+        .confirm({
+          title: 'Quitter le mode cuisine ?',
+          message: 'Votre progression ne sera pas sauvegardée.',
+          confirmLabel: 'Quitter',
+          confirmSeverity: 'danger',
+        })
+        .then((confirmed) => {
+          if (confirmed) {
+            void this.router.navigate(['/recette', detail.id]);
+          }
+        });
+      return;
     }
 
     void this.router.navigate(['/recette', detail.id]);

@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   Query,
   UploadedFile,
   UseGuards,
@@ -29,6 +30,7 @@ import { GetRecipeTypesUseCase } from '../application/use-cases/get-recipe-types
 import { GetRecipesUseCase } from '../application/use-cases/get-recipes.usecase';
 import { RejectRecipeUseCase } from '../application/use-cases/reject-recipe.usecase';
 import { RemoveRecipeFavoriteUseCase } from '../application/use-cases/remove-recipe-favorite.usecase';
+import { ReorderRecipeFavoritesUseCase } from '../application/use-cases/reorder-recipe-favorites.usecase';
 import { UpdateRecipeUseCase } from '../application/use-cases/update-recipe.usecase';
 import { UploadRecipeImageUseCase } from '../application/use-cases/upload-recipe-image.usecase';
 import type { CreateRecipeParams } from '../domain/repositories/recipe.repository';
@@ -47,6 +49,7 @@ export class RecipeController {
     private readonly uploadRecipeImage: UploadRecipeImageUseCase,
     private readonly addRecipeFavorite: AddRecipeFavoriteUseCase,
     private readonly removeRecipeFavorite: RemoveRecipeFavoriteUseCase,
+    private readonly reorderRecipeFavorites: ReorderRecipeFavoritesUseCase,
     private readonly approveRecipe: ApproveRecipeUseCase,
     private readonly rejectRecipe: RejectRecipeUseCase,
   ) {}
@@ -75,6 +78,15 @@ export class RecipeController {
   @Get('equipment')
   async listEquipment() {
     return this.getEquipment.execute();
+  }
+
+  @Put('favorites/order')
+  @UseGuards(JwtAuthGuard)
+  async reorderFavorites(
+    @Body() body: { recipeIds?: string[] },
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.reorderRecipeFavorites.execute(body?.recipeIds ?? [], user);
   }
 
   @Get(':id')

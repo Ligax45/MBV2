@@ -49,22 +49,6 @@
     color 0.15s ease;
 }
 
-.library-page__filter--favorites {
-  flex-shrink: 0;
-  white-space: nowrap;
-}
-
-.library-page__filter--favorites:hover {
-  border-color: var(--favorite-border);
-  background-color: var(--favorite-inactive-bg);
-}
-
-.library-page__filter--favorites.library-page__filter--active {
-  border-color: var(--favorite-border);
-  background-color: var(--favorite-bg);
-  color: var(--favorite-text);
-}
-
 .library-page__filter--type:hover:not(.library-page__filter--type-active) {
   border-color: color-mix(in srgb, var(--primary) 35%, var(--border));
   background-color: var(--accent);
@@ -193,7 +177,47 @@
   contain: layout style;
 }
 
-.library-page__grid > app-recipe-card {
+.library-page__grid-item {
+  position: relative;
   content-visibility: auto;
   contain-intrinsic-size: auto 22rem;
+}
+
+.library-page__drag-handle {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background-color: color-mix(in srgb, var(--card) 92%, transparent);
+  color: var(--secondary);
+  cursor: grab;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.library-page__drag-handle:hover {
+  border-color: var(--favorite-border);
+  background-color: var(--favorite-inactive-bg);
+  color: var(--favorite-inactive-text);
+}
+
+.library-page__grid-item.cdk-drag-preview {
+  box-shadow: var(--shadow-md);
+}
+
+.library-page__grid-item.cdk-drag-placeholder {
+  opacity: 0.35;
+}
+
+.cdk-drop-list-dragging .library-page__grid-item:not(.cdk-drag-placeholder) {
+  transition: transform 0.2s ease;
 }

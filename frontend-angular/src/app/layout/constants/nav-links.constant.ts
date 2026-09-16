@@ -10,5 +10,11 @@ export const NAV_LINKS: readonly NavLink[] = [
   },
   { path: '/', label: 'Accueil', icon: 'pi pi-home' },
   { path: '/bibliotheque', label: 'Bibliothèque', icon: 'pi pi-book' },
+  {
+    path: '/bibliotheque/favoris',
+    label: 'Mes favoris',
+    icon: 'pi pi-heart',
+    requiresAuth: true,
+  },
   { path: '/bibliotheque/mes-recettes', label: 'Mes recettes', icon: 'pi pi-folder', requiresAuth: true },
 ] as const;
