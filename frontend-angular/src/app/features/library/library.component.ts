@@ -1,4 +1,5 @@
-﻿import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+﻿import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProgressSpinner } from 'primeng/progressspinner';
@@ -19,6 +20,7 @@ import { RecipeSearchBarComponent } from './components/recipe-search-bar/recipe-
 @Component({
   selector: 'app-library',
   imports: [
+    DragDropModule,
     RecipeSearchBarComponent,
     RecipeCardComponent,
     ProgressSpinner,
@@ -38,6 +40,7 @@ export class LibraryComponent implements OnInit {
   protected readonly recipeTypes = signal<RecipeTypeSummary[]>([]);
   protected readonly loading = signal(true);
   protected readonly loadFailed = signal(false);
+  protected readonly reorderingFavorites = signal(false);
   protected readonly searchQuery = signal('');
   protected readonly favoritesOnly = signal(false);
   protected readonly mineOnly = signal(false);
@@ -74,6 +77,9 @@ export class LibraryComponent implements OnInit {
       return 'Retrouvez vos recettes publiques, privées et en attente de validation';
     }
     if (this.favoritesOnly()) {
+      if (this.canReorderFavorites()) {
+        return 'Glissez les cartes pour définir votre ordre préféré';
+      }
       return 'Retrouvez toutes les recettes que vous avez aimées';
     }
     return 'Découvrez les recettes validées de la communauté';
@@ -137,9 +143,15 @@ export class LibraryComponent implements OnInit {
   protected readonly hasActiveFilters = computed(
     () =>
       this.searchQuery().trim().length > 0 ||
-      this.selectedRecipeTypeId() !== null ||
-      this.favoritesOnly() ||
-      this.mineOnly(),
+      this.selectedRecipeTypeId() !== null,
+  );
+
+  protected readonly canReorderFavorites = computed(
+    () =>
+      this.favoritesOnly() &&
+      !this.searchQuery().trim() &&
+      this.selectedRecipeTypeId() === null &&
+      this.recipes().length > 1,
   );
 
   protected readonly emptyIcon = computed(() => {
@@ -179,22 +191,6 @@ export class LibraryComponent implements OnInit {
     });
   }
 
-  toggleFavorites(): void {
-    if (this.favoritesOnly()) {
-      void this.router.navigate(['/bibliotheque']);
-      return;
-    }
-
-    if (!this.currentUser.isAuthenticated()) {
-      void this.router.navigate(['/connexion'], {
-        queryParams: { returnUrl: '/bibliotheque/favoris' },
-      });
-      return;
-    }
-
-    void this.router.navigate(['/bibliotheque/favoris']);
-  }
-
   onSearchChange(query: string): void {
     this.searchQuery.set(query);
   }
@@ -212,12 +208,28 @@ export class LibraryComponent implements OnInit {
   clearFilters(): void {
     this.searchQuery.set('');
     this.selectedRecipeTypeId.set(null);
-    if (this.favoritesOnly()) {
-      void this.router.navigate(['/bibliotheque']);
+  }
+
+  onFavoriteReorder(event: CdkDragDrop<RecipeListItem[]>): void {
+    if (!this.canReorderFavorites() || this.reorderingFavorites()) {
+      return;
     }
-    if (this.mineOnly()) {
-      void this.router.navigate(['/bibliotheque']);
-    }
+
+    const next = [...this.recipes()];
+    moveItemInArray(next, event.previousIndex, event.currentIndex);
+    this.recipes.set(next);
+    this.reorderingFavorites.set(true);
+
+    this.recipeData.reorderRecipeFavorites(next.map((item) => item.id)).subscribe({
+      next: () => {
+        this.reorderingFavorites.set(false);
+      },
+      error: () => {
+        this.reorderingFavorites.set(false);
+        this.alertService.error('Impossible de réordonner vos favoris.');
+        this.loadRecipes();
+      },
+    });
   }
 
   onFavoriteChange(event: { recipeId: string; isFavorited: boolean }): void {

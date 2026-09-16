@@ -36,17 +36,6 @@
           (valueChange)="onSearchChange($event)"
         />
       </div>
-
-      <button
-        type="button"
-        class="library-page__filter library-page__filter--favorites"
-        [class.library-page__filter--active]="favoritesOnly()"
-        [attr.aria-pressed]="favoritesOnly()"
-        (click)="toggleFavorites()"
-      >
-        <i class="pi pi-heart" aria-hidden="true"></i>
-        Mes favoris
-      </button>
     </div>
   </div>
 
@@ -104,13 +93,36 @@
       }
     </div>
   } @else {
-    <div class="library-page__grid">
+    <div
+      class="library-page__grid"
+      cdkDropList
+      cdkDropListOrientation="mixed"
+      [cdkDropListDisabled]="!canReorderFavorites() || reorderingFavorites()"
+      (cdkDropListDropped)="onFavoriteReorder($event)"
+    >
       @for (recipe of filteredRecipes(); track recipe.id; let i = $index) {
-        <app-recipe-card
-          [recipe]="recipe"
-          [priority]="i < 4"
-          (favoriteChange)="onFavoriteChange($event)"
-        />
+        <div
+          class="library-page__grid-item"
+          cdkDrag
+          [cdkDragDisabled]="!canReorderFavorites() || reorderingFavorites()"
+        >
+          @if (canReorderFavorites()) {
+            <button
+              type="button"
+              class="library-page__drag-handle"
+              cdkDragHandle
+              aria-label="Réordonner la recette {{ recipe.title }}"
+            >
+              <i class="pi pi-arrows-alt" aria-hidden="true"></i>
+            </button>
+          }
+          <app-recipe-card
+            [recipe]="recipe"
+            [priority]="i < 4"
+            [confirmBeforeUnfavorite]="favoritesOnly()"
+            (favoriteChange)="onFavoriteChange($event)"
+          />
+        </div>
       }
     </div>
   }

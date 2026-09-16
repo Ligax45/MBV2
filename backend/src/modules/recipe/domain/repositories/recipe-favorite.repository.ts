@@ -8,4 +8,5 @@ export interface RecipeFavoriteRepository {
   isFavorite(userId: string, recipeId: string): Promise<boolean>;
   addFavorite(userId: string, recipeId: string): Promise<void>;
   removeFavorite(userId: string, recipeId: string): Promise<void>;
+  reorderFavorites(userId: string, recipeIds: string[]): Promise<void>;
 }

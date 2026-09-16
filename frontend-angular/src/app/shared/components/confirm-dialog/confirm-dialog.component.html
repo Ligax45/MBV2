@@ -1,0 +1,26 @@
+@if (state(); as dialog) {
+  <app-dialog
+    [title]="dialog.title"
+    [visible]="visible()"
+    (visibleChange)="onVisibleChange($event)"
+    [dismissableMask]="true"
+  >
+    <p class="confirm-dialog__message">{{ dialog.message }}</p>
+
+    <div appDialogFooter class="confirm-dialog__actions">
+      <p-button
+        type="button"
+        [label]="dialog.cancelLabel!"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="onCancel()"
+      />
+      <p-button
+        type="button"
+        [label]="dialog.confirmLabel!"
+        [severity]="dialog.confirmSeverity === 'danger' ? 'danger' : 'primary'"
+        (onClick)="onConfirm()"
+      />
+    </div>
+  </app-dialog>
+}

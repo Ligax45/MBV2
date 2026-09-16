@@ -73,7 +73,9 @@ html.dark .p-inputtext,
 html.light .p-inputnumber-input,
 html.dark .p-inputnumber-input,
 html.light .p-password-input,
-html.dark .p-password-input {
+html.dark .p-password-input,
+html.light .p-textarea,
+html.dark .p-textarea {
   background: var(--card);
   color: var(--foreground);
   border-color: var(--border);
@@ -82,15 +84,28 @@ html.dark .p-password-input {
 html.light .p-inputtext,
 html.dark .p-inputtext {
   border-radius: var(--radius-pill);
-  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  padding: var(--input-padding-y) var(--input-padding-x-pill);
+}
+
+html.light .p-inputtext.input-surface,
+html.dark .p-inputtext.input-surface {
+  border-radius: var(--radius-md);
+  padding: var(--input-padding-y) var(--input-padding-x);
+}
+
+html.light .p-iconfield .p-inputtext,
+html.dark .p-iconfield .p-inputtext {
+  padding-left: var(--input-padding-left-icon);
 }
 
 html.light .p-inputnumber-input,
 html.dark .p-inputnumber-input,
 html.light .p-password-input,
-html.dark .p-password-input {
+html.dark .p-password-input,
+html.light .p-textarea,
+html.dark .p-textarea {
   border-radius: var(--radius-md);
-  padding: 0.75rem 1rem;
+  padding: var(--input-padding-y) var(--input-padding-x);
 }
 
 html.light .p-inputtext::placeholder,
@@ -98,7 +113,9 @@ html.dark .p-inputtext::placeholder,
 html.light .p-inputnumber-input::placeholder,
 html.dark .p-inputnumber-input::placeholder,
 html.light .p-password-input::placeholder,
-html.dark .p-password-input::placeholder {
+html.dark .p-password-input::placeholder,
+html.light .p-textarea::placeholder,
+html.dark .p-textarea::placeholder {
   color: var(--placeholder-foreground);
   opacity: 1;
 }
@@ -108,7 +125,9 @@ html.dark .p-inputtext:enabled:hover,
 html.light .p-inputnumber-input:enabled:hover,
 html.dark .p-inputnumber-input:enabled:hover,
 html.light .p-password-input:enabled:hover,
-html.dark .p-password-input:enabled:hover {
+html.dark .p-password-input:enabled:hover,
+html.light .p-textarea:enabled:hover,
+html.dark .p-textarea:enabled:hover {
   border-color: color-mix(in srgb, var(--primary) 30%, var(--border));
 }
 
@@ -117,7 +136,9 @@ html.dark .p-inputtext:enabled:focus,
 html.light .p-inputnumber-input:enabled:focus,
 html.dark .p-inputnumber-input:enabled:focus,
 html.light .p-password-input:enabled:focus,
-html.dark .p-password-input:enabled:focus {
+html.dark .p-password-input:enabled:focus,
+html.light .p-textarea:enabled:focus,
+html.dark .p-textarea:enabled:focus {
   border-color: var(--primary);
   box-shadow: 0 0 0 2px var(--p-focus-glow);
 }
@@ -305,6 +326,8 @@ html.dark .p-progressspinner-circle {
 
 html.light .p-inputtext.ng-invalid,
 html.dark .p-inputtext.ng-invalid,
+html.light .p-textarea.ng-invalid,
+html.dark .p-textarea.ng-invalid,
 html.light .p-select.ng-invalid,
 html.dark .p-select.ng-invalid,
 html.light .p-inputnumber.ng-invalid .p-inputnumber-input,

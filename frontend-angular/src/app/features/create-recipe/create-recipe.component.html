@@ -339,7 +339,7 @@
               <span class="dynamic-list__index">{{ i + 1 }}.</span>
               <input
                 pInputText
-                class="dynamic-list__qty"
+                class="dynamic-list__qty input-surface"
                 placeholder="Quantité"
                 [ngModel]="ing.quantity"
                 (ngModelChange)="updateIngredient(ing.id, 'quantity', $event)"
@@ -367,7 +367,7 @@
                 <input
                   pInputText
                   [id]="'ingredient-name-' + ing.id"
-                  class="dynamic-list__name"
+                  class="dynamic-list__name input-surface"
                   placeholder="Nom de l'ingrédient"
                   [ngModel]="ing.name"
                   (ngModelChange)="updateIngredient(ing.id, 'name', $event)"
@@ -425,7 +425,7 @@
                 <input
                   pInputText
                   [id]="'step-title-' + step.id"
-                  class="dynamic-list__step-title"
+                  class="dynamic-list__step-title input-surface"
                   placeholder="Titre de l'étape (optionnel)"
                   [ngModel]="step.title"
                   (ngModelChange)="updateStep(step.id, 'title', $event)"

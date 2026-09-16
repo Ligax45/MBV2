@@ -13,6 +13,7 @@ import {
 } from '@core/utils/recipe-format.util';
 import { isPubliclyListed } from '@core/utils/recipe-visibility.util';
 import { AlertService } from '@shared/services/alert.service';
+import { ConfirmDialogService } from '@shared/services/confirm-dialog.service';
 
 const STAR_COUNT = 5;
 
@@ -25,12 +26,14 @@ const STAR_COUNT = 5;
 export class RecipeCardComponent {
   readonly recipe = input.required<RecipeListItem>();
   readonly priority = input(false);
+  readonly confirmBeforeUnfavorite = input(false);
   readonly favoriteChange = output<{ recipeId: string; isFavorited: boolean }>();
 
   private readonly recipeData = inject(RecipeDataService);
   private readonly currentUser = inject(CurrentUserService);
   private readonly router = inject(Router);
   private readonly alertService = inject(AlertService);
+  private readonly confirmDialog = inject(ConfirmDialogService);
 
   protected readonly isLiked = computed(() => this.recipe().isFavorited ?? false);
   protected readonly canFavorite = computed(() => isPubliclyListed(this.recipe()));
@@ -105,6 +108,31 @@ export class RecipeCardComponent {
     }
 
     const next = !this.isLiked();
+
+    if (!next && this.confirmBeforeUnfavorite()) {
+      void this.confirmDialog
+        .confirm({
+          title: 'Retirer des favoris ?',
+          message: `Voulez-vous retirer « ${this.recipe().title} » de vos favoris ?`,
+          confirmLabel: 'Retirer',
+          confirmSeverity: 'danger',
+        })
+        .then((confirmed) => {
+          if (confirmed) {
+            this.applyFavoriteChange(false);
+          }
+        });
+      return;
+    }
+
+    this.applyFavoriteChange(next);
+  }
+
+  private applyFavoriteChange(next: boolean): void {
+    if (this.togglingFavorite()) {
+      return;
+    }
+
     this.togglingFavorite.set(true);
 
     this.recipeData.setRecipeFavorite(this.recipe().id, next).subscribe({

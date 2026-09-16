@@ -8,6 +8,8 @@ export class RecipeFavoriteOrmEntity {
   recipe!: RecipeOrmEntity;
 
   createdAt: Date = new Date();
+
+  sortOrder = 0;
 }
 
 export const RecipeFavoriteOrmEntitySchema =
@@ -33,6 +35,11 @@ export const RecipeFavoriteOrmEntitySchema =
         type: 'datetime',
         fieldNames: ['created_at'],
         defaultRaw: 'NOW()',
+      },
+      sortOrder: {
+        type: 'number',
+        fieldNames: ['sort_order'],
+        default: 0,
       },
     },
   });
