@@ -81,6 +81,12 @@ export interface RecipeApiResponse {
   createdAt: string;
   updatedAt: string;
   isFavorite?: boolean;
+  hasCompleted?: boolean;
+  userRating?: number | null;
+  userComment?: string | null;
+  averageRating?: number | null;
+  ratingCount?: number;
+  favoriteCount?: number;
   visibility: RecipeVisibility;
   moderationStatus: RecipeModerationStatus;
   moderationComment: string | null;

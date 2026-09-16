@@ -3,8 +3,10 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, delay, map, of, throwError } from 'rxjs';
 
 import { BOUCHON_RECIPE_TYPES } from '@core/data/bouchon-recipe-types.data';
+import type { RecipeComment } from '@core/models/recipe-comment.model';
 import type { RecipeDetail } from '@core/models/recipe-detail.model';
 import type { RecipeListItem } from '@core/models/recipe-list-item.model';
+import type { RecipeListQuery } from '@core/models/recipe-list-query.model';
 import type { RecipeTypeSummary } from '@core/models/recipe-api.model';
 import { mapRecipeToDetail, mapRecipeToListItem } from '@core/utils/recipe.mapper';
 
@@ -30,9 +32,9 @@ export class RecipeDataService {
     return this.api.getRecipeTypes();
   }
 
-  getRecipes(options: { favoritesOnly?: boolean; mineOnly?: boolean } = {}): Observable<RecipeListItem[]> {
+  getRecipes(options: RecipeListQuery = {}): Observable<RecipeListItem[]> {
     if (environment.useMockData) {
-      return this.bouchon.getRecipes(options.favoritesOnly === true);
+      return this.bouchon.getRecipes(options);
     }
     return this.api
       .getRecipes(options)
@@ -93,5 +95,39 @@ export class RecipeDataService {
       return this.bouchon.reorderRecipeFavorites(recipeIds);
     }
     return this.api.reorderRecipeFavorites(recipeIds).pipe(map(() => undefined));
+  }
+
+  markRecipeCompleted(id: string): Observable<void> {
+    if (environment.useMockData) {
+      return this.bouchon.markRecipeCompleted(id);
+    }
+    return this.api.markRecipeCompleted(id).pipe(map(() => undefined));
+  }
+
+  setRecipeRating(id: string, rating: number): Observable<{
+    userRating: number;
+    averageRating: number | null;
+    ratingCount: number;
+  }> {
+    if (environment.useMockData) {
+      return this.bouchon.setRecipeRating(id, rating);
+    }
+    return this.api.setRecipeRating(id, rating);
+  }
+
+  getRecipeComments(id: string): Observable<RecipeComment[]> {
+    if (environment.useMockData) {
+      return this.bouchon.getRecipeComments(id);
+    }
+    return this.api.getRecipeComments(id).pipe(map((response) => response.comments));
+  }
+
+  setRecipeComment(id: string, comment: string): Observable<string | null> {
+    if (environment.useMockData) {
+      return this.bouchon.setRecipeComment(id, comment);
+    }
+    return this.api
+      .setRecipeComment(id, comment)
+      .pipe(map((response) => response.userComment));
   }
 }

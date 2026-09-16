@@ -13,8 +13,14 @@ import { GetRecipeTypesUseCase } from './application/use-cases/get-recipe-types.
 import { GetRecipesUseCase } from './application/use-cases/get-recipes.usecase';
 import { RejectRecipeUseCase } from './application/use-cases/reject-recipe.usecase';
 import { RemoveRecipeFavoriteUseCase } from './application/use-cases/remove-recipe-favorite.usecase';
+import { MarkRecipeCompletedUseCase } from './application/use-cases/mark-recipe-completed.usecase';
 import { ReorderRecipeFavoritesUseCase } from './application/use-cases/reorder-recipe-favorites.usecase';
+import { GetRecipeCommentsUseCase } from './application/use-cases/get-recipe-comments.usecase';
+import { SetRecipeCommentUseCase } from './application/use-cases/set-recipe-comment.usecase';
+import { SetRecipeRatingUseCase } from './application/use-cases/set-recipe-rating.usecase';
+import { RECIPE_COMPLETION_REPOSITORY } from './domain/repositories/recipe-completion.repository';
 import { RECIPE_FAVORITE_REPOSITORY } from './domain/repositories/recipe-favorite.repository';
+import { RECIPE_RATING_REPOSITORY } from './domain/repositories/recipe-rating.repository';
 import { RECIPE_REPOSITORY } from './domain/repositories/recipe.repository';
 import {
   EquipmentOrmEntity,
@@ -25,9 +31,17 @@ import {
   RecipeEquipmentOrmEntitySchema,
 } from './infrastructure/mikroorm/recipe-equipment.orm-entity';
 import {
+  RecipeCompletionOrmEntity,
+  RecipeCompletionOrmEntitySchema,
+} from './infrastructure/mikroorm/recipe-completion.orm-entity';
+import {
   RecipeFavoriteOrmEntity,
   RecipeFavoriteOrmEntitySchema,
 } from './infrastructure/mikroorm/recipe-favorite.orm-entity';
+import {
+  RecipeRatingOrmEntity,
+  RecipeRatingOrmEntitySchema,
+} from './infrastructure/mikroorm/recipe-rating.orm-entity';
 import {
   RecipeIngredientOrmEntity,
   RecipeIngredientOrmEntitySchema,
@@ -48,7 +62,9 @@ import {
   UserOrmEntity,
   UserOrmEntitySchema,
 } from './infrastructure/mikroorm/user.orm-entity';
+import { MikroOrmRecipeCompletionRepository } from './infrastructure/repositories/recipe-completion.repository.impl';
 import { MikroOrmRecipeFavoriteRepository } from './infrastructure/repositories/recipe-favorite.repository.impl';
+import { MikroOrmRecipeRatingRepository } from './infrastructure/repositories/recipe-rating.repository.impl';
 import { MikroOrmRecipeRepository } from './infrastructure/repositories/recipe.repository.impl';
 import { RecipeController } from './presentation/recipe.controller';
 
@@ -70,6 +86,10 @@ import { RecipeController } from './presentation/recipe.controller';
       RecipeEquipmentOrmEntity,
       RecipeFavoriteOrmEntitySchema,
       RecipeFavoriteOrmEntity,
+      RecipeCompletionOrmEntitySchema,
+      RecipeCompletionOrmEntity,
+      RecipeRatingOrmEntitySchema,
+      RecipeRatingOrmEntity,
       UserOrmEntitySchema,
       UserOrmEntity,
     ]),
@@ -87,6 +107,10 @@ import { RecipeController } from './presentation/recipe.controller';
     AddRecipeFavoriteUseCase,
     RemoveRecipeFavoriteUseCase,
     ReorderRecipeFavoritesUseCase,
+    MarkRecipeCompletedUseCase,
+    SetRecipeRatingUseCase,
+    SetRecipeCommentUseCase,
+    GetRecipeCommentsUseCase,
     ApproveRecipeUseCase,
     RejectRecipeUseCase,
     {
@@ -96,6 +120,14 @@ import { RecipeController } from './presentation/recipe.controller';
     {
       provide: RECIPE_FAVORITE_REPOSITORY,
       useClass: MikroOrmRecipeFavoriteRepository,
+    },
+    {
+      provide: RECIPE_COMPLETION_REPOSITORY,
+      useClass: MikroOrmRecipeCompletionRepository,
+    },
+    {
+      provide: RECIPE_RATING_REPOSITORY,
+      useClass: MikroOrmRecipeRatingRepository,
     },
   ],
 })

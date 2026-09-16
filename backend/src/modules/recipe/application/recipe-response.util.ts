@@ -2,6 +2,12 @@ import type { Recipe } from '../domain/entities/recipe.entity';
 
 interface RecipeResponseOptions {
   isFavorite?: boolean;
+  hasCompleted?: boolean;
+  userRating?: number | null;
+  userComment?: string | null;
+  averageRating?: number | null;
+  ratingCount?: number;
+  favoriteCount?: number;
 }
 
 export function toRecipeResponse(
@@ -41,6 +47,12 @@ export function toRecipeResponse(
       label: item.label,
     })),
     isFavorite: options.isFavorite ?? false,
+    hasCompleted: options.hasCompleted ?? false,
+    userRating: options.userRating ?? null,
+    userComment: options.userComment ?? null,
+    averageRating: options.averageRating ?? null,
+    ratingCount: options.ratingCount ?? 0,
+    favoriteCount: options.favoriteCount ?? 0,
     visibility: recipe.visibility,
     moderationStatus: recipe.moderationStatus,
     moderationComment: recipe.moderationComment,
@@ -67,6 +79,9 @@ export function toRecipeListItemResponse(
     createdAt: recipe.createdAt.toISOString(),
     updatedAt: recipe.updatedAt.toISOString(),
     isFavorite: options.isFavorite ?? false,
+    averageRating: options.averageRating ?? null,
+    ratingCount: options.ratingCount ?? 0,
+    favoriteCount: options.favoriteCount ?? 0,
     visibility: recipe.visibility,
     moderationStatus: recipe.moderationStatus,
     moderationComment: recipe.moderationComment,

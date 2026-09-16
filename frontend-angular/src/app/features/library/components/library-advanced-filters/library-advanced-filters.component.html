@@ -1,0 +1,71 @@
+@if (open()) {
+  <section class="library-advanced-filters" aria-label="Filtres avancés">
+    <div class="library-advanced-filters__group">
+      <h2 class="library-advanced-filters__label">Trier par</h2>
+      <div class="library-advanced-filters__chips">
+        @for (option of sortOptions; track option.value) {
+          <button
+            type="button"
+            class="library-advanced-filters__chip"
+            [class.library-advanced-filters__chip--active]="filters().sort === option.value"
+            [attr.aria-pressed]="filters().sort === option.value"
+            (click)="setSort(option.value)"
+          >
+            {{ option.label }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="library-advanced-filters__group">
+      <h2 class="library-advanced-filters__label">Note minimale</h2>
+      <div class="library-advanced-filters__chips">
+        @for (option of ratingOptions; track option.label) {
+          <button
+            type="button"
+            class="library-advanced-filters__chip"
+            [class.library-advanced-filters__chip--active]="filters().minRating === option.value"
+            [attr.aria-pressed]="filters().minRating === option.value"
+            (click)="setMinRating(option.value)"
+          >
+            {{ option.label }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="library-advanced-filters__group">
+      <h2 class="library-advanced-filters__label">Difficulté</h2>
+      <div class="library-advanced-filters__chips">
+        @for (option of difficultyOptions; track option.value) {
+          <button
+            type="button"
+            class="library-advanced-filters__chip"
+            [class.library-advanced-filters__chip--active]="isDifficultyActive(option.value)"
+            [attr.aria-pressed]="isDifficultyActive(option.value)"
+            (click)="toggleDifficulty(option.value)"
+          >
+            {{ option.label }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="library-advanced-filters__group">
+      <h2 class="library-advanced-filters__label">Temps total</h2>
+      <div class="library-advanced-filters__chips">
+        @for (option of timeOptions; track option.value) {
+          <button
+            type="button"
+            class="library-advanced-filters__chip"
+            [class.library-advanced-filters__chip--active]="filters().timePreset === option.value"
+            [attr.aria-pressed]="filters().timePreset === option.value"
+            (click)="setTimePreset(option.value)"
+          >
+            {{ option.label }}
+          </button>
+        }
+      </div>
+    </div>
+  </section>
+}

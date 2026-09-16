@@ -36,7 +36,31 @@
           (valueChange)="onSearchChange($event)"
         />
       </div>
+
+      @if (isPublicLibrary()) {
+        <button
+          type="button"
+          class="library-page__filters-toggle"
+          [class.library-page__filters-toggle--active]="advancedFiltersOpen()"
+          [attr.aria-expanded]="advancedFiltersOpen()"
+          (click)="toggleAdvancedFilters()"
+        >
+          <i class="pi pi-sliders-h" aria-hidden="true"></i>
+          Filtres
+          @if (advancedFiltersActiveCount() > 0) {
+            <span class="library-page__filters-badge">{{ advancedFiltersActiveCount() }}</span>
+          }
+        </button>
+      }
     </div>
+
+    @if (isPublicLibrary()) {
+      <app-library-advanced-filters
+        [open]="advancedFiltersOpen()"
+        [filters]="advancedFilters()"
+        (filtersChange)="onAdvancedFiltersChange($event)"
+      />
+    }
   </div>
 
   @if (loading()) {

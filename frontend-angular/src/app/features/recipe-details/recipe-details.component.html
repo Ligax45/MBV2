@@ -119,6 +119,18 @@
             </div>
           </div>
 
+          @if (showCommunityRating()) {
+            <div class="recipe-details__community-rating">
+              <app-recipe-star-rating
+                [rating]="detail.averageRating ?? null"
+                ariaLabel="Note moyenne de la recette"
+              />
+              <span class="recipe-details__community-rating-count">
+                {{ detail.ratingCount }} avis
+              </span>
+            </div>
+          }
+
           @if (canFavorite()) {
             <button
               type="button"
@@ -136,6 +148,64 @@
               {{ isLiked() ? 'Recette aimée' : 'Aimer cette recette' }}
             </button>
           }
+
+          @if (canRate()) {
+            <section class="recipe-details__rating-section" aria-label="Votre expérience">
+              @if (!hasCompleted()) {
+                <button
+                  type="button"
+                  class="recipe-details__complete-btn"
+                  [disabled]="markingCompleted()"
+                  [attr.aria-busy]="markingCompleted()"
+                  (click)="markCompleted()"
+                >
+                  <i class="pi pi-check-circle" aria-hidden="true"></i>
+                  J'ai réalisé cette recette
+                </button>
+              } @else {
+                <div class="recipe-details__user-rating">
+                  <span class="recipe-details__user-rating-label">Votre note</span>
+                  <app-recipe-star-rating
+                    [rating]="userRating()"
+                    [interactive]="true"
+                    [disabled]="savingRating()"
+                    ariaLabel="Votre note sur cette recette"
+                    (ratingChange)="onUserRatingChange($event)"
+                  />
+                </div>
+
+                <div class="recipe-details__comment-form">
+                  <label class="recipe-details__comment-label" for="recipe-comment">
+                    Votre commentaire
+                  </label>
+                  <textarea
+                    id="recipe-comment"
+                    class="recipe-details__comment-input"
+                    rows="4"
+                    [value]="commentDraft()"
+                    [attr.maxlength]="commentMaxLength"
+                    [disabled]="savingComment()"
+                    placeholder="Partagez votre expérience avec cette recette…"
+                    (input)="onCommentInput($event)"
+                  ></textarea>
+                  <div class="recipe-details__comment-actions">
+                    <span class="recipe-details__comment-hint">
+                      {{ commentDraft().length }}/{{ commentMaxLength }}
+                    </span>
+                    <button
+                      type="button"
+                      class="recipe-details__comment-save"
+                      [disabled]="savingComment()"
+                      [attr.aria-busy]="savingComment()"
+                      (click)="saveComment()"
+                    >
+                      Enregistrer
+                    </button>
+                  </div>
+                </div>
+              }
+            </section>
+          }
         </div>
       </div>
 
@@ -144,6 +214,42 @@
           <i class="pi pi-play" aria-hidden="true"></i>
           Commencer à cuisiner
         </a>
+      }
+
+      @if (canRate()) {
+        <section class="recipe-details__comments" aria-label="Commentaires">
+          <h2 class="recipe-details__comments-title">Commentaires</h2>
+
+          @if (loadingComments()) {
+            <div class="recipe-details__comments-state" role="status">
+              <p-progressSpinner ariaLabel="Chargement des commentaires" />
+            </div>
+          } @else if (comments().length === 0) {
+            <p class="recipe-details__comments-empty">
+              Aucun commentaire pour le moment.
+              @if (!hasCompleted()) {
+                Réalisez la recette pour partager le vôtre.
+              }
+            </p>
+          } @else {
+            <ul class="recipe-details__comments-list">
+              @for (comment of comments(); track comment.userId) {
+                <li class="recipe-details__comment-item">
+                  <div class="recipe-details__comment-header">
+                    <span class="recipe-details__comment-author">{{ comment.authorName }}</span>
+                    <time
+                      class="recipe-details__comment-date"
+                      [attr.datetime]="comment.updatedAt"
+                    >
+                      {{ formatDate(comment.updatedAt) }}
+                    </time>
+                  </div>
+                  <p class="recipe-details__comment-body">{{ comment.comment }}</p>
+                </li>
+              }
+            </ul>
+          }
+        </section>
       }
 
       @if (detail.ingredients.length > 0 || detail.steps.length > 0) {

@@ -162,6 +162,11 @@
   color: var(--secondary);
 }
 
+.recipe-card__rating-count {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
 .recipe-card__meta {
   display: flex;
   flex-wrap: wrap;

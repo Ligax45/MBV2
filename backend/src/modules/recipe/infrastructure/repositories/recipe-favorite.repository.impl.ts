@@ -108,6 +108,33 @@ export class MikroOrmRecipeFavoriteRepository implements RecipeFavoriteRepositor
     await em.flush();
   }
 
+  async getFavoriteCountsByRecipeIds(
+    recipeIds: string[],
+  ): Promise<Map<string, number>> {
+    const counts = new Map<string, number>();
+    if (recipeIds.length === 0) {
+      return counts;
+    }
+
+    const em = this.favoriteRepo.getEntityManager();
+    const placeholders = recipeIds.map(() => '?').join(',');
+    const rows = await em.getConnection().execute<
+      Array<{ recipe_id: string; favorite_count: number }>
+    >(
+      `SELECT recipe_id, COUNT(*)::int AS favorite_count
+       FROM recipe_favorites
+       WHERE recipe_id IN (${placeholders})
+       GROUP BY recipe_id`,
+      recipeIds,
+    );
+
+    for (const row of rows) {
+      counts.set(row.recipe_id, Number(row.favorite_count) || 0);
+    }
+
+    return counts;
+  }
+
   async removeFavorite(userId: string, recipeId: string): Promise<void> {
     const deleted = await this.favoriteRepo.nativeDelete({
       user: userId,

@@ -25,6 +25,12 @@ export interface RecipeDetail {
   ingredients: RecipeIngredient[];
   steps: RecipeStep[];
   isFavorited?: boolean;
+  hasCompleted?: boolean;
+  userRating?: number | null;
+  userComment?: string | null;
+  averageRating?: number | null;
+  ratingCount?: number;
+  favoriteCount?: number;
   visibility: RecipeVisibility;
   moderationStatus: RecipeModerationStatus;
   moderationComment: string | null;
