@@ -1,5 +1,6 @@
 docs/*
 !docs/conventions.md
+!docs/export-pdf.md
 
 # Impeccable (per-dev install: npx impeccable install --providers=cursor --scope=project)
 .cursor/skills/impeccable/
