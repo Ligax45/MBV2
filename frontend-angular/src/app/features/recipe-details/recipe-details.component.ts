@@ -1,5 +1,5 @@
 ﻿import { NgOptimizedImage } from '@angular/common';
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -19,6 +19,7 @@ import { isPubliclyListed } from '@core/utils/recipe-visibility.util';
 import { RecipeStarRatingComponent } from '@shared/components/recipe-star-rating/recipe-star-rating.component';
 import { AlertService } from '@shared/services/alert.service';
 import { ConfirmDialogService } from '@shared/services/confirm-dialog.service';
+import { RecipePdfPreviewComponent } from './components/recipe-pdf-preview/recipe-pdf-preview.component';
 
 type DetailTab = 'ingredients' | 'steps';
 
@@ -26,7 +27,13 @@ const RECIPE_COMMENT_MAX_LENGTH = 2000;
 
 @Component({
   selector: 'app-recipe-details',
-  imports: [NgOptimizedImage, RouterLink, ProgressSpinner, RecipeStarRatingComponent],
+  imports: [
+    NgOptimizedImage,
+    RouterLink,
+    ProgressSpinner,
+    RecipeStarRatingComponent,
+    RecipePdfPreviewComponent,
+  ],
   templateUrl: './recipe-details.component.html',
   styleUrl: './recipe-details.component.scss',
 })
@@ -105,6 +112,7 @@ export class RecipeDetailsComponent implements OnInit {
   });
 
   protected readonly fromModeration = signal(false);
+  private readonly pdfPreview = viewChild.required(RecipePdfPreviewComponent);
 
   constructor() {
     this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe((params) => {
@@ -182,6 +190,10 @@ export class RecipeDetailsComponent implements OnInit {
 
     event.preventDefault();
     this.setActiveTab(tabs[nextIndex], true);
+  }
+
+  protected openPdfPreview(detail: RecipeDetail): void {
+    void this.pdfPreview().open(detail.id, detail.title);
   }
 
   protected retryLoad(): void {

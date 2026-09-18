@@ -29,15 +29,19 @@ export function parseDatabaseUrl(url: string): DbResolvedConfig {
 
 /** Connexion effective : DATABASE_URL prioritaire, sinon DB_HOST / …. */
 export function resolveDbConfig(): DbResolvedConfig {
+  const password = resolveEffectivePassword();
   const url = resolveDatabaseUrl();
   if (url) {
-    return parseDatabaseUrl(url);
+    return {
+      ...parseDatabaseUrl(url),
+      password,
+    };
   }
 
   const conn = resolveDbConnection();
   return {
     ...conn,
-    password: resolveDbPassword(),
+    password,
   };
 }
 
