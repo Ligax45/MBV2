@@ -1,0 +1,38 @@
+@if (generatingPdf()) {
+  <div class="recipe-pdf-preview__loading-overlay" role="status" aria-live="polite">
+    <p-progressSpinner ariaLabel="Génération du PDF" />
+    <p>Génération du PDF…</p>
+  </div>
+}
+
+<app-dialog
+  title="Prévisualisation"
+  [(visible)]="visible"
+  [width]="'min(95vw, 48rem)'"
+  (visibleChange)="onVisibleChange($event)"
+>
+  @if (pdfPreviewUrl(); as url) {
+    <iframe
+      class="recipe-pdf-preview__frame"
+      [src]="url"
+      title="Prévisualisation de la recette"
+    ></iframe>
+  }
+
+  <div appDialogFooter class="recipe-pdf-preview__actions">
+    <p-button label="Fermer" severity="secondary" (onClick)="close()" />
+    <p-button
+      label="Ouvrir"
+      severity="secondary"
+      icon="pi pi-external-link"
+      (onClick)="openInNewTab()"
+      [disabled]="!pdfBlob()"
+    />
+    <p-button
+      label="Télécharger"
+      icon="pi pi-download"
+      (onClick)="downloadPdf()"
+      [disabled]="!pdfBlob()"
+    />
+  </div>
+</app-dialog>

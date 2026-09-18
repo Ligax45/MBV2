@@ -21,6 +21,7 @@
       }
     </div>
   } @else if (recipe(); as detail) {
+    <app-recipe-pdf-preview />
     <article class="recipe-details">
       <div class="recipe-details__hero">
         <div class="recipe-details__image-wrap">
@@ -38,6 +39,15 @@
           <div class="recipe-details__header-row">
             <h1 class="recipe-details__title">{{ detail.title }}</h1>
             <div class="recipe-details__actions">
+              <button
+                type="button"
+                class="recipe-details__action-btn"
+                aria-label="Prévisualiser le PDF de la recette"
+                (click)="openPdfPreview(detail)"
+              >
+                <i class="pi pi-file-pdf" aria-hidden="true"></i>
+                Prévisualiser le PDF
+              </button>
               @if (canModify()) {
                 <a
                   class="recipe-details__action-btn recipe-details__action-btn--edit"
