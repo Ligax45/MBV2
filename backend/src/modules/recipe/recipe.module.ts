@@ -130,5 +130,6 @@ import { RecipeController } from './presentation/recipe.controller';
       useClass: MikroOrmRecipeRatingRepository,
     },
   ],
+  exports: [RECIPE_REPOSITORY],
 })
 export class RecipeModule {}

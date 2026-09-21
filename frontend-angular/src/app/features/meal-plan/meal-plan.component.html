@@ -1,0 +1,174 @@
+<div class="meal-plan-page">
+  <header class="meal-plan-page__header">
+    <div class="meal-plan-page__heading">
+      <h1 class="meal-plan-page__title">Menu de la semaine</h1>
+      <p class="meal-plan-page__subtitle">{{ weekLabel() }}</p>
+    </div>
+
+    <div class="meal-plan-page__nav">
+      <button
+        type="button"
+        class="meal-plan-page__nav-btn"
+        aria-label="Semaine précédente"
+        [disabled]="loading()"
+        (click)="goToPreviousWeek()"
+      >
+        <i class="pi pi-chevron-left" aria-hidden="true"></i>
+      </button>
+      <button
+        type="button"
+        class="meal-plan-page__nav-btn meal-plan-page__nav-btn--text"
+        [disabled]="loading()"
+        (click)="goToCurrentWeek()"
+      >
+        Aujourd’hui
+      </button>
+      <button
+        type="button"
+        class="meal-plan-page__nav-btn"
+        aria-label="Semaine suivante"
+        [disabled]="loading()"
+        (click)="goToNextWeek()"
+      >
+        <i class="pi pi-chevron-right" aria-hidden="true"></i>
+      </button>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <div class="meal-plan-page__state" role="status">
+      <p-progressSpinner ariaLabel="Chargement du menu" />
+    </div>
+  } @else if (loadFailed()) {
+    <div class="meal-plan-page__state" role="status">
+      <p class="meal-plan-page__state-message">
+        Impossible de charger votre menu. Vérifiez votre connexion et réessayez.
+      </p>
+      <button type="button" class="meal-plan-page__retry" (click)="loadWeek()">
+        Réessayer
+      </button>
+    </div>
+  } @else {
+    <div class="meal-plan-page__grid">
+      @for (day of days(); track day.date) {
+        <article class="meal-plan-day" [class.meal-plan-day--busy]="isDayBusy(day.date)">
+          <header class="meal-plan-day__header">
+            <h2 class="meal-plan-day__weekday">{{ day.weekdayLabel }}</h2>
+            <p class="meal-plan-day__date">{{ day.shortDateLabel }}</p>
+          </header>
+
+          @if (day.entry; as entry) {
+            <div class="meal-plan-day__recipe">
+              <a
+                class="meal-plan-day__recipe-link"
+                [routerLink]="['/recette', entry.recipe.id]"
+              >
+                @if (entry.recipe.imageUrl) {
+                  <div class="meal-plan-day__image-wrap">
+                    <img
+                      class="meal-plan-day__image"
+                      [ngSrc]="entry.recipe.imageUrl"
+                      fill
+                      sizes="(max-width: 767px) 92vw, 12rem"
+                      alt=""
+                    />
+                  </div>
+                } @else {
+                  <div class="meal-plan-day__image-placeholder" aria-hidden="true">
+                    <i class="pi pi-image"></i>
+                  </div>
+                }
+                <h3 class="meal-plan-day__title">{{ entry.recipe.title }}</h3>
+                <p class="meal-plan-day__meta">
+                  <span>{{ entry.recipe.totalTimeMinutes }} min</span>
+                  <span aria-hidden="true">·</span>
+                  <span>{{ difficultyLabel(entry.recipe.difficulty) }}</span>
+                </p>
+              </a>
+
+              <div class="meal-plan-day__actions">
+                <button
+                  type="button"
+                  class="meal-plan-day__action"
+                  [disabled]="isDayBusy(day.date)"
+                  (click)="openPicker(day.date)"
+                >
+                  Remplacer
+                </button>
+                <button
+                  type="button"
+                  class="meal-plan-day__action meal-plan-day__action--danger"
+                  [disabled]="isDayBusy(day.date)"
+                  (click)="onRemoveDay(day.date, entry.recipe.title)"
+                >
+                  Retirer
+                </button>
+              </div>
+            </div>
+          } @else {
+            <button
+              type="button"
+              class="meal-plan-day__empty"
+              [disabled]="isDayBusy(day.date)"
+              (click)="openPicker(day.date)"
+            >
+              <i class="pi pi-plus" aria-hidden="true"></i>
+              Ajouter une recette
+            </button>
+          }
+        </article>
+      }
+    </div>
+  }
+</div>
+
+<p-dialog
+  header="Choisir une recette"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [visible]="pickerOpen()"
+  (visibleChange)="onPickerVisibleChange($event)"
+  styleClass="meal-plan-picker-dialog"
+  [style]="{ width: 'min(100%, 32rem)' }"
+>
+  <div class="meal-plan-picker">
+    <p-iconfield class="meal-plan-picker__search">
+      <p-inputicon styleClass="pi pi-search" />
+      <input
+        pInputText
+        type="search"
+        class="w-full"
+        placeholder="Rechercher une recette…"
+        [value]="recipeSearch()"
+        (input)="recipeSearch.set($any($event.target).value)"
+      />
+    </p-iconfield>
+
+    @if (recipesLoading()) {
+      <div class="meal-plan-picker__loading" role="status">
+        <p-progressSpinner ariaLabel="Chargement des recettes" />
+      </div>
+    } @else if (filteredRecipes().length === 0) {
+      <p class="meal-plan-picker__empty" role="status">Aucune recette trouvée.</p>
+    } @else {
+      <ul class="meal-plan-picker__list">
+        @for (recipe of filteredRecipes(); track recipe.id) {
+          <li>
+            <button
+              type="button"
+              class="meal-plan-picker__item"
+              [disabled]="mutatingDate() !== null"
+              (click)="selectRecipe(recipe)"
+            >
+              <span class="meal-plan-picker__item-title">{{ recipe.title }}</span>
+              <span class="meal-plan-picker__item-meta">
+                {{ recipe.totalTimeMinutes }} min
+              </span>
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</p-dialog>

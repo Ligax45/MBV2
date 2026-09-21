@@ -39,6 +39,7 @@ Documentation détaillée :
 - Ingrédients avec quantité et unité
 - Étapes de préparation par recette
 - Bibliothèque avec recherche
+- Menu de la semaine (planification des repas, utilisateurs connectés)
 - Détail recette (ingrédients, étapes, équipement)
 - Thème clair / sombre
 - API modulaire et évolutive (NestJS)
