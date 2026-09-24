@@ -8,10 +8,12 @@ import {
   Post,
   Put,
   Query,
+  Res,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import type { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CurrentUser } from '../../auth/presentation/current-user.decorator';
 import type { AuthenticatedUser } from '../../auth/domain/auth-user.model';
@@ -24,6 +26,7 @@ import { AddRecipeFavoriteUseCase } from '../application/use-cases/add-recipe-fa
 import { ApproveRecipeUseCase } from '../application/use-cases/approve-recipe.usecase';
 import { CreateRecipeUseCase } from '../application/use-cases/create-recipe.usecase';
 import { DeleteRecipeUseCase } from '../application/use-cases/delete-recipe.usecase';
+import { ExportRecipePdfUseCase } from '../application/use-cases/export-recipe-pdf.usecase';
 import { GetRecipeByIdUseCase } from '../application/use-cases/get-recipe-by-id.usecase';
 import { GetEquipmentUseCase } from '../application/use-cases/get-equipment.usecase';
 import { GetRecipeTypesUseCase } from '../application/use-cases/get-recipe-types.usecase';
@@ -45,6 +48,7 @@ export class RecipeController {
   constructor(
     private readonly getRecipes: GetRecipesUseCase,
     private readonly getRecipeById: GetRecipeByIdUseCase,
+    private readonly exportRecipePdf: ExportRecipePdfUseCase,
     private readonly getRecipeTypes: GetRecipeTypesUseCase,
     private readonly getEquipment: GetEquipmentUseCase,
     private readonly createRecipe: CreateRecipeUseCase,
@@ -114,6 +118,21 @@ export class RecipeController {
     @CurrentUser() user?: AuthenticatedUser,
   ) {
     return this.getRecipeComments.execute(id, user);
+  }
+
+  @Get(':id/pdf')
+  @UseGuards(OptionalJwtAuthGuard)
+  async exportPdf(
+    @Param('id') id: string,
+    @Res({ passthrough: false }) res: Response,
+    @CurrentUser() user?: AuthenticatedUser,
+  ) {
+    const { buffer, filename } = await this.exportRecipePdf.execute(id, user);
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
+    res.setHeader('Content-Length', buffer.length);
+    res.send(buffer);
   }
 
   @Get(':id')

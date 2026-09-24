@@ -56,6 +56,12 @@ export class RecipeApiService {
     return this.http.get<RecipeDetailApiResponse>(`${this.baseUrl}/recipes/${id}`);
   }
 
+  downloadRecipePdf(id: string): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/recipes/${id}/pdf`, {
+      responseType: 'blob',
+    });
+  }
+
   getRecipeTypes(): Observable<RecipeTypeSummary[]> {
     return this.http.get<RecipeTypeSummary[]>(`${this.baseUrl}/recipes/types`);
   }

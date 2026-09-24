@@ -8,6 +8,7 @@ import { UpdateRecipeUseCase } from './application/use-cases/update-recipe.useca
 import { UploadRecipeImageUseCase } from './application/use-cases/upload-recipe-image.usecase';
 import { DeleteRecipeUseCase } from './application/use-cases/delete-recipe.usecase';
 import { GetEquipmentUseCase } from './application/use-cases/get-equipment.usecase';
+import { ExportRecipePdfUseCase } from './application/use-cases/export-recipe-pdf.usecase';
 import { GetRecipeByIdUseCase } from './application/use-cases/get-recipe-by-id.usecase';
 import { GetRecipeTypesUseCase } from './application/use-cases/get-recipe-types.usecase';
 import { GetRecipesUseCase } from './application/use-cases/get-recipes.usecase';
@@ -98,6 +99,7 @@ import { RecipeController } from './presentation/recipe.controller';
   providers: [
     GetRecipesUseCase,
     GetRecipeByIdUseCase,
+    ExportRecipePdfUseCase,
     GetRecipeTypesUseCase,
     GetEquipmentUseCase,
     CreateRecipeUseCase,

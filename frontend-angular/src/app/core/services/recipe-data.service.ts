@@ -130,4 +130,11 @@ export class RecipeDataService {
       .setRecipeComment(id, comment)
       .pipe(map((response) => response.userComment));
   }
+
+  downloadRecipePdf(id: string): Observable<Blob> {
+    if (environment.useMockData) {
+      return throwError(() => new Error('MOCK_PDF_UNSUPPORTED'));
+    }
+    return this.api.downloadRecipePdf(id);
+  }
 }
