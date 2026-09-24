@@ -48,6 +48,11 @@
   --error-text: #dc2626;
   --error-foreground: #ffffff;
   --overlay-scrim: rgb(0 0 0 / 50%);
+
+  /* Modales : hauteur stable (scroll interne, pas de resize au changement de contenu) */
+  --dialog-content-min-height: 9rem;
+  --dialog-picker-content-height: min(32rem, calc(85dvh - 6rem));
+  --dialog-crop-content-height: min(28rem, calc(75dvh - 6rem));
   --shadow-elevated: 0 8px 24px color-mix(in srgb, var(--foreground) 10%, transparent);
   --breakpoint-md: 768px;
 
@@ -76,6 +81,13 @@
   --meta-prep-text: var(--badge-easy-text);
   --meta-cook-bg: #fef3c7;
   --meta-cook-text: #b45309;
+}
+
+@media (max-width: 767px) {
+  :root {
+    --dialog-picker-content-height: min(28rem, calc(80dvh - 5rem));
+    --dialog-crop-content-height: min(26rem, calc(72dvh - 5rem));
+  }
 }
 
 html.light {

@@ -122,15 +122,13 @@
   }
 </div>
 
-<p-dialog
-  header="Choisir une recette"
-  [modal]="true"
-  [draggable]="false"
-  [resizable]="false"
+<app-dialog
+  title="Choisir une recette"
   [visible]="pickerOpen()"
   (visibleChange)="onPickerVisibleChange($event)"
-  styleClass="meal-plan-picker-dialog"
-  [style]="{ width: 'min(100%, 32rem)' }"
+  width="min(95vw, 36rem)"
+  contentHeight="var(--dialog-picker-content-height)"
+  dialogStyleClass="app-dialog meal-plan-picker-dialog"
 >
   <div class="meal-plan-picker">
     <p-iconfield class="meal-plan-picker__search">
@@ -138,37 +136,43 @@
       <input
         pInputText
         type="search"
-        class="w-full"
+        class="meal-plan-picker__search-input"
         placeholder="Rechercher une recette…"
         [value]="recipeSearch()"
         (input)="recipeSearch.set($any($event.target).value)"
       />
     </p-iconfield>
 
-    @if (recipesLoading()) {
-      <div class="meal-plan-picker__loading" role="status">
-        <p-progressSpinner ariaLabel="Chargement des recettes" />
-      </div>
-    } @else if (filteredRecipes().length === 0) {
-      <p class="meal-plan-picker__empty" role="status">Aucune recette trouvée.</p>
-    } @else {
-      <ul class="meal-plan-picker__list">
-        @for (recipe of filteredRecipes(); track recipe.id) {
-          <li>
-            <button
-              type="button"
-              class="meal-plan-picker__item"
-              [disabled]="mutatingDate() !== null"
-              (click)="selectRecipe(recipe)"
-            >
-              <span class="meal-plan-picker__item-title">{{ recipe.title }}</span>
-              <span class="meal-plan-picker__item-meta">
-                {{ recipe.totalTimeMinutes }} min
-              </span>
-            </button>
-          </li>
-        }
-      </ul>
-    }
+    <div
+      class="meal-plan-picker__results"
+      role="region"
+      aria-label="Résultats de recherche"
+    >
+      @if (recipesLoading()) {
+        <div class="meal-plan-picker__loading" role="status">
+          <p-progressSpinner ariaLabel="Chargement des recettes" />
+        </div>
+      } @else if (filteredRecipes().length === 0) {
+        <p class="meal-plan-picker__empty" role="status">Aucune recette trouvée.</p>
+      } @else {
+        <ul class="meal-plan-picker__list">
+          @for (recipe of filteredRecipes(); track recipe.id) {
+            <li>
+              <button
+                type="button"
+                class="meal-plan-picker__item"
+                [disabled]="mutatingDate() !== null"
+                (click)="selectRecipe(recipe)"
+              >
+                <span class="meal-plan-picker__item-title">{{ recipe.title }}</span>
+                <span class="meal-plan-picker__item-meta">
+                  {{ recipe.totalTimeMinutes }} min
+                </span>
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </div>
   </div>
-</p-dialog>
+</app-dialog>

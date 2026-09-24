@@ -1,7 +1,6 @@
 import { NgOptimizedImage } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { Dialog } from 'primeng/dialog';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
 import { InputText } from 'primeng/inputtext';
@@ -24,6 +23,7 @@ import {
 } from '@core/utils/meal-plan-week.util';
 import { filterRecipesByTitle } from '@core/utils/recipe-search.util';
 import { AlertService } from '@shared/services/alert.service';
+import { AppDialogComponent } from '@shared/components/app-dialog/app-dialog.component';
 import { ConfirmDialogService } from '@shared/services/confirm-dialog.service';
 
 @Component({
@@ -31,7 +31,7 @@ import { ConfirmDialogService } from '@shared/services/confirm-dialog.service';
   imports: [
     RouterLink,
     NgOptimizedImage,
-    Dialog,
+    AppDialogComponent,
     IconField,
     InputIcon,
     InputText,

@@ -11,10 +11,11 @@
 
 .meal-plan-page__title {
   margin: 0;
+  font-family: var(--font-display);
   font-size: 2rem;
   font-weight: 700;
   color: var(--foreground);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 
 .meal-plan-page__subtitle {
@@ -39,9 +40,15 @@
   padding: 0 0.75rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-pill);
-  background: var(--card);
+  background: var(--background);
   color: var(--foreground);
+  font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .meal-plan-page__nav-btn--text {
@@ -57,7 +64,8 @@
 }
 
 .meal-plan-page__nav-btn:not(:disabled):hover {
-  background: var(--sidebar-hover-bg);
+  border-color: color-mix(in srgb, var(--primary) 35%, var(--border));
+  background: var(--accent);
 }
 
 .meal-plan-page__nav-btn:focus-visible {
@@ -104,6 +112,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--card);
+  box-shadow: 0 2px 12px color-mix(in srgb, var(--foreground) 6%, transparent);
 }
 
 .meal-plan-day--busy {
@@ -135,6 +144,17 @@
   display: block;
   text-decoration: none;
   color: inherit;
+  border-radius: var(--radius-md);
+  transition: opacity 0.15s ease;
+}
+
+.meal-plan-day__recipe-link:hover {
+  opacity: 0.92;
+}
+
+.meal-plan-day__recipe-link:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--ring) 50%, transparent);
+  outline-offset: 2px;
 }
 
 .meal-plan-day__image-wrap {
@@ -192,10 +212,24 @@
   padding: 0 0.875rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-pill);
-  background: transparent;
+  background: var(--background);
   color: var(--foreground);
   font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.meal-plan-day__action:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--primary) 35%, var(--border));
+  background: var(--accent);
+}
+
+.meal-plan-day__action--danger:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--destructive) 45%, var(--border));
+  background: color-mix(in srgb, var(--destructive) 8%, var(--card));
 }
 
 .meal-plan-day__action--danger {
@@ -225,35 +259,74 @@
 }
 
 .meal-plan-day__empty:hover:not(:disabled) {
-  border-color: var(--primary);
-  color: var(--primary);
+  border-color: color-mix(in srgb, var(--primary) 45%, var(--border));
+  background: var(--accent);
+  color: var(--foreground);
+}
+
+.meal-plan-picker {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
 }
 
 .meal-plan-picker__search {
   display: block;
+  flex-shrink: 0;
   width: 100%;
   margin-bottom: 1rem;
 }
 
+.meal-plan-picker__results {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+:host ::ng-deep p-iconfield.meal-plan-picker__search {
+  display: block;
+  width: 100%;
+}
+
+.meal-plan-picker__search-input {
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 0.9375rem;
+}
+
 .meal-plan-picker__loading {
   display: flex;
+  flex: 1;
+  align-items: center;
   justify-content: center;
-  padding: 2rem 0;
+  min-height: 0;
 }
 
 .meal-plan-picker__empty {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
   margin: 0;
-  padding: 1rem 0;
+  padding: 1rem;
   text-align: center;
   color: var(--secondary);
 }
 
 .meal-plan-picker__list {
   list-style: none;
-  margin: 0;
-  padding: 0;
-  max-height: 50dvh;
+  flex: 1;
+  margin: 0 -0.375rem;
+  padding: 0 0.375rem;
+  min-height: 0;
   overflow-y: auto;
+  scrollbar-gutter: stable;
 }
 
 .meal-plan-picker__item {
@@ -263,17 +336,28 @@
   gap: 0.75rem;
   width: 100%;
   min-height: 52px;
-  padding: 0.75rem 0.5rem;
+  padding: 0.75rem 0.625rem;
   border: none;
   border-bottom: 1px solid var(--border);
+  border-radius: var(--radius-md);
   background: transparent;
   text-align: left;
   cursor: pointer;
   color: var(--foreground);
+  transition: background-color 0.15s ease;
 }
 
 .meal-plan-picker__item:hover:not(:disabled) {
-  background: var(--sidebar-hover-bg);
+  background: var(--accent);
+}
+
+.meal-plan-picker__item:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--ring) 50%, transparent);
+  outline-offset: 2px;
+}
+
+.meal-plan-picker__list li:last-child .meal-plan-picker__item {
+  border-bottom: none;
 }
 
 .meal-plan-picker__item-title {
