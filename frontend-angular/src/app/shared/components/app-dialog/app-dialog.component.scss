@@ -1,3 +1,32 @@
 :host ::ng-deep .app-dialog .p-dialog-content {
+  box-sizing: border-box;
+  min-height: var(--app-dialog-content-min-height, var(--dialog-content-min-height));
+}
+
+:host ::ng-deep .app-dialog.app-dialog--fixed-body .p-dialog-content {
+  display: flex;
+  flex-direction: column;
+  height: var(--app-dialog-content-height);
+  min-height: var(--app-dialog-content-height);
+  max-height: var(--app-dialog-content-height);
+  overflow: hidden;
+}
+
+:host ::ng-deep .app-dialog:not(.meal-plan-picker-dialog) .p-dialog-content {
   padding-top: 0.25rem;
+}
+
+:host ::ng-deep .app-dialog.meal-plan-picker-dialog .p-dialog-content {
+  padding: 1.25rem;
+}
+
+:host ::ng-deep .app-dialog.meal-plan-picker-dialog .p-dialog-header {
+  padding: 1.25rem 1.25rem 0.75rem;
+}
+
+:host ::ng-deep .app-dialog.meal-plan-picker-dialog .p-dialog-title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.25;
 }
