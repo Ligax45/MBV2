@@ -5,9 +5,14 @@ import { catchError, switchMap, throwError } from 'rxjs';
 
 import { AuthService } from '@core/services/auth.service';
 import { connexionRedirectQueryParams } from '@core/utils/auth-navigation.util';
+import { environment } from '../../../environments/environment';
 
 function isAuthEndpoint(url: string): boolean {
   return /\/auth\/(login|register|refresh|logout|mfa)/.test(url);
+}
+
+function isApiRequest(url: string): boolean {
+  return url.startsWith(environment.apiUrl) || url.startsWith('/api');
 }
 
 function redirectToConnexion(router: Router): void {
@@ -18,38 +23,23 @@ function redirectToConnexion(router: Router): void {
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
   const router = inject(Router);
-  const token = auth.getAccessToken();
 
-  const authReq = token
-    ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
+  const apiReq = isApiRequest(req.url)
+    ? req.clone({ withCredentials: true })
     : req;
 
-  return next(authReq).pipe(
+  return next(apiReq).pipe(
     catchError((err: unknown) => {
       if (!(err instanceof HttpErrorResponse) || err.status !== 401) {
         return throwError(() => err);
       }
 
-      if (isAuthEndpoint(req.url) || req.url.includes('/auth/refresh')) {
-        return throwError(() => err);
-      }
-
-      if (!auth.getRefreshToken()) {
-        auth.logoutLocal();
-        redirectToConnexion(router);
+      if (!isApiRequest(req.url) || isAuthEndpoint(req.url)) {
         return throwError(() => err);
       }
 
       return auth.refreshAccessToken().pipe(
-        switchMap(() => {
-          const newToken = auth.getAccessToken();
-          if (!newToken) {
-            return throwError(() => err);
-          }
-          return next(
-            req.clone({ setHeaders: { Authorization: `Bearer ${newToken}` } }),
-          );
-        }),
+        switchMap(() => next(apiReq.clone({ withCredentials: true }))),
         catchError((refreshErr) => {
           auth.logoutLocal();
           redirectToConnexion(router);
