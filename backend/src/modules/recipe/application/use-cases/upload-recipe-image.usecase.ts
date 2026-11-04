@@ -1,12 +1,15 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import type { AuthenticatedUser } from '../../../auth/domain/auth-user.model';
 import { SupabaseStorageService } from '../../../../core/storage/supabase-storage.service';
 import { RECIPE_REPOSITORY } from '../../domain/repositories/recipe.repository';
 import type { RecipeRepository } from '../../domain/repositories/recipe.repository';
+import { canModifyRecipe } from '../recipe-authorization.util';
 
 const PG_UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -39,6 +42,7 @@ export class UploadRecipeImageUseCase {
   async execute(
     recipeId: string,
     file: Express.Multer.File,
+    actor: AuthenticatedUser,
   ): Promise<UploadedRecipeImageResult> {
     const id = recipeId?.trim() ?? '';
     if (!id) throw new BadRequestException('id is required');
@@ -58,6 +62,12 @@ export class UploadRecipeImageUseCase {
 
     const existing = await this.recipeRepo.findById(id);
     if (!existing) throw new NotFoundException('Recette introuvable');
+
+    if (!canModifyRecipe(actor, existing.authorUserId ?? null)) {
+      throw new ForbiddenException(
+        'Seul l’auteur peut modifier l’image de cette recette',
+      );
+    }
 
     const extension =
       MIME_TO_EXT[mime] ??

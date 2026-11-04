@@ -40,7 +40,13 @@ import { SetRecipeCommentUseCase } from '../application/use-cases/set-recipe-com
 import { SetRecipeRatingUseCase } from '../application/use-cases/set-recipe-rating.usecase';
 import { UpdateRecipeUseCase } from '../application/use-cases/update-recipe.usecase';
 import { UploadRecipeImageUseCase } from '../application/use-cases/upload-recipe-image.usecase';
-import type { CreateRecipeParams } from '../domain/repositories/recipe.repository';
+import {
+  CreateRecipeDto,
+  RejectRecipeDto,
+  ReorderFavoritesDto,
+  SetRecipeCommentDto,
+  SetRecipeRatingDto,
+} from './dto/recipe.dto';
 import { recipeImageUploadOptions } from './recipe-image-upload.filter';
 
 @Controller('recipes')
@@ -105,10 +111,10 @@ export class RecipeController {
   @Put('favorites/order')
   @UseGuards(JwtAuthGuard)
   async reorderFavorites(
-    @Body() body: { recipeIds?: string[] },
+    @Body() body: ReorderFavoritesDto,
     @CurrentUser() user: AuthenticatedUser,
   ) {
-    return this.reorderRecipeFavorites.execute(body?.recipeIds ?? [], user);
+    return this.reorderRecipeFavorites.execute(body.recipeIds, user);
   }
 
   @Get(':id/comments')
@@ -148,7 +154,7 @@ export class RecipeController {
   @UseGuards(JwtAuthGuard)
   async create(
     @CurrentUser() user: AuthenticatedUser,
-    @Body() body: CreateRecipeParams,
+    @Body() body: CreateRecipeDto,
   ) {
     return this.createRecipe.execute(body, user.id);
   }
@@ -158,7 +164,7 @@ export class RecipeController {
   async update(
     @Param('id') id: string,
     @CurrentUser() user: AuthenticatedUser,
-    @Body() body: CreateRecipeParams,
+    @Body() body: CreateRecipeDto,
   ) {
     return this.updateRecipe.execute(id, body, user);
   }
@@ -203,20 +209,20 @@ export class RecipeController {
   @UseGuards(JwtAuthGuard)
   async setRating(
     @Param('id') id: string,
-    @Body() body: { rating?: number },
+    @Body() body: SetRecipeRatingDto,
     @CurrentUser() user: AuthenticatedUser,
   ) {
-    return this.setRecipeRating.execute(id, user, body?.rating);
+    return this.setRecipeRating.execute(id, user, body.rating);
   }
 
   @Put(':id/comment')
   @UseGuards(JwtAuthGuard)
   async setComment(
     @Param('id') id: string,
-    @Body() body: { comment?: string },
+    @Body() body: SetRecipeCommentDto,
     @CurrentUser() user: AuthenticatedUser,
   ) {
-    return this.setRecipeComment.execute(id, user, body?.comment);
+    return this.setRecipeComment.execute(id, user, body.comment);
   }
 
   @Post(':id/approve')
@@ -235,9 +241,9 @@ export class RecipeController {
   async reject(
     @Param('id') id: string,
     @CurrentUser() user: AuthenticatedUser,
-    @Body() body: { comment?: string },
+    @Body() body: RejectRecipeDto,
   ) {
-    return this.rejectRecipe.execute(id, user, body?.comment);
+    return this.rejectRecipe.execute(id, user, body.comment);
   }
 
   @Post(':id/image')
@@ -246,7 +252,8 @@ export class RecipeController {
   async uploadImage(
     @Param('id') id: string,
     @UploadedFile() file: Express.Multer.File,
+    @CurrentUser() user: AuthenticatedUser,
   ) {
-    return this.uploadRecipeImage.execute(id, file);
+    return this.uploadRecipeImage.execute(id, file, user);
   }
 }

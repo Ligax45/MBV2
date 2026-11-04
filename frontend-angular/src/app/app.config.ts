@@ -38,7 +38,7 @@ export const appConfig: ApplicationConfig = {
     MessageService,
     provideAppInitializer(() => {
       inject(ThemeService).initialize();
-      inject(AuthService).restoreSession();
+      return inject(AuthService).restoreSession();
     }),
   ],
 };

@@ -22,6 +22,12 @@ export class JwtKeyService {
       return;
     }
 
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error(
+        'JWT_PRIVATE_KEY and JWT_PUBLIC_KEY are required in production',
+      );
+    }
+
     const pair = generateKeyPairSync('rsa', {
       modulusLength: 2048,
     });
