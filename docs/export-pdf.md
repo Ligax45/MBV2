@@ -471,9 +471,9 @@ Tester avec la recette bouchon `id = 1` (fiche complète) et des cas synthétiqu
 
 | Besoin | Piste |
 |--------|-------|
-| Photo dans le PDF | Backend : fetch `imageUrl` (Supabase) + pdfmake `image` ; ou migration Puppeteer |
+| Photo dans le PDF | Backend : lire le fichier derrière `imageUrl` (`/api/media/...`) + pdfmake `image` ; ou migration Puppeteer |
 | Mise en page identique au site | Template HTML + Puppeteer / Playwright |
-| Cache PDF | Stocker dans Supabase Storage, URL signée |
+| Cache PDF | Fichier sur le disque du serveur, à côté des photos de recettes |
 | Export favoris / batch | Job async backend |
 | Watermark / branding | CSS print (Puppeteer) ou styles pdfmake enrichis |
 

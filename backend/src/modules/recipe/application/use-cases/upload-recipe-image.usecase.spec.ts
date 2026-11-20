@@ -3,7 +3,7 @@ import { UserRole } from '../../../auth/domain/user-role.enum';
 import type { AuthenticatedUser } from '../../../auth/domain/auth-user.model';
 import { Recipe } from '../../domain/entities/recipe.entity';
 import type { RecipeRepository } from '../../domain/repositories/recipe.repository';
-import type { SupabaseStorageService } from '../../../../core/storage/supabase-storage.service';
+import type { LocalImageStorageService } from '../../../../core/storage/local-image-storage.service';
 import { UploadRecipeImageUseCase } from './upload-recipe-image.usecase';
 
 function makeRecipe(authorUserId: string): Recipe {
@@ -52,7 +52,7 @@ describe('UploadRecipeImageUseCase', () => {
   } as Express.Multer.File;
 
   let recipeRepo: jest.Mocked<Pick<RecipeRepository, 'findById' | 'updateImageUrl'>>;
-  let storage: jest.Mocked<Pick<SupabaseStorageService, 'uploadRecipeCover'>>;
+  let storage: jest.Mocked<Pick<LocalImageStorageService, 'uploadRecipeCover'>>;
   let useCase: UploadRecipeImageUseCase;
 
   beforeEach(() => {
@@ -64,7 +64,7 @@ describe('UploadRecipeImageUseCase', () => {
       uploadRecipeCover: jest.fn().mockResolvedValue('https://cdn.example/cover.jpg'),
     };
     useCase = new UploadRecipeImageUseCase(
-      storage as unknown as SupabaseStorageService,
+      storage as unknown as LocalImageStorageService,
       recipeRepo as unknown as RecipeRepository,
     );
   });

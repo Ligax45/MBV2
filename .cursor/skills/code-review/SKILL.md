@@ -26,7 +26,7 @@ This skill is configured for the **MiamBookV2** mono-repo. Two independent packa
 
 | Package | Path | Role |
 |---------|------|------|
-| Backend | `backend/` | NestJS API REST, MikroORM, PostgreSQL/Supabase |
+| Backend | `backend/` | NestJS API REST, MikroORM, PostgreSQL |
 | Frontend | `frontend-angular/` | Angular 21, PrimeNG, proxy `/api` → `:3333` |
 
 ### Detecting which package(s) the diff touches

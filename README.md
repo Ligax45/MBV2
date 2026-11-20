@@ -10,7 +10,7 @@ MiamBookV2 est une **bibliothèque de recettes de cuisine** moderne : créer, or
 |--------|----------------|
 | **Frontend** | Angular 21, TypeScript, PrimeNG, PrimeIcons |
 | **Backend** | NestJS, API REST |
-| **Base de données** | PostgreSQL sur Supabase (MikroORM) |
+| **Base de données** | PostgreSQL (MikroORM) |
 | **Gestion des paquets** | npm |
 | **Architecture** | Mono-repo — frontend et backend séparés |
 
@@ -22,6 +22,7 @@ MiamBookV2 est une **bibliothèque de recettes de cuisine** moderne : créer, or
 MiamBookV2/
 ├── frontend-angular/     # Application Angular (UI)
 ├── backend/              # API NestJS + migrations PostgreSQL
+├── docker-compose.yml    # PostgreSQL + API + frontend
 ├── LICENSE
 └── README.md
 ```
@@ -50,7 +51,7 @@ Documentation détaillée :
 
 - **Node.js** 20+ (LTS recommandé)
 - **npm** 9+
-- Compte **Supabase** (PostgreSQL managé) pour le backend
+- **PostgreSQL** 16, ou Docker (y compris sur Raspberry Pi)
 
 ---
 
@@ -63,7 +64,7 @@ cd backend
 npm install
 ```
 
-Copier `backend/.env.example` vers `backend/.env`, renseigner la connexion **Supabase** (voir [backend/README.md](backend/README.md)), puis appliquer les migrations :
+Copier `backend/.env.example` vers `backend/.env`, renseigner PostgreSQL (voir [backend/README.md](backend/README.md)), puis appliquer les migrations :
 
 ```bash
 npm run migration:up
@@ -85,7 +86,23 @@ Application : [http://localhost:4200](http://localhost:4200)
 
 En développement, le proxy Angular redirige `/api` vers le backend (`proxy.conf.json` → port **3333**).
 
-### 3. Cursor + Impeccable (optionnel, UI design)
+### 3. Docker (Raspberry Pi ou machine locale)
+
+À la racine :
+
+```bash
+cp .env.example .env
+```
+
+Renseigner `JWT_PRIVATE_KEY` et `JWT_PUBLIC_KEY` (générées avec `npm run auth:generate-keys` dans `backend/`). Sur le Pi, adapter `CORS_ORIGINS` à l’adresse utilisée par le navigateur.
+
+```bash
+docker compose up --build
+```
+
+L’application est servie sur le port **80**. PostgreSQL n’est pas exposé hors du réseau Docker. Les photos restent dans le volume `recipe-images`.
+
+### 4. Cursor + Impeccable (optionnel, UI design)
 
 Impeccable n’est pas versionné dans le dépôt. Après un clone, à la racine du mono-repo :
 

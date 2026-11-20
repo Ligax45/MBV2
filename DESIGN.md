@@ -337,7 +337,7 @@ Bordures fines `1px solid var(--border)` pour séparer sans alourdir. Pas de coi
 - **Do** tester à 320px : barres d'action visibles, scroll sans masquer les contrôles fixes.
 - **Do** respecter `100dvh` + safe areas sur les écrans immersifs (mode cuisson).
 - **Do** utiliser PrimeNG pour composants complexes, avec overrides dans `primeng-overrides.scss` (clair et `.dark`).
-- **Do** charger les images recettes via `NgOptimizedImage` + `recipeImageLoader` pour les URLs Supabase.
+- **Do** charger les images recettes via `NgOptimizedImage` + `recipeImageLoader`. Les photos servies par l’API sont des URL `/api/media/...`.
 - **Do** utiliser `--error-border` / `--error-text` pour tout état de validation — jamais `--p-red-*` ni hex rouge isolé.
 - **Do** préférer `color-mix(in srgb, var(--foreground) N%, transparent)` pour les ombres sur surfaces thème-aware (mode cuisson, create-recipe).
 
