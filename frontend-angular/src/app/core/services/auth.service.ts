@@ -13,8 +13,6 @@ import type {
 import { isAuthSuccessResponse } from '@core/models/auth-api.model';
 import { environment } from '../../../environments/environment';
 
-const ACCESS_TOKEN_KEY = 'miambook_access_token';
-const REFRESH_TOKEN_KEY = 'miambook_refresh_token';
 const USER_STORAGE_KEY = 'miambook_user';
 
 @Injectable({ providedIn: 'root' })
@@ -30,29 +28,36 @@ export class AuthService {
 
   login(payload: LoginPayload): Observable<AuthApiResponse> {
     return this.http
-      .post<AuthApiResponse>(`${this.baseUrl}/auth/login`, payload)
+      .post<AuthApiResponse>(`${this.baseUrl}/auth/login`, payload, {
+        withCredentials: true,
+      })
       .pipe(tap((response) => this.handleAuthResponse(response)));
   }
 
   register(payload: RegisterPayload): Observable<AuthApiResponse> {
     return this.http
-      .post<AuthApiResponse>(`${this.baseUrl}/auth/register`, payload)
+      .post<AuthApiResponse>(`${this.baseUrl}/auth/register`, payload, {
+        withCredentials: true,
+      })
       .pipe(tap((response) => this.handleAuthResponse(response)));
   }
 
   verifyMfa(mfaSessionToken: string, totpCode: string): Observable<AuthSuccessResponse> {
     return this.http
-      .post<AuthSuccessResponse>(`${this.baseUrl}/auth/mfa/verify`, {
-        mfaSessionToken,
-        totpCode,
-      })
+      .post<AuthSuccessResponse>(
+        `${this.baseUrl}/auth/mfa/verify`,
+        { mfaSessionToken, totpCode },
+        { withCredentials: true },
+      )
       .pipe(tap((response) => this.persistSession(response)));
   }
 
   setupMfaRequired(mfaSetupSessionToken: string): Observable<MfaSetupResponse> {
-    return this.http.post<MfaSetupResponse>(`${this.baseUrl}/auth/mfa/setup-required`, {
-      mfaSetupSessionToken,
-    });
+    return this.http.post<MfaSetupResponse>(
+      `${this.baseUrl}/auth/mfa/setup-required`,
+      { mfaSetupSessionToken },
+      { withCredentials: true },
+    );
   }
 
   confirmMfaRequired(
@@ -60,22 +65,22 @@ export class AuthService {
     totpCode: string,
   ): Observable<AuthSuccessResponse> {
     return this.http
-      .post<AuthSuccessResponse>(`${this.baseUrl}/auth/mfa/confirm-required`, {
-        mfaSetupSessionToken,
-        totpCode,
-      })
+      .post<AuthSuccessResponse>(
+        `${this.baseUrl}/auth/mfa/confirm-required`,
+        { mfaSetupSessionToken, totpCode },
+        { withCredentials: true },
+      )
       .pipe(tap((response) => this.persistSession(response)));
   }
 
   refreshAccessToken(): Observable<void> {
-    const refreshToken = this.getRefreshToken();
-    if (!refreshToken) {
-      return throwError(() => new Error('NO_REFRESH_TOKEN'));
-    }
-
     if (!this.refreshInFlight) {
       this.refreshInFlight = this.http
-        .post<AuthSuccessResponse>(`${this.baseUrl}/auth/refresh`, { refreshToken })
+        .post<AuthSuccessResponse>(
+          `${this.baseUrl}/auth/refresh`,
+          {},
+          { withCredentials: true },
+        )
         .pipe(
           tap((response) => this.persistSession(response)),
           map(() => undefined),
@@ -90,59 +95,36 @@ export class AuthService {
   }
 
   logout(): Observable<{ success: boolean } | void> {
-    const refreshToken = this.getRefreshToken();
     this.clearSession();
 
-    if (!refreshToken) {
-      return new Observable((subscriber) => {
-        subscriber.next();
-        subscriber.complete();
-      });
-    }
-
-    return this.http.post<{ success: boolean }>(`${this.baseUrl}/auth/logout`, {
-      refreshToken,
-    });
+    return this.http.post<{ success: boolean }>(
+      `${this.baseUrl}/auth/logout`,
+      {},
+      { withCredentials: true },
+    );
   }
 
   logoutLocal(): void {
     this.clearSession();
   }
 
-  getAccessToken(): string | null {
-    return localStorage.getItem(ACCESS_TOKEN_KEY);
-  }
-
-  getRefreshToken(): string | null {
-    return localStorage.getItem(REFRESH_TOKEN_KEY);
-  }
-
   async restoreSession(): Promise<void> {
-    const accessToken = this.getAccessToken();
-    const refreshToken = this.getRefreshToken();
-    const storedUser = this.readStoredUser();
-
-    if (!accessToken || !refreshToken || !storedUser) {
-      this.clearSession();
-      return;
-    }
-
-    this.userSignal.set(storedUser);
-
     try {
       const user = await firstValueFrom(
-        this.http.get<AuthUser>(`${this.baseUrl}/auth/me`),
+        this.http.get<AuthUser>(`${this.baseUrl}/auth/me`, {
+          withCredentials: true,
+        }),
       );
-      this.userSignal.set(user);
-      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+      this.persistUser(user);
     } catch {
       try {
         await firstValueFrom(this.refreshAccessToken());
         const user = await firstValueFrom(
-          this.http.get<AuthUser>(`${this.baseUrl}/auth/me`),
+          this.http.get<AuthUser>(`${this.baseUrl}/auth/me`, {
+            withCredentials: true,
+          }),
         );
-        this.userSignal.set(user);
-        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+        this.persistUser(user);
       } catch {
         this.clearSession();
       }
@@ -156,16 +138,19 @@ export class AuthService {
   }
 
   private persistSession(response: AuthSuccessResponse): void {
-    localStorage.setItem(ACCESS_TOKEN_KEY, response.accessToken);
-    localStorage.setItem(REFRESH_TOKEN_KEY, response.refreshToken);
-    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(response.user));
-    this.userSignal.set(response.user);
+    this.persistUser(response.user);
+  }
+
+  private persistUser(user: AuthUser): void {
+    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+    this.userSignal.set(user);
   }
 
   private clearSession(): void {
-    localStorage.removeItem(ACCESS_TOKEN_KEY);
-    localStorage.removeItem(REFRESH_TOKEN_KEY);
     localStorage.removeItem(USER_STORAGE_KEY);
+    // Legacy cleanup (ancien stockage Bearer).
+    localStorage.removeItem('miambook_access_token');
+    localStorage.removeItem('miambook_refresh_token');
     this.userSignal.set(null);
   }
 

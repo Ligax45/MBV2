@@ -70,3 +70,10 @@ export function isAuthSuccessResponse(
 ): response is AuthSuccessResponse {
   return 'accessToken' in response;
 }
+
+/** Réponse HTTP publique : tokens transmis uniquement via cookies httpOnly. */
+export function toPublicAuthSuccessResponse(
+  response: AuthSuccessResponse,
+): { user: AuthUserResponse } {
+  return { user: response.user };
+}

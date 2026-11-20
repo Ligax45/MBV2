@@ -8,8 +8,6 @@ export interface AuthUser {
 }
 
 export interface AuthSuccessResponse {
-  accessToken: string;
-  refreshToken: string;
   user: AuthUser;
 }
 
@@ -47,7 +45,11 @@ export interface MfaSetupResponse {
 export function isAuthSuccessResponse(
   response: AuthApiResponse,
 ): response is AuthSuccessResponse {
-  return 'accessToken' in response;
+  return (
+    'user' in response &&
+    !('mfaRequired' in response) &&
+    !('mfaSetupRequired' in response)
+  );
 }
 
 export function isMfaRequiredResponse(
