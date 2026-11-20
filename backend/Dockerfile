@@ -25,9 +25,14 @@ RUN addgroup -S nestjs && adduser -S nestjs -G nestjs
 COPY package.json package-lock.json ./
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh \
+    && mkdir -p /data/recipe-images \
+    && chown -R nestjs:nestjs /data/recipe-images
 
 USER nestjs
 
 EXPOSE 3333
 
-CMD ["node", "dist/main"]
+ENTRYPOINT ["docker-entrypoint.sh"]

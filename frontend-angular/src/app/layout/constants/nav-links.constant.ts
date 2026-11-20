@@ -17,4 +17,10 @@ export const NAV_LINKS: readonly NavLink[] = [
     requiresAuth: true,
   },
   { path: '/bibliotheque/mes-recettes', label: 'Mes recettes', icon: 'pi pi-folder', requiresAuth: true },
+  {
+    path: '/planification',
+    label: 'Menu de la semaine',
+    icon: 'pi pi-calendar',
+    requiresAuth: true,
+  },
 ] as const;

@@ -1,0 +1,53 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-miambook}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-miambook}
+      POSTGRES_DB: ${POSTGRES_DB:-miambookv2_db}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-miambook} -d ${POSTGRES_DB:-miambookv2_db}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  backend:
+    build: ./backend
+    environment:
+      PORT: 3333
+      NODE_ENV: production
+      RUN_MIGRATIONS: "true"
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${POSTGRES_USER:-miambook}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-miambook}
+      DB_NAME: ${POSTGRES_DB:-miambookv2_db}
+      DB_SSL: "false"
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost}
+      COOKIE_PATH: /api
+      COOKIE_SECURE: "false"
+      RECIPE_IMAGES_DIR: /data/recipe-images
+      JWT_PRIVATE_KEY: ${JWT_PRIVATE_KEY:?Définis JWT_PRIVATE_KEY dans le fichier .env}
+      JWT_PUBLIC_KEY: ${JWT_PUBLIC_KEY:?Définis JWT_PUBLIC_KEY dans le fichier .env}
+    volumes:
+      - recipe-images:/data/recipe-images
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend-angular
+    ports:
+      - "${HTTP_PORT:-80}:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres-data:
+  recipe-images:

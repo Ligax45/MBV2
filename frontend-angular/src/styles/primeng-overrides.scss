@@ -300,7 +300,13 @@ html.dark .p-dialog .p-dialog-header {
 
 html.light .p-dialog .p-dialog-content,
 html.dark .p-dialog .p-dialog-content {
+  box-sizing: border-box;
   color: var(--foreground);
+}
+
+html.light .p-dialog:not(.app-dialog):not(.photo-crop-dialog) .p-dialog-content,
+html.dark .p-dialog:not(.app-dialog):not(.photo-crop-dialog) .p-dialog-content {
+  min-height: var(--dialog-content-min-height);
 }
 
 html.light .p-dialog .p-dialog-footer,

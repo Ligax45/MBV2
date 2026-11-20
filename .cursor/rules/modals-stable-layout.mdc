@@ -1,0 +1,32 @@
+---
+description: Modales — dimensions stables (pas de resize au changement de contenu interne)
+globs: frontend-angular/**/*
+alwaysApply: false
+---
+
+# Modales — layout stable
+
+## Règle produit
+
+Une modale **ne doit pas changer de taille** quand son contenu interne change (recherche, filtre, chargement, liste vide, nombre d’éléments, etc.). Seul le **viewport** (mobile / tablette / desktop, rotation, redimensionnement du navigateur) peut faire varier les dimensions via `min()`, `dvh`, `vw` et les media queries.
+
+## Implémentation
+
+1. **Préférer `app-dialog`** (`shared/components/app-dialog`) pour toute nouvelle modale.
+2. **Corps à hauteur fixe** quand le contenu est dynamique (listes, recherche, états async) :
+   - Passer `contentHeight="var(--dialog-*-content-height)"` (ou une valeur `min(..., calc(...dvh...))` cohérente).
+   - Ajouter un token dans `src/styles/tokens.scss` si la hauteur est réutilisable.
+3. **Scroll interne** : zone liste / résultats en `flex: 1; min-height: 0; overflow-y: auto` dans un conteneur flex colonne qui remplit le corps fixe (`app-dialog--fixed-body`).
+4. **États vides / chargement** : occuper la **même zone** que la liste (wrapper `__results`), centrés en flex — pas de hauteur « au contenu ».
+5. **`p-dialog` direct** (exception rare) : même contrat — hauteur fixe sur `.p-dialog-content` + scroll interne (voir `photo-crop-dialog`).
+6. **Largeur** : définie une fois (`width` sur `app-dialog` ou `style` PrimeNG), pas de largeur qui dépend du nombre de lignes.
+
+## Anti-patterns
+
+- `max-height: 50dvh` sur une liste **sans** hauteur fixe du parent → la modale rétrécit quand il y a moins d’items.
+- Corps modale sans `min-height` sur les dialogues de confirmation / contenu variable léger.
+- Ajuster padding ou marges pour « compenser » un saut de hauteur au lieu de fixer le shell.
+
+## Vérification rapide
+
+Ouvrir la modale, taper une recherche qui filtre à 0 / 1 / N résultats : la boîte (header + corps + footer) garde la même taille ; seul le scroll interne bouge.

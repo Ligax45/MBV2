@@ -32,7 +32,7 @@ Ce n’est pas un simple carnet de notes ni un flux social générique : c’est
 ## Operating Context
 
 - **Usage typique** : en cuisine (mobile), à la maison pour préparer un repas ; consultation rapide de la bibliothèque ou de « Mes recettes » ; création/édition de fiches quand on n’est pas en train de cuisiner.
-- **Environnement technique** : mono-repo `MBV2` — frontend Angular 21 (port 4200), API NestJS (port 3333), PostgreSQL via Supabase ; proxy dev `/api` → backend.
+- **Environnement technique** : mono-repo `MBV2` — frontend Angular 21 (port 4200), API NestJS (port 3333), PostgreSQL local ; proxy dev `/api` → backend. Les photos sont des fichiers sur le disque du serveur.
 - **Mode démo** : données bouchon locales (`useMockData: true`) sans base ; bascule API réelle via `environment.development.ts`.
 - **Thème** : clair / sombre, persistance `localStorage` (`miambook-theme`).
 

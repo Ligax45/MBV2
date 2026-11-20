@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import type { AuthenticatedUser } from '../../../auth/domain/auth-user.model';
-import { SupabaseStorageService } from '../../../../core/storage/supabase-storage.service';
+import { LocalImageStorageService } from '../../../../core/storage/local-image-storage.service';
 import { RECIPE_REPOSITORY } from '../../domain/repositories/recipe.repository';
 import type { RecipeRepository } from '../../domain/repositories/recipe.repository';
 import { canModifyRecipe } from '../recipe-authorization.util';
@@ -35,7 +35,7 @@ export interface UploadedRecipeImageResult {
 @Injectable()
 export class UploadRecipeImageUseCase {
   constructor(
-    private readonly storage: SupabaseStorageService,
+    private readonly storage: LocalImageStorageService,
     @Inject(RECIPE_REPOSITORY) private readonly recipeRepo: RecipeRepository,
   ) {}
 
@@ -77,7 +77,6 @@ export class UploadRecipeImageUseCase {
     const imageUrl = await this.storage.uploadRecipeCover(
       id,
       file.buffer,
-      mime,
       extension,
     );
 

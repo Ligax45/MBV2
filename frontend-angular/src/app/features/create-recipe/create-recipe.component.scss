@@ -635,6 +635,14 @@
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
 
+:host ::ng-deep .photo-crop-dialog .p-dialog-content {
+  box-sizing: border-box;
+  height: var(--dialog-crop-content-height);
+  min-height: var(--dialog-crop-content-height);
+  max-height: var(--dialog-crop-content-height);
+  overflow: auto;
+}
+
 .photo-crop-dialog__hint {
   margin: 0 0 1rem;
   color: var(--muted-foreground);
