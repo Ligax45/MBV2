@@ -4,6 +4,7 @@ import { UpdateUserRoleUseCase } from '../application/use-cases/update-user-role
 import { UserRole } from '../domain/user-role.enum';
 import { CurrentUser } from './current-user.decorator';
 import type { AuthenticatedUser } from '../domain/auth-user.model';
+import { UpdateUserRoleDto } from './dto/admin.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { Roles } from './roles.decorator';
 import { RolesGuard } from './roles.guard';
@@ -26,7 +27,7 @@ export class AdminController {
   async patchUserRole(
     @CurrentUser() actor: AuthenticatedUser,
     @Param('id') id: string,
-    @Body() body: { role: string },
+    @Body() body: UpdateUserRoleDto,
   ) {
     return this.updateUserRole.execute(actor, id, body.role);
   }

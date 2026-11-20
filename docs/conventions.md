@@ -56,6 +56,7 @@ Transversal : `backend/src/core/` (database, storage), `backend/src/migrations/`
 | `*.repository.ts` | Interface repository (domain) |
 | `*.repository.impl.ts` | Implémentation repository |
 | `*.controller.ts` | Controller REST |
+| `*.dto.ts` | DTO validation HTTP (`presentation/dto/`) |
 | `*.guard.ts` / `*.decorator.ts` / `*.strategy.ts` | Couche presentation auth |
 | `*-response.util.ts` / `*-authorization.util.ts` | Utils application |
 | `*.entity.ts` | Entité domaine |
@@ -69,12 +70,13 @@ Kebab-case, guillemets simples, trailing commas (Prettier).
 
 - **Pas de préfixe global Nest** — le proxy Angular réécrit `/api` → backend `:3333`.
 - Préfixes par module : `recipes`, `auth`, `admin`.
-- **Pas de fichiers `*.dto.ts`** — types inline dans controllers ou interfaces domaine (`CreateRecipeParams`).
-- **Validation manuelle** dans les use cases via `BadRequestException` (pas de `ValidationPipe` global ni `class-validator`).
+- **DTOs `class-validator`** dans `presentation/dto/*.dto.ts` pour les bodies HTTP ; `ValidationPipe` global (`whitelist`, `forbidNonWhitelisted`, `transform`) dans `main.ts`.
+- **Validation métier complémentaire** possible dans les use cases via `BadRequestException`.
 - **Query params booléens** : chaînes `'true'` (`?favorites=true`, `?mine=true`).
-- **JSON** : camelCase (`imageUrl`, `recipeTypeId`). Dates en ISO string.
+- **JSON** : camelCase (`imageUrl`, `recipeTypeId`). Dates en ISO string. Body JSON limité (~100kb).
 - **Erreurs** : exceptions Nest natives (`BadRequestException`, `UnauthorizedException`, `ForbiddenException`, `NotFoundException`).
 - Messages d'erreur métier en **français** ; messages de validation technique souvent en anglais — ne pas uniformiser sans décision explicite.
+- **HTTP hardening** : `helmet`, `@nestjs/throttler` (limites plus strictes sur auth/MFA), CORS via `CORS_ORIGINS` avec `credentials: true`.
 
 ---
 
@@ -82,19 +84,26 @@ Kebab-case, guillemets simples, trailing commas (Prettier).
 
 ### Backend
 
-- JWT **RS256** (paire de clés, `JwtKeysModule`).
-- Access token 15 min, refresh token 30 jours en DB.
-- Guards : `JwtAuthGuard`, `OptionalJwtAuthGuard`, `RolesGuard`.
+- JWT **RS256** (paire de clés, `JwtKeysModule`). Clés **obligatoires** si `NODE_ENV=production`.
+- Access token 15 min, refresh token 30 jours en DB (secret hashé Argon2, rotation au refresh).
+- Tokens délivrés en **cookies httpOnly** (`mb_access`, `mb_refresh`) : `SameSite=Lax`, `Path=/api` (`COOKIE_PATH`), `Secure` en prod.
+- Le body JSON de succès auth ne contient **plus** les tokens — seulement `user` (et flags MFA).
+- Extraction JWT : cookie `mb_access` (fallback Bearer pour outils/tests).
+- Guards : `JwtAuthGuard`, `OptionalJwtAuthGuard` (cookie ou Bearer), `RolesGuard`.
+- Middleware CSRF Origin : mutations rejetées si `Origin`/`Referer` hors allowlist CORS.
 - Décorateurs : `@CurrentUser()`, `@Roles(UserRole.Admin, ...)`.
 - Rôles : `user | moderator | admin`.
 
 ### Frontend
 
-- Tokens en `localStorage` (`miambook_access_token`, `miambook_refresh_token`, `miambook_user`).
-- `AuthService` : signals + `restoreSession()` au démarrage.
-- `authInterceptor` : Bearer token + refresh automatique sur 401.
+- Auth par **cookies httpOnly** via proxy même origine `/api` + `withCredentials: true`.
+- Plus de tokens dans `localStorage` (legacy keys nettoyées au logout). Cache UI optionnel : `miambook_user`.
+- `AuthService` : signals + `restoreSession()` via `GET /auth/me` (await dans `provideAppInitializer`).
+- `authInterceptor` : credentials sur `/api`, refresh automatique sur 401 (hors endpoints auth).
+- MFA QR généré **localement** (`qrcode`), sans envoyer le secret à un tiers.
+- `returnUrl` : chemins internes relatifs uniquement (pas `//…`).
 - `CurrentUserService` : façade computed (`isAdmin`, `canModerateRecipes`, `hasRole()`).
-- Guards fonctionnels `CanActivateFn` (`authGuard`, `roleGuard`) avec `route.data.roles`.
+- Guards fonctionnels `CanActivateFn` (`authGuard`, `roleGuard`) avec `route.data.roles` — **UI only** ; l’API reste la source de vérité.
 
 Tout changement auth doit être vérifié **des deux côtés** (backend guards + frontend interceptor/guards).
 

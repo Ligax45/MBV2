@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { TokenService } from '../../infrastructure/token.service';
 
 export interface LogoutInput {
@@ -11,11 +11,9 @@ export class LogoutUseCase {
 
   async execute(input: LogoutInput) {
     const refreshToken = input.refreshToken?.trim();
-    if (!refreshToken) {
-      throw new BadRequestException('refreshToken is required');
+    if (refreshToken) {
+      await this.tokenService.revokeRefreshToken(refreshToken);
     }
-
-    await this.tokenService.revokeRefreshToken(refreshToken);
     return { success: true };
   }
 }

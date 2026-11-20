@@ -8,10 +8,12 @@ import {
   Post,
   Put,
   Query,
+  Res,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import type { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CurrentUser } from '../../auth/presentation/current-user.decorator';
 import type { AuthenticatedUser } from '../../auth/domain/auth-user.model';
@@ -24,6 +26,7 @@ import { AddRecipeFavoriteUseCase } from '../application/use-cases/add-recipe-fa
 import { ApproveRecipeUseCase } from '../application/use-cases/approve-recipe.usecase';
 import { CreateRecipeUseCase } from '../application/use-cases/create-recipe.usecase';
 import { DeleteRecipeUseCase } from '../application/use-cases/delete-recipe.usecase';
+import { ExportRecipePdfUseCase } from '../application/use-cases/export-recipe-pdf.usecase';
 import { GetRecipeByIdUseCase } from '../application/use-cases/get-recipe-by-id.usecase';
 import { GetEquipmentUseCase } from '../application/use-cases/get-equipment.usecase';
 import { GetRecipeTypesUseCase } from '../application/use-cases/get-recipe-types.usecase';
@@ -37,7 +40,13 @@ import { SetRecipeCommentUseCase } from '../application/use-cases/set-recipe-com
 import { SetRecipeRatingUseCase } from '../application/use-cases/set-recipe-rating.usecase';
 import { UpdateRecipeUseCase } from '../application/use-cases/update-recipe.usecase';
 import { UploadRecipeImageUseCase } from '../application/use-cases/upload-recipe-image.usecase';
-import type { CreateRecipeParams } from '../domain/repositories/recipe.repository';
+import {
+  CreateRecipeDto,
+  RejectRecipeDto,
+  ReorderFavoritesDto,
+  SetRecipeCommentDto,
+  SetRecipeRatingDto,
+} from './dto/recipe.dto';
 import { recipeImageUploadOptions } from './recipe-image-upload.filter';
 
 @Controller('recipes')
@@ -45,6 +54,7 @@ export class RecipeController {
   constructor(
     private readonly getRecipes: GetRecipesUseCase,
     private readonly getRecipeById: GetRecipeByIdUseCase,
+    private readonly exportRecipePdf: ExportRecipePdfUseCase,
     private readonly getRecipeTypes: GetRecipeTypesUseCase,
     private readonly getEquipment: GetEquipmentUseCase,
     private readonly createRecipe: CreateRecipeUseCase,
@@ -101,10 +111,10 @@ export class RecipeController {
   @Put('favorites/order')
   @UseGuards(JwtAuthGuard)
   async reorderFavorites(
-    @Body() body: { recipeIds?: string[] },
+    @Body() body: ReorderFavoritesDto,
     @CurrentUser() user: AuthenticatedUser,
   ) {
-    return this.reorderRecipeFavorites.execute(body?.recipeIds ?? [], user);
+    return this.reorderRecipeFavorites.execute(body.recipeIds, user);
   }
 
   @Get(':id/comments')
@@ -114,6 +124,21 @@ export class RecipeController {
     @CurrentUser() user?: AuthenticatedUser,
   ) {
     return this.getRecipeComments.execute(id, user);
+  }
+
+  @Get(':id/pdf')
+  @UseGuards(OptionalJwtAuthGuard)
+  async exportPdf(
+    @Param('id') id: string,
+    @Res({ passthrough: false }) res: Response,
+    @CurrentUser() user?: AuthenticatedUser,
+  ) {
+    const { buffer, filename } = await this.exportRecipePdf.execute(id, user);
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
+    res.setHeader('Content-Length', buffer.length);
+    res.send(buffer);
   }
 
   @Get(':id')
@@ -129,7 +154,7 @@ export class RecipeController {
   @UseGuards(JwtAuthGuard)
   async create(
     @CurrentUser() user: AuthenticatedUser,
-    @Body() body: CreateRecipeParams,
+    @Body() body: CreateRecipeDto,
   ) {
     return this.createRecipe.execute(body, user.id);
   }
@@ -139,7 +164,7 @@ export class RecipeController {
   async update(
     @Param('id') id: string,
     @CurrentUser() user: AuthenticatedUser,
-    @Body() body: CreateRecipeParams,
+    @Body() body: CreateRecipeDto,
   ) {
     return this.updateRecipe.execute(id, body, user);
   }
@@ -184,20 +209,20 @@ export class RecipeController {
   @UseGuards(JwtAuthGuard)
   async setRating(
     @Param('id') id: string,
-    @Body() body: { rating?: number },
+    @Body() body: SetRecipeRatingDto,
     @CurrentUser() user: AuthenticatedUser,
   ) {
-    return this.setRecipeRating.execute(id, user, body?.rating);
+    return this.setRecipeRating.execute(id, user, body.rating);
   }
 
   @Put(':id/comment')
   @UseGuards(JwtAuthGuard)
   async setComment(
     @Param('id') id: string,
-    @Body() body: { comment?: string },
+    @Body() body: SetRecipeCommentDto,
     @CurrentUser() user: AuthenticatedUser,
   ) {
-    return this.setRecipeComment.execute(id, user, body?.comment);
+    return this.setRecipeComment.execute(id, user, body.comment);
   }
 
   @Post(':id/approve')
@@ -216,9 +241,9 @@ export class RecipeController {
   async reject(
     @Param('id') id: string,
     @CurrentUser() user: AuthenticatedUser,
-    @Body() body: { comment?: string },
+    @Body() body: RejectRecipeDto,
   ) {
-    return this.rejectRecipe.execute(id, user, body?.comment);
+    return this.rejectRecipe.execute(id, user, body.comment);
   }
 
   @Post(':id/image')
@@ -227,7 +252,8 @@ export class RecipeController {
   async uploadImage(
     @Param('id') id: string,
     @UploadedFile() file: Express.Multer.File,
+    @CurrentUser() user: AuthenticatedUser,
   ) {
-    return this.uploadRecipeImage.execute(id, file);
+    return this.uploadRecipeImage.execute(id, file, user);
   }
 }

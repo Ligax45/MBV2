@@ -6,6 +6,7 @@ import { Button } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { InputText } from 'primeng/inputtext';
 import { Password } from 'primeng/password';
+import QRCode from 'qrcode';
 
 import type { AuthApiResponse } from '@core/models/auth-api.model';
 import {
@@ -177,15 +178,26 @@ export class AuthComponent implements OnInit {
     this.submitting.set(true);
     this.auth.setupMfaRequired(mfaSetupSessionToken).subscribe({
       next: (setup) => {
-        this.submitting.set(false);
-        this.mfaSecret = setup.secret;
-        this.otpauthUri = setup.otpauthUri;
-        this.qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(setup.otpauthUri)}`;
-        this.totpCode = '';
-        this.view.set('mfa-setup');
+        void this.showMfaSetup(setup.secret, setup.otpauthUri);
       },
       error: (err) => this.handleError(err, 'Configuration MFA impossible'),
     });
+  }
+
+  private async showMfaSetup(secret: string, otpauthUri: string): Promise<void> {
+    try {
+      this.mfaSecret = secret;
+      this.otpauthUri = otpauthUri;
+      this.qrCodeUrl = await QRCode.toDataURL(otpauthUri, {
+        width: 200,
+        margin: 1,
+      });
+      this.totpCode = '';
+      this.view.set('mfa-setup');
+      this.submitting.set(false);
+    } catch (err) {
+      this.handleError(err, 'Génération du QR code MFA impossible');
+    }
   }
 
   private navigateAfterAuth(): void {

@@ -1,4 +1,18 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
+import type { Request, Response } from 'express';
+import {
+  isAuthSuccessResponse,
+  toPublicAuthSuccessResponse,
+} from '../application/auth-response.util';
 import { ConfirmMfaUseCase } from '../application/use-cases/confirm-mfa.usecase';
 import { DisableMfaUseCase } from '../application/use-cases/disable-mfa.usecase';
 import { GetCurrentUserUseCase } from '../application/use-cases/get-current-user.usecase';
@@ -8,8 +22,22 @@ import { RefreshTokenUseCase } from '../application/use-cases/refresh-token.usec
 import { RegisterUseCase } from '../application/use-cases/register.usecase';
 import { SetupMfaUseCase } from '../application/use-cases/setup-mfa.usecase';
 import { VerifyMfaUseCase } from '../application/use-cases/verify-mfa.usecase';
-import { CurrentUser } from './current-user.decorator';
 import type { AuthenticatedUser } from '../domain/auth-user.model';
+import {
+  REFRESH_COOKIE_NAME,
+  clearAuthCookies,
+  setAuthCookies,
+} from './auth-cookies';
+import { CurrentUser } from './current-user.decorator';
+import {
+  LoginDto,
+  MfaConfirmDto,
+  MfaConfirmRequiredDto,
+  MfaDisableDto,
+  MfaSetupRequiredDto,
+  MfaVerifyDto,
+  RegisterDto,
+} from './dto/auth.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Controller('auth')
@@ -27,37 +55,64 @@ export class AuthController {
   ) {}
 
   @Post('register')
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
   async registerUser(
-    @Body() body: { identifiant: string; pseudo: string; password: string },
+    @Body() body: RegisterDto,
+    @Res({ passthrough: true }) res: Response,
   ) {
-    return this.register.execute(body);
+    const result = await this.register.execute(body);
+    return this.attachAuthCookies(res, result);
   }
 
   @Post('login')
-  async loginUser(@Body() body: { identifiant: string; password: string }) {
-    return this.login.execute(body);
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
+  async loginUser(
+    @Body() body: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const result = await this.login.execute(body);
+    return this.attachAuthCookies(res, result);
   }
 
   @Post('refresh')
-  async refresh(@Body() body: { refreshToken: string }) {
-    return this.refreshToken.execute(body);
+  @Throttle({ default: { limit: 30, ttl: 60_000 } })
+  async refresh(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const refreshToken =
+      (req.cookies?.[REFRESH_COOKIE_NAME] as string | undefined) ?? '';
+    const result = await this.refreshToken.execute({ refreshToken });
+    setAuthCookies(res, result.accessToken, result.refreshToken);
+    return toPublicAuthSuccessResponse(result);
   }
 
   @Post('logout')
-  async logoutUser(@Body() body: { refreshToken: string }) {
-    return this.logout.execute(body);
+  async logoutUser(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const refreshToken =
+      (req.cookies?.[REFRESH_COOKIE_NAME] as string | undefined) ?? '';
+    const result = await this.logout.execute({ refreshToken });
+    clearAuthCookies(res);
+    return result;
   }
 
   @Post('mfa/verify')
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
   async verifyMfaCode(
-    @Body() body: { mfaSessionToken: string; totpCode: string },
+    @Body() body: MfaVerifyDto,
+    @Res({ passthrough: true }) res: Response,
   ) {
-    return this.verifyMfa.execute(body);
+    const result = await this.verifyMfa.execute(body);
+    return this.attachAuthCookies(res, result);
   }
 
   /** Configuration MFA pour un compte sensible (session temporaire post-login). */
   @Post('mfa/setup-required')
-  async setupMfaRequired(@Body() body: { mfaSetupSessionToken: string }) {
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
+  async setupMfaRequired(@Body() body: MfaSetupRequiredDto) {
     return this.setupMfa.execute({
       mfaSetupSessionToken: body.mfaSetupSessionToken,
     });
@@ -72,13 +127,16 @@ export class AuthController {
 
   /** Confirmation MFA pour compte sensible — délivre les tokens finaux. */
   @Post('mfa/confirm-required')
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
   async confirmMfaRequired(
-    @Body() body: { mfaSetupSessionToken: string; totpCode: string },
+    @Body() body: MfaConfirmRequiredDto,
+    @Res({ passthrough: true }) res: Response,
   ) {
-    return this.confirmMfa.execute({
+    const result = await this.confirmMfa.execute({
       mfaSetupSessionToken: body.mfaSetupSessionToken,
       totpCode: body.totpCode,
     });
+    return this.attachAuthCookies(res, result);
   }
 
   /** Confirmation MFA volontaire (utilisateur déjà authentifié). */
@@ -86,7 +144,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   async confirmMfaAuthenticated(
     @CurrentUser() user: AuthenticatedUser,
-    @Body() body: { totpCode: string },
+    @Body() body: MfaConfirmDto,
   ) {
     return this.confirmMfa.execute({
       userId: user.id,
@@ -98,7 +156,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   async disableMfaForUser(
     @CurrentUser() user: AuthenticatedUser,
-    @Body() body: { password: string; totpCode: string },
+    @Body() body: MfaDisableDto,
   ) {
     return this.disableMfa.execute({
       userId: user.id,
@@ -111,5 +169,18 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   async me(@CurrentUser() user: AuthenticatedUser) {
     return this.getCurrentUser.execute(user.id);
+  }
+
+  private attachAuthCookies<T>(res: Response, result: T): T | { user: unknown } {
+    if (isAuthSuccessResponse(result as never)) {
+      const success = result as {
+        accessToken: string;
+        refreshToken: string;
+        user: unknown;
+      };
+      setAuthCookies(res, success.accessToken, success.refreshToken);
+      return toPublicAuthSuccessResponse(success as never);
+    }
+    return result;
   }
 }
