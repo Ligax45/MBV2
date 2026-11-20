@@ -1,6 +1,6 @@
 /**
- * Résolution de la connexion PostgreSQL (Supabase ou local).
- * Priorité : DATABASE_URL (URI Supabase) puis DB_HOST / DB_PORT / …
+ * Résolution de la connexion PostgreSQL.
+ * Priorité : DATABASE_URL puis DB_HOST / DB_PORT / …
  */
 
 export interface DbConnectionParams {
@@ -14,7 +14,7 @@ export interface DbResolvedConfig extends DbConnectionParams {
   password: string;
 }
 
-/** Parse DATABASE_URL (Supabase URI) en paramètres explicites pour `pg` / SCRAM. */
+/** Parse DATABASE_URL en paramètres explicites pour `pg` / SCRAM. */
 export function parseDatabaseUrl(url: string): DbResolvedConfig {
   const parsed = new URL(url);
 
@@ -70,38 +70,22 @@ export function resolveEffectivePassword(): string {
   }
 }
 
-export function isSupabaseHost(host: string): boolean {
-  return host.includes('supabase.co');
-}
-
-/** SSL requis pour Supabase (connexion distante). */
+/** SSL uniquement si `DB_SSL=true` ou si l'URI l'exige. */
 export function shouldUseSsl(): boolean {
   const flag = process.env.DB_SSL?.toLowerCase();
   if (flag === 'true' || flag === '1') return true;
   if (flag === 'false' || flag === '0') return false;
 
   const url = resolveDatabaseUrl() ?? '';
-  if (
-    url.includes('supabase.co') ||
-    url.includes('sslmode=require') ||
-    url.includes('ssl=true')
-  ) {
-    return true;
-  }
-
-  const host = process.env.DB_HOST ?? '';
-  return isSupabaseHost(host);
+  return url.includes('sslmode=require') || url.includes('ssl=true');
 }
 
 export function resolveDbConnection(): DbConnectionParams {
-  const host = process.env.DB_HOST ?? 'localhost';
-  const isSupabase = isSupabaseHost(host);
-
   return {
-    host,
+    host: process.env.DB_HOST ?? 'localhost',
     port: Number(process.env.DB_PORT ?? 5432),
     user: process.env.DB_USER ?? 'postgres',
-    dbName: process.env.DB_NAME ?? (isSupabase ? 'postgres' : 'miambookv2_db'),
+    dbName: process.env.DB_NAME ?? 'miambookv2_db',
   };
 }
 

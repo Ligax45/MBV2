@@ -1,3 +1,5 @@
+.env
+
 docs/*
 !docs/conventions.md
 !docs/export-pdf.md

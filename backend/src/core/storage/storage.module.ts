@@ -1,9 +1,11 @@
 import { Global, Module } from '@nestjs/common';
-import { SupabaseStorageService } from './supabase-storage.service';
+import { LocalImageStorageService } from './local-image-storage.service';
+import { MediaController } from './media.controller';
 
 @Global()
 @Module({
-  providers: [SupabaseStorageService],
-  exports: [SupabaseStorageService],
+  controllers: [MediaController],
+  providers: [LocalImageStorageService],
+  exports: [LocalImageStorageService],
 })
 export class StorageModule {}
